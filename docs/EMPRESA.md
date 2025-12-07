@@ -6,11 +6,11 @@ A EcoTransparência é uma iniciativa tecnológica voltada para democratizar o a
 
 ## Missão
 
-Promover a transparência e facilitar o acesso a informações socioambientais e climáticas, capacitando empresas, instituições financeiras e cidadãos a tomarem decisões mais sustentáveis e responsáveis.
+Coletar, unificar e analisar dados abertos brasileiros (sanções ambientais, vulnerabilidades sociais e climáticas) em uma plataforma intuitiva, transformando informações dispersas em scores de risco detalhados para facilitar a responsabilidade e a mitigação.
 
 ## Visão
 
-Ser a principal referência em avaliação de risco socioambiental e climático no Brasil, contribuindo para a construção de uma economia mais sustentável e resiliente através da democratização do acesso à informação.
+Tornar-se a plataforma digital indispensável para o mercado brasileiro, fornecendo scores de risco socioambiental e climático transparentes e acionáveis que guiam as melhores decisões estratégicas.
 
 ## Valores
 

@@ -1,0 +1,154 @@
+<div class="search-container">
+  <header class="search-header">
+    <h1>EcoTransparência</h1>
+    <p>Consulte o score de risco socioambiental e climático de empresas e pessoas físicas</p>
+  </header>
+
+  <!-- CA01 - Search Form -->
+  <form class="search-form" (submit)="onSubmit($event)">
+    <div class="search-input-group">
+      <input
+        type="text"
+        class="search-input"
+        placeholder="Digite o nome, CPF ou CNPJ para consulta"
+        [value]="searchTerm()"
+        (input)="onInputChange($any($event.target).value)"
+        [attr.aria-label]="'Campo de busca'"
+        [attr.aria-describedby]="errorMessage() ? 'error-message' : null"
+      />
+      <button
+        type="submit"
+        class="search-button"
+        [disabled]="isLoading()"
+        aria-label="Pesquisar"
+      >
+        @if (isLoading()) {
+          <span class="loading-spinner"></span>
+          Buscando...
+        } @else {
+          Pesquisar
+        }
+      </button>
+    </div>
+
+    @if (searchTerm()) {
+      <button
+        type="button"
+        class="clear-button"
+        (click)="clearSearch()"
+        aria-label="Limpar busca"
+      >
+        Limpar
+      </button>
+    }
+  </form>
+
+  <!-- Error Message - CA02, CA05, CT17 -->
+  @if (errorMessage()) {
+    <div class="error-message" id="error-message" role="alert">
+      {{ errorMessage() }}
+    </div>
+  }
+
+  <!-- CA13 - Loading Indicator -->
+  @if (isLoading()) {
+    <div class="loading-container" role="status" aria-live="polite">
+      <div class="loading-spinner-large"></div>
+      <p>Buscando informações...</p>
+    </div>
+  }
+
+  <!-- CA12 - No Results Message -->
+  @if (noResultsFound() && !isLoading()) {
+    <div class="no-results" role="status">
+      <p>Nenhum registro encontrado para a entidade pesquisada</p>
+    </div>
+  }
+
+  <!-- Search Results - CA07, CA08, CA10 -->
+  @if (searchResult()?.found && !isLoading()) {
+    <div class="results-container">
+      <!-- Entity Info -->
+      <div class="entity-info">
+        <h2>{{ searchResult()?.entity?.name }}</h2>
+        <p class="document">
+          {{ searchResult()?.entity?.documentType === 'cpf' ? 'CPF' : 'CNPJ' }}:
+          {{ searchResult()?.entity?.document }}
+        </p>
+      </div>
+
+      <!-- CA07 - Score Display with Risk Level -->
+      <div class="score-card" [class]="'risk-' + searchResult()?.scoreResult?.riskLevel?.toLowerCase()">
+        <div class="score-value">
+          <span class="score-number">{{ searchResult()?.scoreResult?.score }}</span>
+          <span class="score-label">Score de Risco</span>
+        </div>
+        <div class="risk-indicator">
+          <span
+            class="risk-badge"
+            [style.background-color]="scoreService.getRiskColor(searchResult()?.scoreResult?.riskLevel!)"
+          >
+            {{ searchResult()?.scoreResult?.riskLevel }}
+          </span>
+          <span class="risk-scale">Escala: 0-100</span>
+        </div>
+      </div>
+
+      <!-- CT18 - Score Components Summary -->
+      <div class="summary-card">
+        <h3>Resumo das Ocorrências</h3>
+        <p class="total-occurrences">
+          Total de ocorrências encontradas:
+          <strong>{{ searchResult()?.scoreResult?.totalOccurrences }}</strong>
+        </p>
+      </div>
+
+      <!-- CA08 - Results by Category -->
+      @if (searchResult()?.scoreResult?.categorySummaries?.length) {
+        <div class="categories-container">
+          <h3>Detalhamento por Categoria</h3>
+
+          @for (category of searchResult()?.scoreResult?.categorySummaries; track category.category) {
+            <div class="category-section">
+              <div class="category-header">
+                <h4>{{ category.category }}</h4>
+                <span class="category-count">{{ category.count }} ocorrência(s)</span>
+              </div>
+
+              <!-- CA09, CA10 - Occurrences ordered chronologically -->
+              <div class="occurrences-list">
+                @for (occurrence of category.occurrences; track occurrence.id) {
+                  <div class="occurrence-card">
+                    <div class="occurrence-header">
+                      <span class="occurrence-date">{{ formatDate(occurrence.date) }}</span>
+                      <span
+                        class="occurrence-status"
+                        [class.status-ativo]="occurrence.status === 'Ativo'"
+                        [class.status-baixado]="occurrence.status === 'Baixado'"
+                      >
+                        {{ occurrence.status }}
+                      </span>
+                    </div>
+                    <p class="occurrence-description">{{ occurrence.description }}</p>
+                    <div class="occurrence-footer">
+                      <span class="occurrence-source">Fonte: {{ occurrence.source }}</span>
+                      <!-- CA11 - Link to original source -->
+                      <a
+                        [href]="occurrence.sourceUrl"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="source-link"
+                      >
+                        Ver fonte original
+                      </a>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+</div>

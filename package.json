@@ -6,7 +6,9 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "test:pact": "ng test --include='**/pact/**/*.spec.ts' --no-watch",
+    "test:pact:watch": "ng test --include='**/pact/**/*.spec.ts'"
   },
   "prettier": {
     "printWidth": 100,
@@ -36,6 +38,8 @@
     "@angular/build": "^21.0.2",
     "@angular/cli": "^21.0.2",
     "@angular/compiler-cli": "^21.0.0",
+    "@pact-foundation/pact": "^16.0.2",
+    "@types/node": "^24.10.1",
     "jsdom": "^27.1.0",
     "typescript": "~5.9.2",
     "vitest": "^4.0.8"

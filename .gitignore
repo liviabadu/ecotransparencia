@@ -28,6 +28,13 @@ yarn-error.log
 !.vscode/extensions.json
 .history/*
 
+# Pact contract files (generated)
+/pacts
+/logs
+
+# Firebase
+.firebase/
+
 # Miscellaneous
 /.angular/cache
 .sass-cache/
