@@ -1,12 +1,12 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
-import { Entity, SearchResult, Occurrence } from '../models/entity.model';
+import { Entity, SearchResult, Occurrence, RiskLevel } from '../models/entity.model';
 import { ScoreService } from './score.service';
 
 /**
  * Interface representing the API response for entity search
- * This defines the contract between frontend and backend
+ * This defines the contract between frontend and backend (V2)
  */
 export interface ApiEntityResponse {
   id: string;
@@ -14,18 +14,91 @@ export interface ApiEntityResponse {
   document: string;
   documentType: 'cpf' | 'cnpj';
   score: number;
-  riskLevel: 'Baixo' | 'Médio' | 'Alto' | 'Crítico';
+  riskLevel: 'Baixo' | 'Medio' | 'Médio' | 'Alto' | 'Critico' | 'Crítico';
   occurrences: ApiOccurrenceResponse[];
+  asgScore?: ApiAsgScore;
+  ocorrencias?: ApiOcorrencias;
 }
 
 export interface ApiOccurrenceResponse {
   id: string;
-  date: string; // ISO date string from API
-  description: string;
-  status: 'Ativo' | 'Baixado';
+  date?: string;
+  description?: string;
+  status?: 'Ativo' | 'Baixado' | 'Lavrado';
   source: string;
-  sourceUrl: string;
-  category: 'Ambiental IBAMA' | 'Ambiental ICMBio' | 'Trabalhista' | 'Administrativo';
+  sourceUrl?: string;
+  category?: 'Ambiental IBAMA' | 'Ambiental ICMBio' | 'Trabalhista' | 'Administrativo';
+  // Geographic and environmental fields
+  location?: {
+    imovel?: string;
+    municipio: string;
+    uf: string;
+  };
+  biome?: string;
+  areaEmbargada?: number;
+  desmatamento?: boolean;
+  autoInfracao?: string;
+}
+
+export interface ApiAsgScoreBreakdown {
+  fonte: string;
+  peso: number;
+  quantidadeOcorrencias: number;
+  score: number;
+  scorePonderado?: number;
+}
+
+export interface ApiAsgScore {
+  score: number;
+  riskLevel: string;
+  totalOcorrencias: number;
+  breakdown: ApiAsgScoreBreakdown[];
+}
+
+export interface ApiEmbargo {
+  id: string;
+  source: string;
+  category?: string;
+  date?: string;
+  description?: string;
+  status?: string;
+  sourceUrl?: string;
+  // Geographic and environmental fields
+  location?: {
+    imovel?: string;
+    municipio: string;
+    uf: string;
+  };
+  biome?: string;
+  areaEmbargada?: number;
+  desmatamento?: boolean;
+  autoInfracao?: string;
+}
+
+export interface ApiAutoInfracao {
+  id: string;
+  source: string;
+  data?: string;
+  descricao?: string;
+  numeroAuto?: string;
+  tipoInfracao?: string;
+  valorMulta?: number;
+  status?: string;
+  // Legal and severity fields
+  location?: {
+    municipio: string;
+    uf: string;
+  };
+  biomasAtingidos?: string;
+  efeitoMeioAmbiente?: string;
+  enquadramentoLegal?: string;
+  gravidade?: string;
+  motivacaoConduta?: string;
+}
+
+export interface ApiOcorrencias {
+  embargos: ApiEmbargo[];
+  autosInfracao: ApiAutoInfracao[];
 }
 
 export interface ApiSearchResponse {
@@ -78,8 +151,13 @@ export class ApiService {
       ...response.entity,
       occurrences: response.entity.occurrences.map((occ) => ({
         ...occ,
-        date: new Date(occ.date),
+        date: occ.date ? new Date(occ.date) : undefined,
       })),
+      asgScore: response.entity.asgScore ? {
+        ...response.entity.asgScore,
+        riskLevel: response.entity.asgScore.riskLevel as RiskLevel,
+      } : undefined,
+      ocorrencias: response.entity.ocorrencias,
     };
 
     const scoreResult = this.scoreService.calculateScoreResult(

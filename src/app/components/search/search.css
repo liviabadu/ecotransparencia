@@ -172,6 +172,7 @@
   border-left-color: green;
 }
 
+.score-card.risk-medio,
 .score-card.risk-médio {
   border-left-color: yellow;
 }
@@ -180,6 +181,7 @@
   border-left-color: orange;
 }
 
+.score-card.risk-critico,
 .score-card.risk-crítico {
   border-left-color: red;
 }
@@ -346,6 +348,335 @@
   text-decoration: underline;
 }
 
+/* ASG Score Card (V2) */
+.asg-score-card {
+  padding: 1.5rem;
+  background-color: #f0f9ff;
+  border: 1px solid #bae6fd;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+}
+
+.asg-score-card h3 {
+  color: #0c4a6e;
+  font-size: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.asg-score-card h4 {
+  color: #075985;
+  font-size: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.asg-summary {
+  padding: 0.75rem;
+  background-color: white;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.asg-summary p {
+  margin: 0;
+  color: #1e3a8a;
+  font-size: 0.9rem;
+}
+
+.breakdown-container {
+  margin-top: 1rem;
+}
+
+.breakdown-item {
+  padding: 1rem;
+  background-color: white;
+  border-left: 4px solid #3b82f6;
+  border-radius: 6px;
+  margin-bottom: 0.75rem;
+}
+
+.breakdown-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.breakdown-fonte {
+  font-weight: 600;
+  color: #1e40af;
+  font-size: 0.95rem;
+}
+
+.breakdown-score {
+  font-weight: 700;
+  color: #1e3a8a;
+  background-color: #dbeafe;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.85rem;
+}
+
+.breakdown-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  font-size: 0.85rem;
+  color: #475569;
+}
+
+.breakdown-percentage {
+  font-weight: 600;
+  color: #0c4a6e;
+}
+
+/* Embargos Container (V2) */
+.embargos-container {
+  margin-bottom: 1.5rem;
+}
+
+.embargos-container h3 {
+  color: #dc2626;
+  font-size: 1.25rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #fca5a5;
+}
+
+.embargos-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.embargo-card {
+  padding: 1rem;
+  background-color: #fef2f2;
+  border-left: 4px solid #dc2626;
+  border-radius: 8px;
+}
+
+.embargo-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.5rem;
+  gap: 0.5rem;
+}
+
+.embargo-badges {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.embargo-date {
+  font-weight: 600;
+  color: #991b1b;
+  font-size: 0.9rem;
+}
+
+.embargo-status {
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.embargo-description {
+  color: #7f1d1d;
+  font-size: 0.9rem;
+  margin-bottom: 0.75rem;
+  line-height: 1.5;
+}
+
+.embargo-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.detail-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: #7f1d1d;
+}
+
+.detail-icon {
+  font-size: 1rem;
+}
+
+.detail-text {
+  color: #991b1b;
+  font-weight: 500;
+}
+
+.embargo-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+}
+
+.embargo-source {
+  color: #991b1b;
+  font-weight: 500;
+}
+
+.embargo-category {
+  color: #7f1d1d;
+  background-color: #fee2e2;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+}
+
+.badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: white;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.badge-desmatamento {
+  background-color: #dc2626;
+}
+
+.badge-biome {
+  background-color: #10b981;
+}
+
+.badge-status {
+  background-color: #3b82f6;
+}
+
+.badge-gravidade {
+  background-color: #dc2626;
+}
+
+/* Autos de Infração Container (V2) */
+.autos-container {
+  margin-bottom: 1.5rem;
+}
+
+.autos-container h3 {
+  color: #ea580c;
+  font-size: 1.25rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #fdba74;
+}
+
+.autos-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.auto-card {
+  padding: 1rem;
+  background-color: #fff7ed;
+  border-left: 4px solid #ea580c;
+  border-radius: 8px;
+}
+
+.auto-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.5rem;
+  gap: 0.5rem;
+}
+
+.auto-badges {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.auto-date {
+  font-weight: 600;
+  color: #9a3412;
+  font-size: 0.9rem;
+}
+
+.auto-numero {
+  font-weight: 600;
+  color: #7c2d12;
+  background-color: #fed7aa;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+}
+
+.auto-description {
+  color: #7c2d12;
+  font-size: 0.9rem;
+  margin-bottom: 0.75rem;
+  line-height: 1.5;
+}
+
+.auto-details-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.auto-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.85rem;
+}
+
+.auto-tipo {
+  color: #9a3412;
+  background-color: #fed7aa;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+.auto-multa {
+  color: #7c2d12;
+  font-weight: 600;
+}
+
+.auto-legal {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  background-color: #ffedd5;
+  border-radius: 6px;
+  margin-bottom: 0.5rem;
+}
+
+.legal-text {
+  color: #7c2d12;
+  font-size: 0.85rem;
+  font-style: italic;
+  font-weight: 500;
+}
+
+.auto-footer {
+  font-size: 0.8rem;
+}
+
+.auto-source {
+  color: #9a3412;
+  font-weight: 500;
+}
+
 /* Responsive */
 @media (max-width: 600px) {
   .search-container {
@@ -385,5 +716,38 @@
     flex-direction: column;
     align-items: flex-start;
     gap: 0.5rem;
+  }
+
+  .breakdown-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .breakdown-details {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .embargo-header,
+  .auto-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .embargo-badges,
+  .auto-badges {
+    width: 100%;
+  }
+
+  .embargo-footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .auto-details-grid {
+    grid-template-columns: 1fr;
   }
 }

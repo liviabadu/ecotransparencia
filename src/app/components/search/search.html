@@ -94,6 +94,44 @@
         </div>
       </div>
 
+      <!-- ASG Score Breakdown (V2 API) -->
+      @if (searchResult()?.entity?.asgScore) {
+        <div class="asg-score-card">
+          <h3>ASG Score Detalhado</h3>
+          <div class="asg-summary">
+            <p>
+              <strong>Score ASG:</strong> {{ searchResult()?.entity?.asgScore?.score }}
+              | <strong>Nível:</strong> {{ searchResult()?.entity?.asgScore?.riskLevel }}
+              | <strong>Total de Ocorrências:</strong> {{ searchResult()?.entity?.asgScore?.totalOcorrencias }}
+            </p>
+          </div>
+
+          @if (searchResult()?.entity?.asgScore?.breakdown?.length) {
+            <div class="breakdown-container">
+              <h4>Composição do Score</h4>
+              @for (item of searchResult()?.entity?.asgScore?.breakdown; track item.fonte) {
+                <div class="breakdown-item">
+                  <div class="breakdown-header">
+                    <span class="breakdown-fonte">{{ item.fonte }}</span>
+                    <span class="breakdown-score">Score: {{ item.score }}</span>
+                  </div>
+                  <div class="breakdown-details">
+                    <span>Ocorrências: {{ item.quantidadeOcorrencias }}</span>
+                    <span>Peso: {{ item.peso }}</span>
+                    @if (item.scorePonderado !== undefined) {
+                      <span>Score Ponderado: {{ item.scorePonderado }}</span>
+                      <span class="breakdown-percentage">
+                        {{ getBreakdownPercentage(item.scorePonderado, searchResult()?.entity?.asgScore?.score || 0) }}% do total
+                      </span>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+
       <!-- CT18 - Score Components Summary -->
       <div class="summary-card">
         <h3>Resumo das Ocorrências</h3>
@@ -102,6 +140,163 @@
           <strong>{{ searchResult()?.scoreResult?.totalOccurrences }}</strong>
         </p>
       </div>
+
+      <!-- Embargos Section (V2 API) -->
+      @if (searchResult()?.entity?.ocorrencias?.embargos?.length) {
+        <div class="embargos-container">
+          <h3>Embargos ({{ searchResult()?.entity?.ocorrencias?.embargos?.length }})</h3>
+          <div class="embargos-list">
+            @for (embargo of searchResult()?.entity?.ocorrencias?.embargos; track embargo.id) {
+              <div class="embargo-card">
+                <div class="embargo-header">
+                  @if (embargo.date) {
+                    <span class="embargo-date">{{ formatDate(embargo.date) }}</span>
+                  }
+                  <div class="embargo-badges">
+                    @if (embargo.status) {
+                      <span
+                        class="embargo-status"
+                        [class.status-ativo]="embargo.status === 'Ativo'"
+                        [class.status-baixado]="embargo.status === 'Baixado'"
+                      >
+                        {{ embargo.status }}
+                      </span>
+                    }
+                    @if (embargo.desmatamento) {
+                      <span class="badge badge-desmatamento">Desmatamento</span>
+                    }
+                    @if (embargo.biome) {
+                      <span class="badge badge-biome" [style.background-color]="getBiomeColor(embargo.biome)">
+                        {{ embargo.biome }}
+                      </span>
+                    }
+                  </div>
+                </div>
+                @if (embargo.description) {
+                  <p class="embargo-description">{{ embargo.description }}</p>
+                }
+                <div class="embargo-details">
+                  @if (embargo.location) {
+                    <div class="detail-item">
+                      <span class="detail-icon">📍</span>
+                      <span class="detail-text">{{ formatLocation(embargo.location) }}</span>
+                    </div>
+                  }
+                  @if (embargo.areaEmbargada) {
+                    <div class="detail-item">
+                      <span class="detail-icon">📊</span>
+                      <span class="detail-text">Área embargada: {{ formatArea(embargo.areaEmbargada) }}</span>
+                    </div>
+                  }
+                  @if (embargo.autoInfracao) {
+                    <div class="detail-item">
+                      <span class="detail-icon">📄</span>
+                      <span class="detail-text">Auto de Infração: {{ embargo.autoInfracao }}</span>
+                    </div>
+                  }
+                </div>
+                <div class="embargo-footer">
+                  <span class="embargo-source">Fonte: {{ embargo.source }}</span>
+                  @if (embargo.sourceUrl) {
+                    <a
+                      [href]="embargo.sourceUrl"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="source-link"
+                    >
+                      Ver fonte original
+                    </a>
+                  }
+                  @if (embargo.category) {
+                    <span class="embargo-category">{{ embargo.category }}</span>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- Autos de Infração Section (V2 API) -->
+      @if (searchResult()?.entity?.ocorrencias?.autosInfracao?.length) {
+        <div class="autos-container">
+          <h3>Autos de Infração ({{ searchResult()?.entity?.ocorrencias?.autosInfracao?.length }})</h3>
+          <div class="autos-list">
+            @for (auto of searchResult()?.entity?.ocorrencias?.autosInfracao; track auto.id) {
+              <div class="auto-card">
+                <div class="auto-header">
+                  @if (auto.data) {
+                    <span class="auto-date">{{ formatDate(auto.data) }}</span>
+                  }
+                  <div class="auto-badges">
+                    @if (auto.numeroAuto) {
+                      <span class="auto-numero">Nº {{ auto.numeroAuto }}</span>
+                    }
+                    @if (auto.status) {
+                      <span class="badge badge-status">{{ auto.status }}</span>
+                    }
+                    @if (auto.gravidade) {
+                      <span class="badge badge-gravidade" [style.background-color]="getGravityColor(auto.gravidade)">
+                        {{ auto.gravidade }}
+                      </span>
+                    }
+                  </div>
+                </div>
+                @if (auto.descricao) {
+                  <p class="auto-description">{{ auto.descricao }}</p>
+                }
+                <div class="auto-details-grid">
+                  @if (auto.location) {
+                    <div class="detail-item">
+                      <span class="detail-icon">📍</span>
+                      <span class="detail-text">{{ formatLocation(auto.location) }}</span>
+                    </div>
+                  }
+                  @if (auto.biomasAtingidos) {
+                    <div class="detail-item">
+                      <span class="detail-icon">🌳</span>
+                      <span class="detail-text">Bioma: {{ auto.biomasAtingidos }}</span>
+                    </div>
+                  }
+                  @if (auto.tipoInfracao) {
+                    <div class="detail-item">
+                      <span class="detail-icon">🌿</span>
+                      <span class="detail-text">Tipo: {{ auto.tipoInfracao }}</span>
+                    </div>
+                  }
+                  @if (auto.efeitoMeioAmbiente) {
+                    <div class="detail-item">
+                      <span class="detail-icon">⚠️</span>
+                      <span class="detail-text">Efeito: {{ auto.efeitoMeioAmbiente }}</span>
+                    </div>
+                  }
+                  @if (auto.valorMulta !== undefined) {
+                    <div class="detail-item">
+                      <span class="detail-icon">💰</span>
+                      <span class="detail-text">Multa: {{ formatCurrency(auto.valorMulta) }}</span>
+                    </div>
+                  }
+                  @if (auto.motivacaoConduta) {
+                    <div class="detail-item">
+                      <span class="detail-icon">🎯</span>
+                      <span class="detail-text">Motivação: {{ auto.motivacaoConduta }}</span>
+                    </div>
+                  }
+                </div>
+                @if (auto.enquadramentoLegal) {
+                  <div class="auto-legal">
+                    <span class="detail-icon">📜</span>
+                    <span class="legal-text">{{ auto.enquadramentoLegal }}</span>
+                  </div>
+                }
+                <div class="auto-footer">
+                  <span class="auto-source">Fonte: {{ auto.source }}</span>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      }
 
       <!-- CA08 - Results by Category -->
       @if (searchResult()?.scoreResult?.categorySummaries?.length) {

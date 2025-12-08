@@ -31,15 +31,15 @@ export class ScoreService {
    * CT09-CT12 - Returns the color associated with a risk level
    */
   getRiskColor(riskLevel: RiskLevel): string {
-    switch (riskLevel) {
-      case 'Baixo':
-        return 'green';
-      case 'Médio':
-        return 'yellow';
-      case 'Alto':
-        return 'orange';
-      case 'Crítico':
-        return 'red';
+    const normalized = riskLevel.toLowerCase();
+    if (normalized === 'baixo') {
+      return 'green';
+    } else if (normalized === 'medio' || normalized === 'médio') {
+      return 'yellow';
+    } else if (normalized === 'alto') {
+      return 'orange';
+    } else {
+      return 'red';
     }
   }
 
@@ -53,6 +53,7 @@ export class ScoreService {
     const categoryMap = new Map<OccurrenceCategory, Occurrence[]>();
 
     for (const occurrence of occurrences) {
+      if (!occurrence.category) continue;
       const existing = categoryMap.get(occurrence.category) || [];
       existing.push(occurrence);
       categoryMap.set(occurrence.category, existing);
@@ -66,9 +67,10 @@ export class ScoreService {
       const categoryOccurrences = categoryMap.get(category);
       if (categoryOccurrences && categoryOccurrences.length > 0) {
         // Sort by date descending (newest first)
-        const sortedOccurrences = [...categoryOccurrences].sort(
-          (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-        );
+        const sortedOccurrences = [...categoryOccurrences].sort((a, b) => {
+          if (!a.date || !b.date) return 0;
+          return new Date(b.date).getTime() - new Date(a.date).getTime();
+        });
 
         categorySummaries.push({
           category,

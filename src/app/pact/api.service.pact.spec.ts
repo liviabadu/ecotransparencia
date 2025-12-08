@@ -5,14 +5,14 @@ import * as path from 'path';
 import { ApiService } from '../services/api.service';
 import { firstValueFrom } from 'rxjs';
 
-const { like, eachLike, integer } = MatchersV3;
+const { like, eachLike, integer, decimal } = MatchersV3;
 
 describe('ApiService Pact Tests', () => {
   let apiService: ApiService;
 
-  // Create a new Pact instance for each test file
+  // Create a new Pact instance for V2
   const provider = new PactV4({
-    consumer: 'EcoTransparenciaFrontend',
+    consumer: 'EcoTransparenciaFrontendV2',
     provider: 'EcoTransparenciaBackend',
     dir: path.resolve(process.cwd(), 'pacts'),
     logLevel: 'warn',
@@ -26,11 +26,11 @@ describe('ApiService Pact Tests', () => {
   });
 
   describe('searchByDocument', () => {
-    it('should return entity when searching by valid CNPJ', async () => {
+    it('should return entity with ASG score when searching by valid CNPJ', async () => {
       await provider
         .addInteraction()
-        .given('an entity with CNPJ 11222333000181 exists')
-        .uponReceiving('a request to search by CNPJ')
+        .given('an entity with CNPJ 11222333000181 has embargos and autos de infracao')
+        .uponReceiving('a request to search by CNPJ expecting ASG score')
         .withRequest('GET', '/api/search/document', (builder) => {
           builder.query({ document: '11222333000181', type: 'cnpj' });
         })
@@ -39,25 +39,52 @@ describe('ApiService Pact Tests', () => {
             found: true,
             entity: {
               id: like('1'),
-              name: like('Empresa Verde Sustentável Ltda'),
+              name: like('Empresa Verde Sustentavel Ltda'),
               document: like('11222333000181'),
               documentType: like('cnpj'),
-              score: integer(15),
-              riskLevel: like('Baixo'),
+              score: integer(45),
+              riskLevel: like('Medio'),
               occurrences: eachLike({
-                id: like('occ-1'),
-                date: like('2023-06-15T00:00:00.000Z'),
-                description: like('Advertência por descarte irregular de resíduos'),
-                status: like('Baixado'),
+                id: like('emb-123'),
                 source: like('IBAMA'),
-                sourceUrl: like('https://ibama.gov.br/consulta/123456'),
                 category: like('Ambiental IBAMA'),
+                status: like('Baixado'),
               }),
+              asgScore: {
+                score: integer(45),
+                riskLevel: like('Medio'),
+                totalOcorrencias: integer(3),
+                breakdown: eachLike({
+                  fonte: like('Embargos IBAMA'),
+                  peso: decimal(0.5),
+                  quantidadeOcorrencias: integer(2),
+                  score: integer(30),
+                  scorePonderado: decimal(15.0),
+                }),
+              },
+              ocorrencias: {
+                embargos: eachLike({
+                  id: like('emb-123'),
+                  source: like('IBAMA'),
+                  category: like('Ambiental IBAMA'),
+                  date: like('2024-01-15T00:00:00.000Z'),
+                  description: like('Embargo por desmatamento ilegal'),
+                  status: like('Baixado'),
+                }),
+                autosInfracao: eachLike({
+                  id: like('auto-456'),
+                  source: like('IBAMA'),
+                  data: like('2024-02-20T10:30:00.000Z'),
+                  descricao: like('Auto de infracao'),
+                  numeroAuto: like('ABCD1234'),
+                  tipoInfracao: like('Fauna'),
+                  valorMulta: decimal(25000.0),
+                }),
+              },
             },
           });
         })
         .executeTest(async (mockServer) => {
-          // Configure the API service to use the mock server
           apiService = TestBed.inject(ApiService);
           (apiService as any).baseUrl = mockServer.url + '/api';
 
@@ -67,17 +94,22 @@ describe('ApiService Pact Tests', () => {
 
           expect(result.found).toBe(true);
           expect(result.entity).toBeDefined();
-          expect(result.entity!.name).toBe('Empresa Verde Sustentável Ltda');
+          expect(result.entity!.name).toBe('Empresa Verde Sustentavel Ltda');
           expect(result.entity!.documentType).toBe('cnpj');
-          expect(result.scoreResult).toBeDefined();
+          expect(result.entity!.asgScore).toBeDefined();
+          expect(result.entity!.asgScore!.score).toBe(45);
+          expect(result.entity!.asgScore!.breakdown.length).toBeGreaterThan(0);
+          expect(result.entity!.ocorrencias).toBeDefined();
+          expect(result.entity!.ocorrencias!.embargos.length).toBeGreaterThan(0);
+          expect(result.entity!.ocorrencias!.autosInfracao.length).toBeGreaterThan(0);
         });
     });
 
-    it('should return entity when searching by valid CPF', async () => {
+    it('should return entity with ASG score when searching by valid CPF', async () => {
       await provider
         .addInteraction()
-        .given('a person with CPF 12345678909 exists')
-        .uponReceiving('a request to search by CPF')
+        .given('a person with CPF 12345678909 has embargos and autos de infracao')
+        .uponReceiving('a request to search by CPF expecting ASG score')
         .withRequest('GET', '/api/search/document', (builder) => {
           builder.query({ document: '12345678909', type: 'cpf' });
         })
@@ -86,20 +118,37 @@ describe('ApiService Pact Tests', () => {
             found: true,
             entity: {
               id: like('5'),
-              name: like('João da Silva Teste'),
+              name: like('Joao da Silva Teste'),
               document: like('12345678909'),
               documentType: like('cpf'),
-              score: integer(35),
-              riskLevel: like('Médio'),
+              score: integer(28),
+              riskLevel: like('Medio'),
               occurrences: eachLike({
-                id: like('occ-16'),
-                date: like('2024-02-15T00:00:00.000Z'),
-                description: like('Auto de infração por pesca ilegal em área protegida'),
-                status: like('Ativo'),
+                id: like('emb-5'),
                 source: like('IBAMA'),
-                sourceUrl: like('https://ibama.gov.br/consulta/890123'),
-                category: like('Ambiental IBAMA'),
               }),
+              asgScore: {
+                score: integer(28),
+                riskLevel: like('Medio'),
+                totalOcorrencias: integer(2),
+                breakdown: eachLike({
+                  fonte: like('Embargos IBAMA'),
+                  peso: decimal(0.5),
+                  quantidadeOcorrencias: integer(1),
+                  score: integer(20),
+                  scorePonderado: decimal(10.0),
+                }),
+              },
+              ocorrencias: {
+                embargos: eachLike({
+                  id: like('emb-5'),
+                  source: like('IBAMA'),
+                }),
+                autosInfracao: eachLike({
+                  id: like('auto-5'),
+                  source: like('IBAMA'),
+                }),
+              },
             },
           });
         })
@@ -113,8 +162,10 @@ describe('ApiService Pact Tests', () => {
 
           expect(result.found).toBe(true);
           expect(result.entity).toBeDefined();
-          expect(result.entity!.name).toBe('João da Silva Teste');
+          expect(result.entity!.name).toBe('Joao da Silva Teste');
           expect(result.entity!.documentType).toBe('cpf');
+          expect(result.entity!.asgScore).toBeDefined();
+          expect(result.entity!.asgScore!.totalOcorrencias).toBe(2);
         });
     });
 
@@ -146,11 +197,11 @@ describe('ApiService Pact Tests', () => {
   });
 
   describe('searchByName', () => {
-    it('should return entity when searching by name', async () => {
+    it('should return entity with ASG score when searching by name', async () => {
       await provider
         .addInteraction()
-        .given('an entity with name containing "Empresa Verde" exists')
-        .uponReceiving('a request to search by name')
+        .given('an entity with name containing "Empresa Verde" has multiple occurrences')
+        .uponReceiving('a request to search by name expecting ASG score')
         .withRequest('GET', '/api/search/name', (builder) => {
           builder.query({ name: 'Empresa Verde' });
         })
@@ -159,20 +210,37 @@ describe('ApiService Pact Tests', () => {
             found: true,
             entity: {
               id: like('1'),
-              name: like('Empresa Verde Sustentável Ltda'),
+              name: like('Empresa Verde Sustentavel Ltda'),
               document: like('11222333000181'),
               documentType: like('cnpj'),
-              score: integer(15),
-              riskLevel: like('Baixo'),
+              score: integer(45),
+              riskLevel: like('Medio'),
               occurrences: eachLike({
-                id: like('occ-1'),
-                date: like('2023-06-15T00:00:00.000Z'),
-                description: like('Advertência por descarte irregular de resíduos'),
-                status: like('Baixado'),
+                id: like('emb-1'),
                 source: like('IBAMA'),
-                sourceUrl: like('https://ibama.gov.br/consulta/123456'),
-                category: like('Ambiental IBAMA'),
               }),
+              asgScore: {
+                score: integer(45),
+                riskLevel: like('Medio'),
+                totalOcorrencias: integer(3),
+                breakdown: eachLike({
+                  fonte: like('Embargos IBAMA'),
+                  peso: decimal(0.5),
+                  quantidadeOcorrencias: integer(2),
+                  score: integer(30),
+                  scorePonderado: decimal(15.0),
+                }),
+              },
+              ocorrencias: {
+                embargos: eachLike({
+                  id: like('emb-1'),
+                  source: like('IBAMA'),
+                }),
+                autosInfracao: eachLike({
+                  id: like('auto-1'),
+                  source: like('IBAMA'),
+                }),
+              },
             },
           });
         })
@@ -187,6 +255,7 @@ describe('ApiService Pact Tests', () => {
           expect(result.found).toBe(true);
           expect(result.entity).toBeDefined();
           expect(result.entity!.name).toContain('Verde');
+          expect(result.entity!.asgScore).toBeDefined();
         });
     });
 
@@ -218,11 +287,11 @@ describe('ApiService Pact Tests', () => {
   });
 
   describe('entity with critical risk level', () => {
-    it('should return entity with multiple occurrences and critical risk', async () => {
+    it('should return entity with critical ASG score and multiple breakdowns', async () => {
       await provider
         .addInteraction()
-        .given('an entity with critical risk level exists')
-        .uponReceiving('a request to search entity with critical risk')
+        .given('an entity with critical risk has many embargos and autos de infracao')
+        .uponReceiving('a request to search entity with critical ASG risk')
         .withRequest('GET', '/api/search/document', (builder) => {
           builder.query({ document: '44555666000181', type: 'cnpj' });
         })
@@ -230,24 +299,43 @@ describe('ApiService Pact Tests', () => {
           builder.jsonBody({
             found: true,
             entity: {
-              id: like('4'),
+              id: like('8'),
               name: like('Mineradora Vermelha S.A.'),
               document: like('44555666000181'),
               documentType: like('cnpj'),
-              score: integer(89),
-              riskLevel: like('Crítico'),
-              occurrences: eachLike(
-                {
-                  id: like('occ-8'),
-                  date: like('2024-06-01T00:00:00.000Z'),
-                  description: like('Embargo total de atividades por contaminação'),
-                  status: like('Ativo'),
+              score: integer(92),
+              riskLevel: like('Critico'),
+              occurrences: eachLike({
+                id: like('emb-critical'),
+                source: like('IBAMA'),
+              }),
+              asgScore: {
+                score: integer(92),
+                riskLevel: like('Critico'),
+                totalOcorrencias: integer(8),
+                breakdown: eachLike(
+                  {
+                    fonte: like('Embargos IBAMA'),
+                    peso: decimal(0.5),
+                    quantidadeOcorrencias: integer(4),
+                    score: integer(100),
+                    scorePonderado: decimal(50.0),
+                  },
+                  2
+                ),
+              },
+              ocorrencias: {
+                embargos: eachLike({
+                  id: like('emb-critical'),
                   source: like('IBAMA'),
-                  sourceUrl: like('https://ibama.gov.br/consulta/456780'),
                   category: like('Ambiental IBAMA'),
-                },
-                1 // Minimum of 1 occurrence
-              ),
+                }),
+                autosInfracao: eachLike({
+                  id: like('auto-critical'),
+                  source: like('IBAMA'),
+                  tipoInfracao: like('Flora'),
+                }),
+              },
             },
           });
         })
@@ -261,8 +349,10 @@ describe('ApiService Pact Tests', () => {
 
           expect(result.found).toBe(true);
           expect(result.entity).toBeDefined();
-          expect(result.entity!.score).toBe(89);
-          expect(result.scoreResult!.riskLevel).toBe('Crítico');
+          expect(result.entity!.score).toBe(92);
+          expect(result.entity!.asgScore).toBeDefined();
+          expect(result.entity!.asgScore!.riskLevel).toBe('Critico');
+          expect(result.entity!.asgScore!.breakdown.length).toBeGreaterThanOrEqual(2);
         });
     });
   });
