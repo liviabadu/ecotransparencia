@@ -1,0 +1,298 @@
+<!-- Skip Link para Acessibilidade -->
+<a href="#main-content" class="skip-link">Pular para o conteúdo</a>
+
+<!-- ========== HEADER ========== -->
+<header class="header">
+  <div class="header-inner">
+    <!-- Logo -->
+    <div class="logo-container">
+      <a routerLink="/" class="logo-link">
+        <div class="logo-box">
+          <span class="logo-text">eco</span>
+          <span class="logo-sub">TRANSPARÊNCIA</span>
+        </div>
+      </a>
+    </div>
+
+    <!-- Navegação -->
+    <nav class="nav-menu" aria-label="Menu principal">
+      <a routerLink="/" class="nav-btn">
+        ← Voltar para Home
+      </a>
+    </nav>
+  </div>
+</header>
+
+<!-- ========== MAIN CONTENT ========== -->
+<main id="main-content" class="main-content">
+  <article class="methodology-article">
+    <div class="container">
+      <!-- Título Principal -->
+      <header class="article-header">
+        <h1 class="article-title">Metodologia de Cálculo de Score</h1>
+        <p class="article-intro">
+          Este documento descreve a metodologia utilizada pela plataforma EcoTransparência para calcular
+          o score de risco socioambiental das entidades consultadas.
+        </p>
+      </header>
+
+      <!-- Escala de Score -->
+      <section class="section">
+        <h2 class="section-title">Escala de Score</h2>
+        <p class="section-text">
+          O score de risco é apresentado em uma escala de <strong>0 a 100 pontos</strong>,
+          onde valores mais altos indicam maior risco. A escala é dividida em quatro níveis:
+        </p>
+
+        <div class="risk-levels-grid">
+          <div class="risk-card risk-baixo">
+            <div class="risk-range">0 - 25</div>
+            <div class="risk-name">Baixo</div>
+            <p class="risk-desc">
+              Pouco ou nenhum registro de ocorrências. Indica histórico positivo de conformidade socioambiental.
+            </p>
+          </div>
+
+          <div class="risk-card risk-medio">
+            <div class="risk-range">26 - 50</div>
+            <div class="risk-name">Médio</div>
+            <p class="risk-desc">
+              Algumas ocorrências de menor gravidade ou já regularizadas. Recomenda-se atenção e monitoramento.
+            </p>
+          </div>
+
+          <div class="risk-card risk-alto">
+            <div class="risk-range">51 - 75</div>
+            <div class="risk-name">Alto</div>
+            <p class="risk-desc">
+              Múltiplas ocorrências ativas ou de maior gravidade. Necessita avaliação detalhada antes de decisões.
+            </p>
+          </div>
+
+          <div class="risk-card risk-critico">
+            <div class="risk-range">76 - 100</div>
+            <div class="risk-name">Crítico</div>
+            <p class="risk-desc">
+              Histórico grave de infrações com múltiplas ocorrências ativas. Alto risco para operações.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Fontes de Dados -->
+      <section class="section">
+        <h2 class="section-title">Fontes de Dados e Categorias</h2>
+        <p class="section-text">
+          O score é calculado a partir de dados consolidados de múltiplas fontes governamentais oficiais:
+        </p>
+
+        <div class="sources-grid">
+          <div class="source-card">
+            <div class="source-icon">🌿</div>
+            <h3 class="source-title">Ambiental IBAMA</h3>
+            <p class="source-desc">
+              Dados do Instituto Brasileiro do Meio Ambiente: embargos e autos de infração
+              por descumprimento de legislação ambiental.
+            </p>
+          </div>
+
+          <div class="source-card">
+            <div class="source-icon">🦜</div>
+            <h3 class="source-title">Ambiental ICMBio</h3>
+            <p class="source-desc">
+              Dados do Instituto Chico Mendes: processos administrativos e autos de infração
+              em áreas protegidas e unidades de conservação.
+            </p>
+          </div>
+
+          <div class="source-card">
+            <div class="source-icon">👷</div>
+            <h3 class="source-title">Trabalhista</h3>
+            <p class="source-desc">
+              Dados do Ministério do Trabalho: inclusão na Lista Suja do Trabalho Escravo
+              e autuações por condições de trabalho degradantes.
+            </p>
+          </div>
+
+          <div class="source-card">
+            <div class="source-icon">📋</div>
+            <h3 class="source-title">Administrativo</h3>
+            <p class="source-desc">
+              Dados do Portal de Dados Abertos: cadastro de empresas impedidas de contratar
+              com a administração pública e sanções vigentes.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Metodologia de Cálculo -->
+      <section class="section">
+        <h2 class="section-title">Metodologia de Cálculo</h2>
+
+        <div class="methodology-box">
+          <h3 class="methodology-subtitle">Composição do Score ASG</h3>
+          <p class="section-text">
+            O score ASG (Ambiental, Social e Governança) é calculado considerando:
+          </p>
+          <ul class="methodology-list">
+            <li><strong>Quantidade de Ocorrências:</strong> Número total de registros em cada fonte</li>
+            <li><strong>Peso da Fonte:</strong> Cada fonte possui um peso específico na composição</li>
+            <li><strong>Score por Fonte:</strong> Pontuação baseada na quantidade e gravidade</li>
+            <li><strong>Score Ponderado:</strong> Score da fonte multiplicado pelo seu peso</li>
+          </ul>
+
+          <div class="formula-box">
+            <p class="formula-title">Fórmula do Score Ponderado:</p>
+            <code class="formula">Score Ponderado = Score da Fonte × Peso da Fonte</code>
+          </div>
+
+          <p class="section-text">
+            O score final é a soma dos scores ponderados de todas as fontes, normalizado para a escala de 0 a 100.
+          </p>
+        </div>
+
+        <div class="factors-box">
+          <h3 class="methodology-subtitle">Fatores Considerados</h3>
+          <p class="section-text">Para cada ocorrência, são considerados os seguintes fatores quando disponíveis:</p>
+          <ul class="factors-list">
+            <li><span class="factor-icon">📅</span> <strong>Data da Ocorrência:</strong> Ocorrências mais recentes têm maior impacto</li>
+            <li><span class="factor-icon">📊</span> <strong>Status:</strong> Ocorrências ativas pesam mais que regularizadas</li>
+            <li><span class="factor-icon">⚠️</span> <strong>Gravidade:</strong> Quando informada, influencia diretamente o score</li>
+            <li><span class="factor-icon">📐</span> <strong>Área Afetada:</strong> Para embargos, a extensão da área é considerada</li>
+            <li><span class="factor-icon">💰</span> <strong>Valor da Multa:</strong> Valores maiores indicam maior gravidade</li>
+            <li><span class="factor-icon">🌳</span> <strong>Bioma:</strong> Infrações em biomas protegidos podem ter peso adicional</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Exemplo de Cálculo -->
+      <section class="section">
+        <h2 class="section-title">Exemplo de Cálculo</h2>
+        <p class="section-text">Considere uma empresa com as seguintes ocorrências:</p>
+
+        <div class="example-table-container">
+          <table class="example-table">
+            <thead>
+              <tr>
+                <th>Fonte</th>
+                <th>Ocorrências</th>
+                <th>Peso</th>
+                <th>Score Fonte</th>
+                <th>Score Ponderado</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>IBAMA</td>
+                <td>2</td>
+                <td>0.4</td>
+                <td>30</td>
+                <td>12</td>
+              </tr>
+              <tr>
+                <td>ICMBio</td>
+                <td>1</td>
+                <td>0.3</td>
+                <td>20</td>
+                <td>6</td>
+              </tr>
+              <tr>
+                <td>Trabalhista</td>
+                <td>0</td>
+                <td>0.2</td>
+                <td>0</td>
+                <td>0</td>
+              </tr>
+              <tr>
+                <td>Administrativo</td>
+                <td>1</td>
+                <td>0.1</td>
+                <td>25</td>
+                <td>2.5</td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr>
+                <td colspan="4"><strong>Score Final:</strong></td>
+                <td><strong>20.5</strong></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+
+        <div class="example-result">
+          <p>
+            <strong>Resultado:</strong> Score Final de <span class="score-highlight">20.5</span>
+            → Nível de Risco: <span class="risk-badge-baixo">Baixo</span>
+          </p>
+        </div>
+      </section>
+
+      <!-- Limitações -->
+      <section class="section">
+        <h2 class="section-title">Limitações e Considerações</h2>
+
+        <div class="limitations-grid">
+          <div class="limitation-card">
+            <h3 class="limitation-title">📂 Dados Públicos</h3>
+            <p class="limitation-text">
+              O score é calculado exclusivamente com base em dados públicos disponíveis em portais governamentais.
+              Informações não publicadas ou em sigilo não são consideradas.
+            </p>
+          </div>
+
+          <div class="limitation-card">
+            <h3 class="limitation-title">🔄 Atualização</h3>
+            <p class="limitation-text">
+              Os dados são atualizados periodicamente conforme a disponibilidade das fontes oficiais.
+              A data da consulta deve ser considerada ao interpretar os resultados.
+            </p>
+          </div>
+
+          <div class="limitation-card">
+            <h3 class="limitation-title">📋 Uso Recomendado</h3>
+            <p class="limitation-text">
+              O score deve ser utilizado como ferramenta de apoio à decisão, não como único critério.
+              Recomenda-se verificar os detalhes das ocorrências individualmente.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Call to Action -->
+      <section class="cta-section">
+        <h2 class="cta-title">Pronto para consultar?</h2>
+        <p class="cta-text">
+          Utilize nossa ferramenta de busca para consultar o score de risco de empresas brasileiras.
+        </p>
+        <a routerLink="/" class="cta-button">
+          Fazer uma Consulta
+        </a>
+      </section>
+    </div>
+  </article>
+</main>
+
+<!-- ========== FOOTER ========== -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div class="footer-logo">
+        <span class="logo-text-small">eco</span>
+        <span class="logo-sub-small">TRANSPARÊNCIA</span>
+      </div>
+      <p class="footer-tagline">Transparência socioambiental ao seu alcance</p>
+    </div>
+
+    <div class="footer-links">
+      <a href="#" class="footer-link">Termos de Uso</a>
+      <a href="#" class="footer-link">Política de Privacidade</a>
+      <a href="#" class="footer-link">Contato</a>
+      <a href="#" class="footer-link">Acessibilidade</a>
+    </div>
+
+    <div class="footer-copy">
+      <p>&copy; 2025 EcoTransparência. Todos os direitos reservados.</p>
+    </div>
+  </div>
+</footer>

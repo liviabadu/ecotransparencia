@@ -1,5 +1,7 @@
 # EcoTransparência
 
+**Acesse a aplicação:** https://ecotransparencia-d786e.web.app
+
 ## Visão Geral
 
 A **EcoTransparência** é uma plataforma digital inovadora que consolida dados públicos sobre responsabilidade socioambiental e riscos climáticos, fornecendo um score detalhado e preciso para empresas.

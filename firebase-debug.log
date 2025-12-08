@@ -1,0 +1,23 @@
+[debug] [2025-12-08T20:54:57.566Z] ----------------------------------------------------------------------
+[debug] [2025-12-08T20:54:57.577Z] Command:       /usr/local/bin/firebase /Users/lucaslinard/.cache/firebase/tools/lib/node_modules/firebase-tools/lib/bin/firebase init
+[debug] [2025-12-08T20:54:57.577Z] CLI Version:   14.23.0
+[debug] [2025-12-08T20:54:57.577Z] Platform:      darwin
+[debug] [2025-12-08T20:54:57.577Z] Node Version:  v20.18.2
+[debug] [2025-12-08T20:54:57.577Z] Time:          Mon Dec 08 2025 17:54:57 GMT-0300 (Brasilia Standard Time)
+[debug] [2025-12-08T20:54:57.578Z] ----------------------------------------------------------------------
+[debug] 
+[info] 
+     ######## #### ########  ######## ########     ###     ######  ########
+     ##        ##  ##     ## ##       ##     ##  ##   ##  ##       ##
+     ######    ##  ########  ######   ########  #########  ######  ######
+     ##        ##  ##    ##  ##       ##     ## ##     ##       ## ##
+     ##       #### ##     ## ######## ########  ##     ##  ######  ########
+
+You're about to initialize a Firebase project in this directory:
+
+  /Users/lucaslinard/WebstormProjects/ecotransparencia
+
+Before we get started, keep in mind:
+
+  * You are initializing within an existing Firebase project directory
+

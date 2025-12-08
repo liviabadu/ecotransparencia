@@ -1,10 +1,11 @@
 import { Component } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { Search } from '../../components/search/search';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [Search],
+  imports: [Search, RouterLink],
   templateUrl: './home.html',
   styleUrl: './home.css',
 })
