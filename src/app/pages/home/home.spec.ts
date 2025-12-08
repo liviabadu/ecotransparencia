@@ -14,11 +14,12 @@ describe('Home', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should render EcoTransparência title in search component', async () => {
+  it('should render hero title', async () => {
     const fixture = TestBed.createComponent(Home);
     await fixture.whenStable();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('EcoTransparência');
+    expect(compiled.querySelector('h1')?.textContent).toContain('Transparência');
+    expect(compiled.querySelector('h1')?.textContent).toContain('Socioambiental');
   });
 
   it('should render the search component', async () => {

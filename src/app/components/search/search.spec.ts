@@ -179,57 +179,29 @@ describe('Search', () => {
       expect(searchButton).toBeTruthy();
     });
 
-    it('should have placeholder text in search input', () => {
+    it('should have placeholder text for CNPJ in search input', () => {
       const compiled = fixture.nativeElement as HTMLElement;
       const searchInput = compiled.querySelector('input[type="text"]') as HTMLInputElement;
-      expect(searchInput.placeholder).toContain('nome');
-    });
-  });
-
-  // CA02 - Validação de Nome com Mínimo de Caracteres
-  describe('CA02 - Name validation', () => {
-    it('should show error for name with less than 3 characters', async () => {
-      component.searchTerm.set('AB');
-      await component.onSearch();
-      fixture.detectChanges();
-
-      expect(component.errorMessage()).toBe(
-        'Informe pelo menos 3 caracteres para realizar a busca'
-      );
-    });
-
-    it('should not show error for name with 3 or more characters', async () => {
-      component.searchTerm.set('ABC');
-      const searchPromise = component.onSearch();
-
-      const req = httpMock.expectOne((request) => request.url.includes('/api/search/name'));
-      req.flush({ found: false });
-
-      await searchPromise;
-      fixture.detectChanges();
-
-      expect(component.errorMessage()).not.toBe(
-        'Informe pelo menos 3 caracteres para realizar a busca'
-      );
+      expect(searchInput.placeholder).toContain('CNPJ');
     });
   });
 
   // CA05 - Mensagem de Erro para Documento Inválido
   describe('CA05 - Invalid document error', () => {
-    it('should show error for invalid CPF', async () => {
-      component.searchTerm.set('123.456.789-00');
-      await component.onSearch();
-      fixture.detectChanges();
-
-      expect(component.errorMessage()).toBe('CPF inválido. Verifique os dígitos informados.');
-    });
-
     it('should show error for invalid CNPJ', async () => {
       component.searchTerm.set('12.345.678/0001-00');
       await component.onSearch();
       fixture.detectChanges();
 
       expect(component.errorMessage()).toBe('CNPJ inválido. Verifique os dígitos informados.');
+    });
+
+    it('should show error for incomplete CNPJ', async () => {
+      component.searchTerm.set('12.345.678/0001');
+      await component.onSearch();
+      fixture.detectChanges();
+
+      expect(component.errorMessage()).toBe('Informe um CNPJ válido (14 dígitos)');
     });
   });
 
@@ -240,7 +212,7 @@ describe('Search', () => {
       await component.onSearch();
       fixture.detectChanges();
 
-      expect(component.errorMessage()).toBe('Informe um nome, CPF ou CNPJ para realizar a busca');
+      expect(component.errorMessage()).toBe('Informe o CNPJ para realizar a busca');
     });
 
     it('should show error for whitespace only search', async () => {
@@ -248,7 +220,7 @@ describe('Search', () => {
       await component.onSearch();
       fixture.detectChanges();
 
-      expect(component.errorMessage()).toBe('Informe um nome, CPF ou CNPJ para realizar a busca');
+      expect(component.errorMessage()).toBe('Informe o CNPJ para realizar a busca');
     });
   });
 
@@ -289,11 +261,11 @@ describe('Search', () => {
   // CA12 - Mensagem para Nenhum Resultado
   describe('CA12 - No results message', () => {
     it('should show message when no results found', async () => {
-      component.searchTerm.set('Entidade Inexistente XYZ');
+      component.searchTerm.set('99.999.999/0001-91');
       const searchPromise = component.onSearch();
 
       const req = httpMock.expectOne((request) =>
-        request.url.includes('/api/search/name')
+        request.url.includes('/api/search/document')
       );
       req.flush({ found: false });
 
@@ -307,7 +279,7 @@ describe('Search', () => {
   // CA13 - Feedback Visual Durante Processamento
   describe('CA13 - Loading indicator', () => {
     it('should set loading to true when search starts', async () => {
-      component.searchTerm.set('Empresa Verde');
+      component.searchTerm.set('11.222.333/0001-81');
 
       // Start search but don't await yet
       const searchPromise = component.onSearch();
@@ -316,9 +288,9 @@ describe('Search', () => {
       expect(component.isLoading()).toBe(true);
 
       const req = httpMock.expectOne((request) =>
-        request.url.includes('/api/search/name')
+        request.url.includes('/api/search/document')
       );
-      req.flush(mockNameSearch['Empresa Verde']);
+      req.flush(mockEntities['11222333000181']);
 
       // Wait for completion
       await searchPromise;
@@ -340,40 +312,8 @@ describe('Search', () => {
     });
   });
 
-  // Integration tests for different entities
+  // Integration tests for different entities (CNPJ only)
   describe('Search integration tests', () => {
-    it('should find João da Silva by CPF', async () => {
-      component.searchTerm.set('123.456.789-09');
-      const searchPromise = component.onSearch();
-
-      const req = httpMock.expectOne((request) =>
-        request.url.includes('/api/search/document')
-      );
-      req.flush(mockEntities['12345678909']);
-
-      await searchPromise;
-      fixture.detectChanges();
-
-      expect(component.searchResult()?.found).toBe(true);
-      expect(component.searchResult()?.entity?.name).toBe('João da Silva Teste');
-    });
-
-    it('should find entity by name search', async () => {
-      component.searchTerm.set('Mineradora Vermelha');
-      const searchPromise = component.onSearch();
-
-      const req = httpMock.expectOne((request) =>
-        request.url.includes('/api/search/name')
-      );
-      req.flush(mockNameSearch['Mineradora Vermelha']);
-
-      await searchPromise;
-      fixture.detectChanges();
-
-      expect(component.searchResult()?.found).toBe(true);
-      expect(component.searchResult()?.entity?.score).toBe(89);
-    });
-
     it('should find Empresa Verde by CNPJ', async () => {
       component.searchTerm.set('11.222.333/0001-81');
       const searchPromise = component.onSearch();
@@ -510,42 +450,25 @@ describe('Search', () => {
     });
   });
 
-  // Input masking for CPF/CNPJ
+  // Input masking for CNPJ
   describe('Input masking', () => {
-    describe('CPF mask', () => {
-      it('should apply CPF mask when entering 11 digits', () => {
-        component.onInputChange('12345678909');
-        expect(component.searchTerm()).toBe('123.456.789-09');
-      });
-
-      it('should apply partial CPF mask for partial input', () => {
-        component.onInputChange('1234');
-        expect(component.searchTerm()).toBe('123.4');
-      });
-
-      it('should apply partial CPF mask for 7 digits', () => {
-        component.onInputChange('1234567');
-        expect(component.searchTerm()).toBe('123.456.7');
-      });
-
-      it('should apply partial CPF mask for 10 digits', () => {
-        component.onInputChange('1234567890');
-        expect(component.searchTerm()).toBe('123.456.789-0');
-      });
-
-      it('should maintain mask when input already has mask', () => {
-        component.onInputChange('123.456.789-09');
-        expect(component.searchTerm()).toBe('123.456.789-09');
-      });
-    });
-
     describe('CNPJ mask', () => {
       it('should apply CNPJ mask when entering 14 digits', () => {
         component.onInputChange('12345678000195');
         expect(component.searchTerm()).toBe('12.345.678/0001-95');
       });
 
-      it('should apply CNPJ mask for 12 digits (transition from CPF to CNPJ)', () => {
+      it('should apply partial CNPJ mask for partial input', () => {
+        component.onInputChange('1234');
+        expect(component.searchTerm()).toBe('12.34');
+      });
+
+      it('should apply partial CNPJ mask for 8 digits', () => {
+        component.onInputChange('12345678');
+        expect(component.searchTerm()).toBe('12.345.678');
+      });
+
+      it('should apply partial CNPJ mask for 12 digits', () => {
         component.onInputChange('123456780001');
         expect(component.searchTerm()).toBe('12.345.678/0001');
       });
@@ -561,7 +484,7 @@ describe('Search', () => {
       });
     });
 
-    describe('Name input (no mask)', () => {
+    describe('Non-numeric input', () => {
       it('should not apply mask to text input', () => {
         component.onInputChange('Empresa Teste');
         expect(component.searchTerm()).toBe('Empresa Teste');
@@ -579,45 +502,13 @@ describe('Search', () => {
     });
 
     describe('Integration with search input', () => {
-      it('should update input value with mask via template', async () => {
-        const compiled = fixture.nativeElement as HTMLElement;
-        const searchInput = compiled.querySelector('input[type="text"]') as HTMLInputElement;
-
+      it('should update input value with CNPJ mask via template', async () => {
         // Simulate user typing digits
-        component.onInputChange('12345678909');
+        component.onInputChange('11222333000181');
         fixture.detectChanges();
 
         // The value binding should show the masked value
-        expect(component.searchTerm()).toBe('123.456.789-09');
-      });
-
-      it('should validate masked CPF correctly on search', async () => {
-        component.onInputChange('12345678909');
-        fixture.detectChanges();
-
-        const searchPromise = component.onSearch();
-
-        const req = httpMock.expectOne((request) =>
-          request.url.includes('/api/search/document')
-        );
-        req.flush(mockEntities['12345678909']);
-
-        await searchPromise;
-        fixture.detectChanges();
-
-        // Should find the person with valid CPF
-        expect(component.searchResult()?.found).toBe(true);
-        expect(component.searchResult()?.entity?.name).toBe('João da Silva Teste');
-      });
-
-      it('should show error for invalid masked CPF on search', async () => {
-        component.onInputChange('12345678900');
-        fixture.detectChanges();
-
-        await component.onSearch();
-        fixture.detectChanges();
-
-        expect(component.errorMessage()).toBe('CPF inválido. Verifique os dígitos informados.');
+        expect(component.searchTerm()).toBe('11.222.333/0001-81');
       });
 
       it('should validate masked CNPJ correctly on search', async () => {
@@ -636,6 +527,16 @@ describe('Search', () => {
 
         expect(component.searchResult()?.found).toBe(true);
         expect(component.searchResult()?.entity?.name).toBe('Empresa Verde Sustentável Ltda');
+      });
+
+      it('should show error for invalid masked CNPJ on search', async () => {
+        component.onInputChange('12345678000100');
+        fixture.detectChanges();
+
+        await component.onSearch();
+        fixture.detectChanges();
+
+        expect(component.errorMessage()).toBe('CNPJ inválido. Verifique os dígitos informados.');
       });
     });
   });

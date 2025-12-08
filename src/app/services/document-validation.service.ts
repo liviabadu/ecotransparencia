@@ -187,6 +187,44 @@ export class DocumentValidationService {
   }
 
   /**
+   * Validates input as CNPJ only
+   * Returns validation result with error messages for CNPJ-only search
+   */
+  validateCnpjOnly(input: string): ValidationResult {
+    const trimmed = input.trim();
+
+    // Check for empty input
+    if (trimmed.length === 0) {
+      return {
+        isValid: false,
+        type: 'cnpj',
+        errorMessage: 'Informe o CNPJ para realizar a busca',
+      };
+    }
+
+    // Check if it looks like a CNPJ (14 digits or formatted)
+    const stripped = this.stripMask(trimmed);
+    if (stripped.length !== 14 || !/^\d+$/.test(stripped)) {
+      return {
+        isValid: false,
+        type: 'cnpj',
+        errorMessage: 'Informe um CNPJ válido (14 dígitos)',
+      };
+    }
+
+    // Validate CNPJ check digits
+    if (this.validateCNPJ(trimmed)) {
+      return { isValid: true, type: 'cnpj' };
+    }
+
+    return {
+      isValid: false,
+      type: 'cnpj',
+      errorMessage: 'CNPJ inválido. Verifique os dígitos informados.',
+    };
+  }
+
+  /**
    * Removes mask characters from CPF/CNPJ
    */
   stripMask(input: string): string {
@@ -251,12 +289,23 @@ export class DocumentValidationService {
 
   /**
    * Applies CNPJ mask: XX.XXX.XXX/XXXX-XX
+   * Public method for CNPJ-only masking
    */
-  private applyCNPJMask(digits: string): string {
-    const d = digits.substring(0, 14); // Limit to 14 digits
+  applyCNPJMask(input: string): string {
+    if (!input) {
+      return '';
+    }
+
+    // Extract only digits
+    const digits = input.replace(/\D/g, '').substring(0, 14); // Limit to 14 digits
+
+    if (digits.length === 0) {
+      return '';
+    }
+
     let result = '';
 
-    for (let i = 0; i < d.length; i++) {
+    for (let i = 0; i < digits.length; i++) {
       if (i === 2 || i === 5) {
         result += '.';
       } else if (i === 8) {
@@ -264,7 +313,7 @@ export class DocumentValidationService {
       } else if (i === 12) {
         result += '-';
       }
-      result += d[i];
+      result += digits[i];
     }
 
     return result;

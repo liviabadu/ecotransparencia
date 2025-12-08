@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component } from '@angular/core';
 import { Search } from '../../components/search/search';
 
 @Component({
@@ -9,5 +9,13 @@ import { Search } from '../../components/search/search';
   styleUrl: './home.css',
 })
 export class Home {
-  protected readonly title = signal('EcoTransparência');
+  /**
+   * Scroll suave para seção
+   */
+  scrollToSection(sectionId: string): void {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
 }

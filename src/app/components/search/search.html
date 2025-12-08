@@ -1,20 +1,16 @@
 <div class="search-container">
-  <header class="search-header">
-    <h1>EcoTransparência</h1>
-    <p>Consulte o score de risco socioambiental e climático de empresas e pessoas físicas</p>
-  </header>
-
   <!-- CA01 - Search Form -->
   <form class="search-form" (submit)="onSubmit($event)">
     <div class="search-input-group">
       <input
         type="text"
         class="search-input"
-        placeholder="Digite o nome, CPF ou CNPJ para consulta"
+        placeholder="Digite o CNPJ da empresa"
         [value]="searchTerm()"
         (input)="onInputChange($any($event.target).value)"
-        [attr.aria-label]="'Campo de busca'"
+        [attr.aria-label]="'Campo de busca por CNPJ'"
         [attr.aria-describedby]="errorMessage() ? 'error-message' : null"
+        maxlength="18"
       />
       <button
         type="submit"
@@ -72,8 +68,7 @@
       <div class="entity-info">
         <h2>{{ searchResult()?.entity?.name }}</h2>
         <p class="document">
-          {{ searchResult()?.entity?.documentType === 'cpf' ? 'CPF' : 'CNPJ' }}:
-          {{ searchResult()?.entity?.document }}
+          CNPJ: {{ searchResult()?.entity?.document }}
         </p>
       </div>
 

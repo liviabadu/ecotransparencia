@@ -29,7 +29,7 @@ export class Search {
 
   /**
    * Main search handler
-   * Validates input, detects document type, and performs search
+   * Validates input and performs CNPJ search
    */
   async onSearch(): Promise<void> {
     const term = this.searchTerm();
@@ -39,8 +39,8 @@ export class Search {
     this.searchResult.set(null);
     this.noResultsFound.set(false);
 
-    // Validate input
-    const validation = this.documentValidationService.validate(term);
+    // Validate input - CNPJ only
+    const validation = this.documentValidationService.validateCnpjOnly(term);
 
     if (!validation.isValid) {
       this.errorMessage.set(validation.errorMessage || 'Erro de validação');
@@ -52,15 +52,7 @@ export class Search {
     this.hasSearched.set(true);
 
     try {
-      let result: SearchResult;
-
-      if (validation.type === 'cpf') {
-        result = await firstValueFrom(this.apiService.searchByDocument(term, 'cpf'));
-      } else if (validation.type === 'cnpj') {
-        result = await firstValueFrom(this.apiService.searchByDocument(term, 'cnpj'));
-      } else {
-        result = await firstValueFrom(this.apiService.searchByName(term));
-      }
+      const result = await firstValueFrom(this.apiService.searchByDocument(term, 'cnpj'));
 
       this.searchResult.set(result);
       this.noResultsFound.set(!result.found);
@@ -83,16 +75,16 @@ export class Search {
   }
 
   /**
-   * Handles input changes and applies CPF/CNPJ mask if applicable
+   * Handles input changes and applies CNPJ mask if applicable
    */
   onInputChange(value: string): void {
     // Check if input looks like a document (numeric)
     if (this.documentValidationService.isNumericInput(value)) {
-      // Apply mask for CPF/CNPJ
-      const masked = this.documentValidationService.applyMask(value);
+      // Apply mask for CNPJ only
+      const masked = this.documentValidationService.applyCNPJMask(value);
       this.searchTerm.set(masked);
     } else {
-      // For names, just set the value as-is
+      // Set the value as-is
       this.searchTerm.set(value);
     }
   }
