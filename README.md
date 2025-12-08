@@ -2,8 +2,7 @@
 
 ## Visão Geral
 
-A **EcoTransparência** é uma plataforma digital inovadora que consolida dados públicos sobre responsabilidade socioambiental e riscos climáticos, fornecendo um score detalhado e preciso para empresas, pessoas físicas e regiões geográficas.
-
+A **EcoTransparência** é uma plataforma digital inovadora que consolida dados públicos sobre responsabilidade socioambiental e riscos climáticos, fornecendo um score detalhado e preciso para empresas.
 ## O Problema que Resolvemos
 
 Atualmente, informações críticas sobre sustentabilidade estão fragmentadas em múltiplos portais governamentais, dificultando a avaliação de riscos por instituições financeiras, empresas e órgãos reguladores. Dados sobre embargos ambientais, autuações, trabalho análogo à escravidão e empresas impedidas de contratar com a administração pública são apresentados em formatos distintos, muitas vezes desatualizados e de difícil interpretação.
@@ -16,8 +15,7 @@ A EcoTransparência oferece uma plataforma centralizada e gratuita que agrega da
 
 ## Principais Funcionalidades
 
-O sistema permite pesquisar entidades por nome ou CPF/CNPJ, consolidando automaticamente informações de diferentes bases de dados públicas. Os resultados são apresentados de forma organizada, incluindo um score de risco calculado e a relação detalhada de fatos encontrados. Os usuários podem gerar relatórios personalizados, comparar scores entre diferentes cidades e visualizar dados em um dashboard interativo com mapas e gráficos.
-
+O sistema permite pesquisar entidades por CNPJ, consolidando automaticamente informações de diferentes bases de dados públicas. Os resultados são apresentados de forma organizada, incluindo um score de risco calculado e a relação detalhada de fatos encontrados. 
 ## Fontes de Dados
 
 A plataforma integra dados das seguintes fontes oficiais: embargos e autuações do IBAMA, embargos e autuações do ICMBio, Lista Suja do Trabalho Escravo (Ministério do Trabalho e Emprego), cadastro de empresas impedidas de contratar com a administração pública (Dados Abertos do Governo Federal), e indicadores de vulnerabilidade climática e social de municípios.
@@ -34,7 +32,7 @@ O arquivo `docs/EMPRESA.md` contém informações detalhadas sobre a empresa, mi
 
 ## Equipe
 
-O projeto é desenvolvido pela turma do 2º semestre de Análise e Desenvolvimento de Sistemas do Campus Taguatinga, composta por: Livia Maria Badu de Oliveira, Marlon Valadão, Matheus Henrique Viana da Silva, Maria Eduarda Sousa Sales e Carolina Mairinque.
+O projeto é desenvolvido pela turma do 4º semestre de Análise e Desenvolvimento de Sistemas do Campus Taguatinga, composta por: Livia Maria Badu de Oliveira, Matheus Henrique Viana da Silva, Kaua Hadad, Rafael Lopes e Nicole.
 
 ## Licença
 
@@ -42,4 +40,4 @@ Este projeto é desenvolvido como parte do Projeto Integrador do curso de Análi
 
 ## Contato
 
-Para mais informações, entre em contato através do e-mail: valadao@sempreceub.com
+Para mais informações, entre em contato através do e-mail: liviabadu@gmail.com 
