@@ -14,17 +14,10 @@ describe('App', () => {
     expect(app).toBeTruthy();
   });
 
-  it('should render EcoTransparência title in search component', async () => {
+  it('should render router-outlet', async () => {
     const fixture = TestBed.createComponent(App);
     await fixture.whenStable();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('EcoTransparência');
-  });
-
-  it('should render the search component', async () => {
-    const fixture = TestBed.createComponent(App);
-    await fixture.whenStable();
-    const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('app-search')).toBeTruthy();
+    expect(compiled.querySelector('router-outlet')).toBeTruthy();
   });
 });
