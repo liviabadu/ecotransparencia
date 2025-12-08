@@ -3,11 +3,23 @@ import { provideRouter } from '@angular/router';
 import { provideHttpClient } from '@angular/common/http';
 
 import { routes } from './app.routes';
+import {initializeApp, provideFirebaseApp} from '@angular/fire/app';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAqhgimtb9EAWDFGwLqS2_pgfkze8dbtFA",
+  authDomain: "ecotransparencia-d786e.firebaseapp.com",
+  projectId: "ecotransparencia-d786e",
+  storageBucket: "ecotransparencia-d786e.firebasestorage.app",
+  messagingSenderId: "860516408210",
+  appId: "1:860516408210:web:deffede2d139ecd9433f4b",
+  measurementId: "G-9D6GWNFJF0"
+};
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
-    provideHttpClient()
+    provideHttpClient(),
+    provideFirebaseApp(() => initializeApp(firebaseConfig)),
   ]
 };
