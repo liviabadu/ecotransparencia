@@ -1,0 +1,398 @@
+.admin-container {
+  min-height: 100vh;
+  background: #F3F4F6;
+}
+
+/* Header */
+.admin-header {
+  background: #FFFFFF;
+  padding: 16px 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo-link {
+  text-decoration: none;
+}
+
+.logo-box {
+  background: #2D5A47;
+  padding: 10px 16px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1;
+}
+
+.logo-text {
+  font-size: 20px;
+  font-weight: 800;
+  color: #FFFFFF;
+  letter-spacing: 2px;
+  font-family: 'Georgia', serif;
+}
+
+.logo-sub {
+  font-size: 8px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  letter-spacing: 2px;
+  margin-top: 2px;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.user-email {
+  color: #6B7280;
+  font-size: 0.875rem;
+}
+
+.logout-btn {
+  background: transparent;
+  border: 2px solid #DC2626;
+  color: #DC2626;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.logout-btn:hover {
+  background: #DC2626;
+  color: #FFFFFF;
+}
+
+/* Main Content */
+.admin-main {
+  padding: 40px 24px;
+}
+
+.admin-content {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.page-header {
+  margin-bottom: 32px;
+}
+
+.page-header h1 {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 8px;
+}
+
+.page-header p {
+  color: #6B7280;
+  font-size: 1rem;
+}
+
+/* Messages */
+.message {
+  padding: 16px 20px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.success-message {
+  background: #D1FAE5;
+  color: #065F46;
+  border: 1px solid #A7F3D0;
+}
+
+.error-message {
+  background: #FEE2E2;
+  color: #DC2626;
+  border: 1px solid #FECACA;
+}
+
+/* Config Sections */
+.config-section {
+  margin-bottom: 32px;
+}
+
+.section-header {
+  margin-bottom: 16px;
+}
+
+.section-header h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 4px;
+}
+
+.section-header p {
+  color: #6B7280;
+  font-size: 0.875rem;
+}
+
+.config-card {
+  background: #FFFFFF;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+/* Table */
+.config-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.config-table th,
+.config-table td {
+  padding: 16px 20px;
+  text-align: left;
+}
+
+.config-table th {
+  background: #F9FAFB;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #6B7280;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid #E5E7EB;
+}
+
+.config-table tbody tr {
+  border-bottom: 1px solid #E5E7EB;
+}
+
+.config-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.fonte-name {
+  font-weight: 600;
+  color: #111827;
+}
+
+.fonte-desc {
+  color: #6B7280;
+  font-size: 0.875rem;
+}
+
+.fonte-peso {
+  text-align: center;
+  width: 120px;
+}
+
+.peso-value {
+  font-weight: 600;
+  color: #2D5A47;
+  font-size: 1rem;
+}
+
+.peso-input {
+  width: 80px;
+  padding: 8px 12px;
+  border: 2px solid #E5E7EB;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+.peso-input:focus {
+  outline: none;
+  border-color: #2D5A47;
+}
+
+.config-table tfoot td {
+  background: #F9FAFB;
+  border-top: 2px solid #E5E7EB;
+}
+
+.total-label {
+  font-weight: 600;
+  color: #374151;
+  text-align: right;
+}
+
+.total-value {
+  font-weight: 700;
+  color: #2D5A47;
+  font-size: 1.125rem;
+  text-align: center;
+}
+
+.total-value.invalid {
+  color: #DC2626;
+}
+
+/* Thresholds Grid */
+.thresholds-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  padding: 20px;
+}
+
+.threshold-item {
+  text-align: center;
+  padding: 20px;
+  background: #F9FAFB;
+  border-radius: 8px;
+}
+
+.threshold-header {
+  margin-bottom: 12px;
+}
+
+.threshold-badge {
+  display: inline-block;
+  padding: 6px 16px;
+  border-radius: 100px;
+  color: #FFFFFF;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.threshold-range {
+  margin-top: 8px;
+}
+
+.range-text {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #374151;
+}
+
+.range-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.range-inputs label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 0.75rem;
+  color: #6B7280;
+}
+
+.threshold-input {
+  width: 60px;
+  padding: 6px 8px;
+  border: 2px solid #E5E7EB;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+.threshold-input:focus {
+  outline: none;
+  border-color: #2D5A47;
+}
+
+/* Action Buttons */
+.action-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.btn {
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-primary {
+  background: #2D5A47;
+  color: #FFFFFF;
+  border: none;
+}
+
+.btn-primary:hover {
+  background: #1E3D30;
+}
+
+.btn-secondary {
+  background: #FFFFFF;
+  color: #374151;
+  border: 2px solid #E5E7EB;
+}
+
+.btn-secondary:hover {
+  background: #F3F4F6;
+  border-color: #D1D5DB;
+}
+
+/* Documentation Link */
+.doc-link {
+  margin-top: 32px;
+  text-align: center;
+}
+
+.doc-link .link {
+  color: #2D5A47;
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.doc-link .link:hover {
+  color: #10B981;
+  text-decoration: underline;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .header-inner {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .header-actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .config-table th,
+  .config-table td {
+    padding: 12px;
+  }
+
+  .fonte-desc {
+    display: none;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+  }
+
+  .btn {
+    width: 100%;
+    text-align: center;
+  }
+}

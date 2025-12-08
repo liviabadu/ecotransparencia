@@ -1,0 +1,161 @@
+<div class="admin-container">
+  <!-- Header -->
+  <header class="admin-header">
+    <div class="header-inner">
+      <a routerLink="/" class="logo-link">
+        <div class="logo-box">
+          <span class="logo-text">eco</span>
+          <span class="logo-sub">TRANSPARÊNCIA</span>
+        </div>
+      </a>
+
+      <div class="header-actions">
+        <span class="user-email">{{ authService.getUserEmail() }}</span>
+        <button class="logout-btn" (click)="logout()">Sair</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="admin-main">
+    <div class="admin-content">
+      <div class="page-header">
+        <h1>Painel Administrativo</h1>
+        <p>Gerencie a metodologia de cálculo de score</p>
+      </div>
+
+      <!-- Messages -->
+      @if (successMessage()) {
+        <div class="message success-message" role="alert">
+          ✓ {{ successMessage() }}
+        </div>
+      }
+
+      @if (errorMessage()) {
+        <div class="message error-message" role="alert">
+          ✕ {{ errorMessage() }}
+        </div>
+      }
+
+      <!-- Score Weights Section -->
+      <section class="config-section">
+        <div class="section-header">
+          <h2>Pesos das Fontes de Dados</h2>
+          <p>Configure o peso de cada fonte no cálculo do score final</p>
+        </div>
+
+        <div class="config-card">
+          <table class="config-table">
+            <thead>
+              <tr>
+                <th>Fonte</th>
+                <th>Descrição</th>
+                <th>Peso</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (weight of scoreWeights(); track weight.fonte; let i = $index) {
+                <tr>
+                  <td class="fonte-name">{{ weight.fonte }}</td>
+                  <td class="fonte-desc">{{ weight.descricao }}</td>
+                  <td class="fonte-peso">
+                    @if (isEditing()) {
+                      <input
+                        type="number"
+                        [value]="weight.peso"
+                        (input)="updateWeight(i, +$any($event.target).value)"
+                        min="0"
+                        max="1"
+                        step="0.05"
+                        class="peso-input"
+                      />
+                    } @else {
+                      <span class="peso-value">{{ (weight.peso * 100).toFixed(0) }}%</span>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+            <tfoot>
+              <tr>
+                <td colspan="2" class="total-label">Total</td>
+                <td class="total-value" [class.invalid]="isWeightInvalid()">
+                  {{ (getTotalWeight() * 100).toFixed(0) }}%
+                </td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </section>
+
+      <!-- Risk Thresholds Section -->
+      <section class="config-section">
+        <div class="section-header">
+          <h2>Faixas de Risco</h2>
+          <p>Configure os limites de score para cada nível de risco</p>
+        </div>
+
+        <div class="config-card">
+          <div class="thresholds-grid">
+            @for (threshold of riskThresholds(); track threshold.nivel; let i = $index) {
+              <div class="threshold-item">
+                <div class="threshold-header">
+                  <span class="threshold-badge" [style.background-color]="threshold.cor">
+                    {{ threshold.nivel }}
+                  </span>
+                </div>
+                <div class="threshold-range">
+                  @if (isEditing()) {
+                    <div class="range-inputs">
+                      <label>
+                        Min:
+                        <input
+                          type="number"
+                          [value]="threshold.min"
+                          (input)="updateThreshold(i, 'min', +$any($event.target).value)"
+                          min="0"
+                          max="100"
+                          class="threshold-input"
+                        />
+                      </label>
+                      <label>
+                        Max:
+                        <input
+                          type="number"
+                          [value]="threshold.max"
+                          (input)="updateThreshold(i, 'max', +$any($event.target).value)"
+                          min="0"
+                          max="100"
+                          class="threshold-input"
+                        />
+                      </label>
+                    </div>
+                  } @else {
+                    <span class="range-text">{{ threshold.min }} - {{ threshold.max }}</span>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      </section>
+
+      <!-- Action Buttons -->
+      <div class="action-buttons">
+        @if (isEditing()) {
+          <button class="btn btn-secondary" (click)="cancelEditing()">Cancelar</button>
+          <button class="btn btn-primary" (click)="saveChanges()">Salvar Alterações</button>
+        } @else {
+          <button class="btn btn-primary" (click)="startEditing()">Editar Configurações</button>
+        }
+      </div>
+
+      <!-- Documentation Link -->
+      <div class="doc-link">
+        <a routerLink="/metodologia" class="link">
+          📄 Ver documentação completa da metodologia
+        </a>
+      </div>
+    </div>
+  </main>
+</div>
