@@ -4,6 +4,7 @@ import { provideHttpClient } from '@angular/common/http';
 
 import { routes } from './app.routes';
 import {initializeApp, provideFirebaseApp} from '@angular/fire/app';
+import {getAuth, provideAuth} from '@angular/fire/auth';
 
 const firebaseConfig = {
   apiKey: "AIzaSyAqhgimtb9EAWDFGwLqS2_pgfkze8dbtFA",
@@ -21,5 +22,6 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     provideHttpClient(),
     provideFirebaseApp(() => initializeApp(firebaseConfig)),
+    provideAuth(() => getAuth()), // Adicione outros serviços aqui (Firestore, etc.)
   ]
 };
