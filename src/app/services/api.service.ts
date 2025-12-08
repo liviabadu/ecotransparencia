@@ -46,9 +46,11 @@ export class ApiService {
    * Search by document (CPF or CNPJ)
    */
   searchByDocument(document: string, type: 'cpf' | 'cnpj'): Observable<SearchResult> {
+    // Remove mask characters, send only digits
+    const cleanDocument = document.replace(/[.\-/]/g, '');
     return this.http
       .get<ApiSearchResponse>(`${this.baseUrl}/search/document`, {
-        params: { document, type },
+        params: { document: cleanDocument, type },
       })
       .pipe(map((response) => this.mapApiResponseToSearchResult(response)));
   }

@@ -259,7 +259,7 @@ describe('Search', () => {
       const searchPromise = component.onSearch();
 
       const req = httpMock.expectOne((request) =>
-        request.url.includes('/api/search/document') && request.params.get('document') === '11.222.333/0001-81'
+        request.url.includes('/api/search/document') && request.params.get('document') === '11222333000181'
       );
       req.flush(mockEntities['11222333000181']);
 
