@@ -114,8 +114,19 @@ export interface Entity {
   ocorrencias?: Ocorrencias;
 }
 
+export interface SituacaoCadastral {
+  dataConsulta: string;
+  mensagem: string;
+  situacao: string;
+  valido: boolean;
+  codigoErro?: number;
+  erroConsulta?: boolean;
+}
+
 export interface SearchResult {
   found: boolean;
   entity?: Entity;
   scoreResult?: ScoreResult;
+  bloqueadoPorSituacaoCadastral?: boolean;
+  situacaoCadastral?: SituacaoCadastral;
 }

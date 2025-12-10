@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { DocumentValidationService } from '../../services/document-validation.service';
 import { ApiService } from '../../services/api.service';
 import { ScoreService } from '../../services/score.service';
-import { SearchResult } from '../../models/entity.model';
+import { SearchResult, SituacaoCadastral } from '../../models/entity.model';
 import { firstValueFrom } from 'rxjs';
 
 @Component({
@@ -26,6 +26,8 @@ export class Search {
   searchResult = signal<SearchResult | null>(null);
   noResultsFound = signal(false);
   hasSearched = signal(false);
+  bloqueadoPorSituacaoCadastral = signal(false);
+  situacaoCadastral = signal<SituacaoCadastral | null>(null);
 
   /**
    * Main search handler
@@ -38,6 +40,8 @@ export class Search {
     this.errorMessage.set(null);
     this.searchResult.set(null);
     this.noResultsFound.set(false);
+    this.bloqueadoPorSituacaoCadastral.set(false);
+    this.situacaoCadastral.set(null);
 
     // Validate input - CNPJ only
     const validation = this.documentValidationService.validateCnpjOnly(term);
@@ -55,7 +59,15 @@ export class Search {
       const result = await firstValueFrom(this.apiService.searchByDocument(term, 'cnpj'));
 
       this.searchResult.set(result);
-      this.noResultsFound.set(!result.found);
+
+      // Handle bloqueado por situação cadastral
+      if (result.bloqueadoPorSituacaoCadastral) {
+        this.bloqueadoPorSituacaoCadastral.set(true);
+        this.situacaoCadastral.set(result.situacaoCadastral || null);
+        this.noResultsFound.set(false);
+      } else {
+        this.noResultsFound.set(!result.found);
+      }
     } catch (error) {
       this.errorMessage.set('Erro ao realizar a busca. Tente novamente.');
     } finally {
@@ -72,6 +84,8 @@ export class Search {
     this.errorMessage.set(null);
     this.noResultsFound.set(false);
     this.hasSearched.set(false);
+    this.bloqueadoPorSituacaoCadastral.set(false);
+    this.situacaoCadastral.set(null);
   }
 
   /**

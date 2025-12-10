@@ -135,6 +135,72 @@
   color: #666;
 }
 
+/* Situação Cadastral Alert (V2) */
+.situacao-cadastral-alert {
+  padding: 1.5rem;
+  background-color: #fffbeb;
+  border: 1px solid #fcd34d;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+}
+
+.situacao-cadastral-alert.error {
+  background-color: #fef2f2;
+  border-color: #fca5a5;
+}
+
+.situacao-cadastral-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.situacao-cadastral-header h3 {
+  margin: 0;
+  color: #92400e;
+  font-size: 1.25rem;
+}
+
+.situacao-icon {
+  font-size: 1.5rem;
+}
+
+.warning-icon {
+  color: #f59e0b;
+}
+
+.info-icon {
+  color: #3b82f6;
+}
+
+.situacao-cadastral-content {
+  padding-left: 2.25rem;
+}
+
+.situacao-mensagem {
+  color: #78350f;
+  font-size: 1rem;
+  line-height: 1.5;
+  margin-bottom: 1rem;
+}
+
+.situacao-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.situacao-details p {
+  margin: 0;
+  color: #92400e;
+}
+
+.situacao-details strong {
+  color: #78350f;
+}
+
 /* Results Container */
 .results-container {
   margin-top: 2rem;

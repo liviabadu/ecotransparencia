@@ -61,6 +61,33 @@
     </div>
   }
 
+  <!-- Bloqueado por Situação Cadastral (V2 API) -->
+  @if (bloqueadoPorSituacaoCadastral() && !isLoading()) {
+    <div class="situacao-cadastral-alert" role="alert">
+      <div class="situacao-cadastral-header">
+        @if (situacaoCadastral()?.erroConsulta) {
+          <span class="situacao-icon warning-icon">&#9888;</span>
+          <h3>Erro na Consulta</h3>
+        } @else {
+          <span class="situacao-icon info-icon">&#9432;</span>
+          <h3>CNPJ Inativo</h3>
+        }
+      </div>
+      <div class="situacao-cadastral-content">
+        <p class="situacao-mensagem">{{ situacaoCadastral()?.mensagem }}</p>
+        <div class="situacao-details">
+          <p><strong>Situação:</strong> {{ situacaoCadastral()?.situacao }}</p>
+          @if (situacaoCadastral()?.dataConsulta) {
+            <p><strong>Data da Consulta:</strong> {{ formatDate(situacaoCadastral()?.dataConsulta) }}</p>
+          }
+          @if (situacaoCadastral()?.codigoErro) {
+            <p><strong>Código do Erro:</strong> {{ situacaoCadastral()?.codigoErro }}</p>
+          }
+        </div>
+      </div>
+    </div>
+  }
+
   <!-- Search Results - CA07, CA08, CA10 -->
   @if (searchResult()?.found && !isLoading()) {
     <div class="results-container">

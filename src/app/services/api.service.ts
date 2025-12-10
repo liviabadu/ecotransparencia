@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
-import { Entity, SearchResult, Occurrence, RiskLevel } from '../models/entity.model';
+import { Entity, SearchResult, Occurrence, RiskLevel, SituacaoCadastral } from '../models/entity.model';
 import { ScoreService } from './score.service';
 
 /**
@@ -101,9 +101,20 @@ export interface ApiOcorrencias {
   autosInfracao: ApiAutoInfracao[];
 }
 
+export interface ApiSituacaoCadastral {
+  dataConsulta: string;
+  mensagem: string;
+  situacao: string;
+  valido: boolean;
+  codigoErro?: number;
+  erroConsulta?: boolean;
+}
+
 export interface ApiSearchResponse {
   found: boolean;
   entity?: ApiEntityResponse;
+  bloqueadoPorSituacaoCadastral?: boolean;
+  situacaoCadastral?: ApiSituacaoCadastral;
 }
 
 @Injectable({
@@ -143,6 +154,15 @@ export class ApiService {
    * Maps API response to frontend SearchResult model
    */
   private mapApiResponseToSearchResult(response: ApiSearchResponse): SearchResult {
+    // Handle blocked by situacao cadastral case
+    if (response.bloqueadoPorSituacaoCadastral) {
+      return {
+        found: false,
+        bloqueadoPorSituacaoCadastral: true,
+        situacaoCadastral: response.situacaoCadastral,
+      };
+    }
+
     if (!response.found || !response.entity) {
       return { found: false };
     }
