@@ -515,7 +515,7 @@ O projeto é desenvolvido pela turma do 4º semestre de Análise e Desenvolvimen
 
 - Livia Maria Badu de Oliveira
 - Matheus Henrique Viana da Silva
-- Kaua Hadad
+- Kaua Nascimento      
 - Rafael Lopes
 - Nicole
 
