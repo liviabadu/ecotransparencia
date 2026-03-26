@@ -354,27 +354,70 @@
 .badges {
   display: flex;
   justify-content: center;
-  gap: 16px;
+  gap: 14px;
   flex-wrap: wrap;
-  margin-top: 6px;
+  margin-top: 8px;
 }
 
 .badge {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 10px 20px;
-  background: rgba(255, 255, 255, 0.06);
+  gap: 12px;
+  padding: 14px 20px;
+  min-height: 52px;
+  box-sizing: border-box;
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.09) 0%,
+    rgba(255, 255, 255, 0.04) 100%
+  );
   border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: 100px;
-  color: #FFFFFF;
+  border-radius: 14px;
+  color: rgba(255, 255, 255, 0.94);
   font-size: 14px;
-  font-weight: 500;
-  backdrop-filter: blur(10px);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.06) inset,
+    0 12px 40px rgba(0, 0, 0, 0.25),
+    0 0 0 1px rgba(34, 197, 94, 0.08);
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
 }
 
-.badge-icon {
-  font-size: 16px;
+.badge:hover {
+  border-color: rgba(52, 211, 153, 0.35);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.08) inset,
+    0 16px 48px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(34, 197, 94, 0.18);
+  transform: translateY(-1px);
+}
+
+.badge-icon-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: rgba(34, 197, 94, 0.12);
+  border: 1px solid rgba(34, 197, 94, 0.22);
+  color: rgba(52, 211, 153, 0.95);
+}
+
+.badge-svg {
+  display: block;
+}
+
+.badge-label {
+  text-align: left;
+  line-height: 1.25;
 }
 
 /* ============================================================================
@@ -698,5 +741,12 @@
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+
+  .hero-content,
+  .search-wrapper,
+  .badges {
+    transform: none;
+    will-change: auto;
   }
 }

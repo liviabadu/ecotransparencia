@@ -96,6 +96,29 @@
             <span class="app-sidebar-nav-text">Início</span>
           </a>
           <a
+            routerLink="/assinaturas"
+            class="app-sidebar-nav-link"
+            routerLinkActive="is-active"
+            (click)="sidebar.close()"
+          >
+            <span class="app-sidebar-nav-icon" aria-hidden="true">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.75"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <rect x="2" y="5" width="20" height="14" rx="2" />
+                <line x1="2" y1="10" x2="22" y2="10" />
+              </svg>
+            </span>
+            <span class="app-sidebar-nav-text">Assinaturas</span>
+          </a>
+          <a
             routerLink="/metodologia"
             class="app-sidebar-nav-link"
             routerLinkActive="is-active"
@@ -122,29 +145,6 @@
               </svg>
             </span>
             <span class="app-sidebar-nav-text">Metodologia do Score</span>
-          </a>
-          <a
-            routerLink="/assinaturas"
-            class="app-sidebar-nav-link"
-            routerLinkActive="is-active"
-            (click)="sidebar.close()"
-          >
-            <span class="app-sidebar-nav-icon" aria-hidden="true">
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.75"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <rect x="2" y="5" width="20" height="14" rx="2" />
-                <line x1="2" y1="10" x2="22" y2="10" />
-              </svg>
-            </span>
-            <span class="app-sidebar-nav-text">Assinaturas</span>
           </a>
           <hr class="app-sidebar-nav-divider" />
           <a

@@ -112,6 +112,17 @@ body::after {
   }
 }
 
+/* Parallax por mouse (transform aplicado via MouseParallaxService) */
+.parallax {
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .parallax {
+    will-change: auto;
+  }
+}
+
 a {
   color: inherit;
 }
