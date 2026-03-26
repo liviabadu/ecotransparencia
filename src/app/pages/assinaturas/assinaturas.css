@@ -1,0 +1,33 @@
+.assinaturas-main {
+  min-height: 100vh;
+  padding: 2.5rem 1.5rem 3rem;
+  max-width: 36rem;
+  margin: 0 auto;
+  color: var(--text-0, rgba(255, 255, 255, 0.92));
+}
+
+.assinaturas-back {
+  display: inline-block;
+  margin-bottom: 1.75rem;
+  font-weight: 600;
+  color: var(--brand-1, #34d399);
+  text-decoration: none;
+}
+
+.assinaturas-back:hover {
+  text-decoration: underline;
+}
+
+.assinaturas-title {
+  font-family: var(--font-display, system-ui, sans-serif);
+  font-size: clamp(1.75rem, 4vw, 2.25rem);
+  font-weight: 700;
+  margin: 0 0 0.75rem;
+  letter-spacing: -0.02em;
+}
+
+.assinaturas-lead {
+  margin: 0;
+  line-height: var(--leading-body, 1.65);
+  color: var(--text-1, rgba(255, 255, 255, 0.78));
+}

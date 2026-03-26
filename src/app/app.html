@@ -1,1 +1,195 @@
-<router-outlet />
+<div class="app-shell">
+  @if (sidebar.open()) {
+    <div
+      class="app-sidebar-backdrop"
+      aria-hidden="true"
+      (click)="sidebar.close()"
+    ></div>
+  }
+
+  <!-- Barra lateral única: faixa fixa à esquerda; expande à direita ao abrir o menu -->
+  <aside
+    class="app-sidebar-drawer"
+    [class.is-open]="sidebar.open()"
+    id="app-sidebar-drawer"
+  >
+    <div class="app-sidebar-rail" aria-label="Atalhos da barra lateral">
+      <div class="app-rail-top">
+        <div class="hamburger-wrap" data-tooltip="Menu">
+          <button
+            type="button"
+            class="hamburger"
+            (click)="toggleSidebar(); $event.stopPropagation()"
+            [attr.aria-expanded]="sidebar.open()"
+            aria-controls="app-sidebar-menu-panel"
+            aria-label="Menu"
+          >
+            <span class="hamburger-line" aria-hidden="true"></span>
+            <span class="hamburger-line" aria-hidden="true"></span>
+            <span class="hamburger-line" aria-hidden="true"></span>
+          </button>
+        </div>
+      </div>
+
+      <div class="app-rail-bottom" (click)="$event.stopPropagation()">
+        <div class="app-settings-wrap" data-tooltip="Configurações">
+          <button
+            type="button"
+            class="app-settings-btn"
+            aria-label="Configurações"
+            (click)="onSettingsClick(); $event.stopPropagation()"
+          >
+            <svg
+              class="app-settings-icon"
+              width="17"
+              height="17"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.9"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
+              <path
+                d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.26.604.852 1 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="app-sidebar-panel-slot"
+      id="app-sidebar-menu-panel"
+      [attr.aria-hidden]="!sidebar.open()"
+    >
+      <div class="app-sidebar-inner">
+        <header class="app-sidebar-panel-head">
+          <span class="app-sidebar-panel-kicker">Navegação</span>
+        </header>
+        <nav class="app-sidebar-nav" aria-label="Menu do site">
+          <a
+            routerLink="/"
+            class="app-sidebar-nav-link"
+            routerLinkActive="is-active"
+            [routerLinkActiveOptions]="{ exact: true }"
+            (click)="sidebar.close()"
+          >
+            <span class="app-sidebar-nav-icon" aria-hidden="true">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.75"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                <polyline points="9 22 9 12 15 12 15 22" />
+              </svg>
+            </span>
+            <span class="app-sidebar-nav-text">Início</span>
+          </a>
+          <a
+            routerLink="/metodologia"
+            class="app-sidebar-nav-link"
+            routerLinkActive="is-active"
+            (click)="sidebar.close()"
+          >
+            <span class="app-sidebar-nav-icon" aria-hidden="true">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.75"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+                <path
+                  d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"
+                />
+                <line x1="8" y1="7" x2="16" y2="7" />
+                <line x1="8" y1="11" x2="14" y2="11" />
+                <line x1="8" y1="15" x2="12" y2="15" />
+              </svg>
+            </span>
+            <span class="app-sidebar-nav-text">Metodologia do Score</span>
+          </a>
+          <a
+            routerLink="/assinaturas"
+            class="app-sidebar-nav-link"
+            routerLinkActive="is-active"
+            (click)="sidebar.close()"
+          >
+            <span class="app-sidebar-nav-icon" aria-hidden="true">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.75"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <rect x="2" y="5" width="20" height="14" rx="2" />
+                <line x1="2" y1="10" x2="22" y2="10" />
+              </svg>
+            </span>
+            <span class="app-sidebar-nav-text">Assinaturas</span>
+          </a>
+          <hr class="app-sidebar-nav-divider" />
+          <a
+            routerLink="/login"
+            class="app-sidebar-nav-link app-sidebar-nav-link--muted"
+            routerLinkActive="is-active"
+            (click)="sidebar.close()"
+          >
+            <span class="app-sidebar-nav-icon" aria-hidden="true">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.75"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+                <polyline points="10 17 15 12 10 7" />
+                <line x1="15" y1="12" x2="3" y2="12" />
+              </svg>
+            </span>
+            <span class="app-sidebar-nav-text">Entrar</span>
+          </a>
+        </nav>
+        <div class="app-sidebar-nav-cta">
+          <h2 class="app-sidebar-nav-cta-title">Transparência socioambiental</h2>
+          <p class="app-sidebar-nav-cta-text">
+            Cadastre-se para salvar consultas, acompanhar scores de risco e aproveitar recursos feitos sob medida para você.
+          </p>
+          <a
+            routerLink="/cadastro"
+            class="app-sidebar-nav-cta-btn"
+            (click)="sidebar.close()"
+          >
+            Cadastrar-se
+          </a>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="app-main">
+    <router-outlet />
+  </div>
+</div>

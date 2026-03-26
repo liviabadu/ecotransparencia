@@ -1,8 +1,9 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, HostListener, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { isFocusInTextEntryField } from '../../utils/form-focus.util';
 
 @Component({
   selector: 'app-login',
@@ -14,6 +15,14 @@ import { AuthService } from '../../services/auth.service';
 export class Login {
   private authService = inject(AuthService);
   private router = inject(Router);
+
+  @HostListener('document:keydown', ['$event'])
+  onEscapeLeavePage(event: KeyboardEvent): void {
+    if (event.key !== 'Escape') return;
+    if (isFocusInTextEntryField()) return;
+    this.router.navigate(['/']);
+    event.preventDefault();
+  }
 
   email = signal('');
   password = signal('');
@@ -27,7 +36,7 @@ export class Login {
 
     try {
       await this.authService.login(this.email(), this.password());
-      this.router.navigate(['/admin']);
+      this.router.navigate(['/']);
     } catch (error: any) {
       this.errorMessage.set(this.getErrorMessage(error.code));
     } finally {

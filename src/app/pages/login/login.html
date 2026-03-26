@@ -7,8 +7,8 @@
           <span class="logo-sub">TRANSPARÊNCIA</span>
         </div>
       </a>
-      <h1>Área Administrativa</h1>
-      <p>Faça login para acessar o painel de administração</p>
+      <h1>Entrar</h1>
+      <p>Acesse sua conta</p>
     </div>
 
     <form class="login-form" (submit)="onSubmit($event)">
@@ -25,7 +25,7 @@
           id="email"
           [value]="email()"
           (input)="onEmailChange($any($event.target).value)"
-          placeholder="admin@ecotransparencia.com"
+          placeholder="seuemail@exemplo.com"
           required
           autocomplete="email"
         />

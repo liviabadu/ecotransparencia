@@ -1,4 +1,594 @@
+/*
+ * Barra lateral: expansão suave (largura + deslize) + itens em stagger.
+ *
+ * Stack: Angular + CSS (não React/Framer/Tailwind). Estado: SidebarService.
+ *
+ * Deixar MAIS LENTO: suba --app-sidebar-open-duration, --app-sidebar-nav-item-duration,
+ * --app-sidebar-stagger-base e --app-sidebar-stagger-step (ver comentário no .app-shell).
+ */
+
+.app-shell {
+  min-height: 100vh;
+  width: 100%;
+  position: relative;
+  --app-sidebar-open-duration: 0.72s;
+  --app-sidebar-ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --app-sidebar-nav-item-duration: 0.48s;
+  --app-sidebar-stagger-base: 0.1s;
+  --app-sidebar-stagger-step: 0.055s;
+}
+
+.app-sidebar-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1038;
+  /* Sem blur: backdrop-filter deixa a UI pesada com a gaveta aberta */
+  background: rgba(0, 0, 0, 0.5);
+  animation: appBackdropIn var(--app-sidebar-open-duration) var(--app-sidebar-ease) both;
+}
+
+@keyframes appBackdropIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/*
+ * Fechado: largura só da rail; o menu fica no slot com overflow hidden (não na gaveta
+ * inteira) para o tooltip “Configurações” poder aparecer à direita da rail.
+ * Largura abre o espaço + o painel desliza em translate3d (GPU).
+ */
+.app-sidebar-drawer {
+  /* Painel: até 280px, nunca invade a viewport além de uma folga (mobile) */
+  --app-sidebar-panel: min(
+    280px,
+    calc(100vw - var(--app-left-rail-width, 56px) - max(12px, env(safe-area-inset-right, 0px)))
+  );
+  --app-sidebar-full: calc(var(--app-left-rail-width, 56px) + var(--app-sidebar-panel));
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  height: 100dvh;
+  width: var(--app-left-rail-width, 56px);
+  max-width: var(--app-sidebar-full);
+  z-index: 1040;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  box-shadow: 12px 0 40px rgba(0, 0, 0, 0.55);
+  overflow: visible;
+  transition: width var(--app-sidebar-open-duration) var(--app-sidebar-ease);
+  pointer-events: none;
+}
+
+.app-sidebar-drawer.is-open {
+  width: var(--app-sidebar-full);
+  pointer-events: auto;
+}
+
+/* Coluna dos ícones: mesmo visual da rail fixa; cliques quando gaveta fechada */
+.app-sidebar-rail {
+  flex: 0 0 var(--app-left-rail-width, 56px);
+  width: var(--app-left-rail-width, 56px);
+  min-width: var(--app-left-rail-width, 56px);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  box-sizing: border-box;
+  padding-left: var(--app-left-rail-pad-inline, 10px);
+  padding-right: var(--app-left-rail-pad-inline, 10px);
+  padding-top: calc(
+    var(--app-left-rail-pad-block, 12px) + 8px + env(safe-area-inset-top, 0px)
+  );
+  padding-bottom: max(
+    calc(var(--app-left-rail-pad-block, 12px) + 10px),
+    env(safe-area-inset-bottom)
+  );
+  pointer-events: auto;
+  background: linear-gradient(180deg, #05080e 0%, #070b12 40%, #0b1220 100%);
+  border-right: 1px solid rgba(255, 255, 255, 0.07);
+  box-shadow: inset -1px 0 0 rgba(34, 197, 94, 0.14);
+}
+
+.app-rail-top,
+.app-rail-bottom {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+/* Menu (hambúrguer) */
+.hamburger-wrap {
+  position: relative;
+  flex-shrink: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.hamburger-wrap::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  top: calc(100% + 8px);
+  bottom: auto;
+  left: 50%;
+  transform: translateX(-50%) translateY(-4px);
+  padding: 5px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.95);
+  background: rgba(15, 18, 24, 0.96);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 0.09s ease-out,
+    transform 0.09s ease-out;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  z-index: 3;
+}
+
+.hamburger-wrap:hover::after {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.hamburger {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  width: var(--app-left-rail-hit, 36px);
+  height: var(--app-left-rail-hit, 36px);
+  padding: 0;
+  border: none;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.14);
+  cursor: pointer;
+  transition: background 0.12s ease-out;
+}
+
+.hamburger:hover {
+  background: rgba(255, 255, 255, 0.24);
+}
+
+.hamburger:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.35);
+}
+
+.hamburger-line {
+  display: block;
+  width: 18px;
+  height: 2.5px;
+  border-radius: 2px;
+  background: #fff;
+  box-shadow: 0 0 1px rgba(255, 255, 255, 0.45);
+}
+
+.app-settings-wrap {
+  position: relative;
+}
+
+.app-settings-wrap::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  top: 50%;
+  left: calc(100% + 10px);
+  right: auto;
+  bottom: auto;
+  transform: translateY(-50%) translateX(-4px);
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.95);
+  background: rgba(15, 18, 24, 0.96);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 0.09s ease-out,
+    transform 0.09s ease-out;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  z-index: 3;
+}
+
+.app-settings-wrap:hover::after {
+  opacity: 1;
+  transform: translateY(-50%) translateX(0);
+}
+
+.app-settings-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--app-left-rail-hit, 36px);
+  height: var(--app-left-rail-hit, 36px);
+  padding: 0;
+  border: none;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  cursor: pointer;
+  transition:
+    background 0.12s ease-out,
+    color 0.12s ease-out;
+}
+
+.app-settings-btn:hover {
+  background: rgba(255, 255, 255, 0.22);
+  color: #fff;
+}
+
+.app-settings-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.35);
+}
+
+.app-settings-icon {
+  display: block;
+  filter: drop-shadow(0 0 0.35px rgba(255, 255, 255, 0.9));
+}
+
+/* overflow-hidden: conteúdo não “vaza” enquanto a largura anima */
+.app-sidebar-panel-slot {
+  flex: 1;
+  min-width: 0;
+  position: relative;
+  align-self: stretch;
+  overflow: hidden;
+}
+
+.app-sidebar-inner {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: var(--app-sidebar-panel);
+  min-width: var(--app-sidebar-panel);
+  box-sizing: border-box;
+  padding: 18px 14px 20px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  background: linear-gradient(180deg, #05080e 0%, #070b12 40%, #0b1220 100%);
+  border-right: 1px solid rgba(255, 255, 255, 0.07);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    inset -1px 0 0 rgba(34, 197, 94, 0.14);
+  transform: translate3d(-100%, 0, 0);
+  transition: transform var(--app-sidebar-open-duration) var(--app-sidebar-ease);
+}
+
+.app-sidebar-drawer.is-open .app-sidebar-inner {
+  transform: translate3d(0, 0, 0);
+}
+
+.app-sidebar-panel-head {
+  margin: 0 0 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.app-sidebar-panel-kicker {
+  display: block;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.62);
+}
+
+.app-sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.app-sidebar-nav-cta {
+  flex-shrink: 0;
+  margin-top: 18px;
+  padding-top: 18px;
+  padding-right: 4px;
+  margin-right: -8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.app-sidebar-nav-cta-title {
+  margin: 0 0 10px;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+  color: rgba(255, 255, 255, 0.95);
+  font-family: var(--font-sans, Inter, system-ui, sans-serif);
+  text-align: left;
+}
+
+.app-sidebar-nav-cta-text {
+  margin: 0 0 16px;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.app-sidebar-nav-cta-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 11px 18px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: transparent;
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.app-sidebar-nav-cta-btn:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.32);
+  color: #fff;
+}
+
+.app-sidebar-nav-cta-btn:focus-visible {
+  outline: none;
+  box-shadow: var(--ring, 0 0 0 3px rgba(45, 212, 191, 0.35));
+}
+
+.app-sidebar-nav-link {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  min-height: 48px;
+  padding: 8px 12px 8px 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  text-decoration: none;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.03);
+  transition:
+    background 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.app-sidebar-nav-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.96);
+  transition:
+    background 0.18s ease,
+    color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.app-sidebar-nav-icon svg {
+  display: block;
+  filter: drop-shadow(0 0 0.4px rgba(255, 255, 255, 0.65));
+}
+
+.app-sidebar-nav-link::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 0;
+  border-radius: 0 3px 3px 0;
+  background: linear-gradient(180deg, var(--brand-1, #34d399), var(--brand-0, #22c55e));
+  opacity: 0;
+  transition:
+    height 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.app-sidebar-nav-link::after {
+  content: '›';
+  flex-shrink: 0;
+  margin-left: auto;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.28);
+  transition: color 0.18s ease, transform 0.18s ease;
+}
+
+.app-sidebar-nav-link:hover {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.app-sidebar-nav-link:hover .app-sidebar-nav-icon {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+}
+
+.app-sidebar-nav-link:hover::before {
+  height: 60%;
+  opacity: 1;
+}
+
+.app-sidebar-nav-link:hover::after {
+  color: rgba(52, 211, 153, 0.85);
+  transform: translateX(2px);
+}
+
+.app-sidebar-nav-link:focus-visible {
+  outline: none;
+  box-shadow: var(--ring, 0 0 0 3px rgba(45, 212, 191, 0.35));
+}
+
+.app-sidebar-nav-link.is-active {
+  background: rgba(34, 197, 94, 0.12);
+  border-color: rgba(34, 197, 94, 0.28);
+  color: #fff;
+}
+
+.app-sidebar-nav-link.is-active::before {
+  height: 70%;
+  opacity: 1;
+}
+
+.app-sidebar-nav-link.is-active::after {
+  color: rgba(52, 211, 153, 0.95);
+}
+
+.app-sidebar-nav-link.is-active .app-sidebar-nav-icon {
+  background: rgba(34, 197, 94, 0.22);
+  color: #fff;
+  box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.25);
+}
+
+.app-sidebar-nav-text {
+  flex: 1;
+  min-width: 0;
+  line-height: 1.3;
+  padding-right: 4px;
+}
+
+.app-sidebar-nav-link--muted {
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.72);
+  background: rgba(0, 0, 0, 0.15);
+}
+
+.app-sidebar-nav-link--muted .app-sidebar-nav-icon {
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.app-sidebar-nav-link--muted:hover {
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.app-sidebar-nav-link--muted:hover .app-sidebar-nav-icon {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.app-sidebar-nav-link--muted.is-active .app-sidebar-nav-icon {
+  background: rgba(34, 197, 94, 0.18);
+  color: #fff;
+}
+
+.app-sidebar-nav-divider {
+  margin: 12px 0 10px;
+  border: none;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.12) 20%,
+    rgba(255, 255, 255, 0.12) 80%,
+    transparent
+  );
+}
+
+@keyframes appSidebarNavItemIn {
+  from {
+    opacity: 0;
+    transform: translate3d(-10px, 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* Stagger: só quando o menu está aberto (repete ao reabrir) */
+.app-sidebar-drawer.is-open .app-sidebar-nav-link {
+  animation: appSidebarNavItemIn var(--app-sidebar-nav-item-duration) var(--app-sidebar-ease) both backwards;
+}
+
+/* hr é o 4º filho; links: 1–3 e 5 (Entrar) */
+.app-sidebar-drawer.is-open .app-sidebar-nav-link:nth-child(1) {
+  animation-delay: calc(var(--app-sidebar-stagger-base) + 0 * var(--app-sidebar-stagger-step));
+}
+
+.app-sidebar-drawer.is-open .app-sidebar-nav-link:nth-child(2) {
+  animation-delay: calc(var(--app-sidebar-stagger-base) + 1 * var(--app-sidebar-stagger-step));
+}
+
+.app-sidebar-drawer.is-open .app-sidebar-nav-link:nth-child(3) {
+  animation-delay: calc(var(--app-sidebar-stagger-base) + 2 * var(--app-sidebar-stagger-step));
+}
+
+.app-sidebar-drawer.is-open .app-sidebar-nav-link:nth-child(5) {
+  animation-delay: calc(var(--app-sidebar-stagger-base) + 3 * var(--app-sidebar-stagger-step));
+}
+
 .app-main {
   min-height: 100vh;
-  background-color: #f5f7fa;
+  width: 100%;
+  position: relative;
+  padding-left: var(--app-left-rail-width, 56px);
+  box-sizing: border-box;
+}
+
+@media (max-width: 380px) {
+  .app-sidebar-inner {
+    padding: 16px 12px;
+  }
+
+  .app-sidebar-nav-link {
+    min-height: 48px;
+    padding: 12px 10px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-sidebar-drawer {
+    transition-duration: 0.01ms;
+  }
+
+  .app-sidebar-inner {
+    transition-duration: 0.01ms;
+  }
+
+  .app-sidebar-backdrop {
+    animation: none;
+  }
+
+  .app-sidebar-drawer.is-open .app-sidebar-nav-link {
+    animation: none;
+  }
 }

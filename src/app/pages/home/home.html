@@ -4,28 +4,33 @@
 <!-- ========== HEADER ========== -->
 <header class="header">
   <div class="header-inner">
-    <!-- Logo -->
-    <div class="logo-container">
-      <div class="logo-box">
-        <span class="logo-text">eco</span>
-        <span class="logo-sub">TRANSPARÊNCIA</span>
+    <div class="header-brand">
+      <!-- Logo (mesma do site) -->
+      <div class="logo-container">
+        <a
+          routerLink="/"
+          (click)="scrollToTop()"
+          class="logo-link"
+          aria-label="Voltar para a página inicial"
+        >
+          <div class="logo-box">
+            <span class="logo-text">eco</span>
+            <span class="logo-sub">TRANSPARÊNCIA</span>
+          </div>
+        </a>
       </div>
     </div>
 
     <!-- Navegação -->
     <nav class="nav-menu" aria-label="Menu principal">
-      <a routerLink="/metodologia" class="nav-btn">
-        Metodologia do Score
+      <a routerLink="/assinaturas" class="nav-btn nav-btn-primary">
+        Assinaturas
       </a>
-      <button
-        class="nav-btn"
-        (click)="scrollToSection('about')"
-        type="button"
-      >
-        Sobre a Empresa
-      </button>
-      <a routerLink="/login" class="nav-btn nav-btn-admin">
-        Área Admin
+      <a routerLink="/login" class="nav-btn nav-btn-primary">
+        Entrar
+      </a>
+      <a routerLink="/cadastro" class="nav-btn nav-btn-primary">
+        Cadastre-se
       </a>
     </nav>
   </div>
@@ -151,10 +156,10 @@
 <footer class="footer">
   <div class="footer-inner">
     <div class="footer-brand">
-      <div class="footer-logo">
-        <span class="logo-text-small">eco</span>
-        <span class="logo-sub-small">TRANSPARÊNCIA</span>
-      </div>
+        <div class="footer-logo">
+          <span class="logo-text-small">eco</span>
+          <span class="logo-sub-small">TRANSPARÊNCIA</span>
+        </div>
       <p class="footer-tagline">Transparência socioambiental ao seu alcance</p>
     </div>
 
@@ -171,3 +176,26 @@
     </div>
   </div>
 </footer>
+
+<!-- Ajuda fixa: canto inferior direito (somente nesta página) -->
+<div class="help-menu" (click)="$event.stopPropagation()">
+  <button
+    type="button"
+    class="help-toggle"
+    aria-label="Abrir menu de ajuda"
+    [attr.aria-expanded]="isHelpMenuOpen()"
+    (click)="toggleHelpMenu()"
+  >
+    ?
+  </button>
+
+  @if (isHelpMenuOpen()) {
+    <div class="help-dropdown" role="menu" aria-label="Menu de ajuda">
+      <button type="button" class="help-item" role="menuitem">Confira planos e preços</button>
+      <button type="button" class="help-item" role="menuitem">Sobre a empresa</button>
+      <button type="button" class="help-item" role="menuitem">Central de ajuda</button>
+      <button type="button" class="help-item" role="menuitem">Notas de versão</button>
+      <button type="button" class="help-item" role="menuitem">Termos e políticas</button>
+    </div>
+  }
+</div>

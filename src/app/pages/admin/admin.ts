@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, HostListener, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -46,6 +46,13 @@ export class Admin implements OnInit {
   successMessage = signal<string | null>(null);
   errorMessage = signal<string | null>(null);
   isEditing = signal(false);
+
+  @HostListener('document:keydown', ['$event'])
+  onEscapeCancelEdit(event: KeyboardEvent): void {
+    if (event.key !== 'Escape' || !this.isEditing()) return;
+    this.cancelEditing();
+    event.preventDefault();
+  }
 
   ngOnInit(): void {
     // Check if user is authenticated

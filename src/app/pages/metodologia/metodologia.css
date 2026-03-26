@@ -57,11 +57,13 @@
 }
 
 .logo-link {
+  display: inline-flex;
+  align-items: center;
   text-decoration: none;
 }
 
 .logo-box {
-  background: #2D5A47;
+  background: #2d5a47;
   padding: 12px 20px;
   border-radius: 8px;
   display: flex;
@@ -78,9 +80,9 @@
 .logo-text {
   font-size: 28px;
   font-weight: 800;
-  color: #FFFFFF;
+  color: #ffffff;
   letter-spacing: 2px;
-  font-family: 'Georgia', serif;
+  font-family: Georgia, serif;
 }
 
 .logo-sub {
@@ -580,7 +582,7 @@
   display: inline-flex;
   flex-direction: column;
   align-items: center;
-  background: #2D5A47;
+  background: #2d5a47;
   padding: 12px 20px;
   border-radius: 8px;
   margin-bottom: 16px;
@@ -589,9 +591,9 @@
 .logo-text-small {
   font-size: 20px;
   font-weight: 800;
-  color: #FFFFFF;
+  color: #ffffff;
   letter-spacing: 2px;
-  font-family: 'Georgia', serif;
+  font-family: Georgia, serif;
 }
 
 .logo-sub-small {
