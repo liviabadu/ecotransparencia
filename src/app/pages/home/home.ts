@@ -1,16 +1,39 @@
-import { Component, HostListener, signal } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  HostListener,
+  NgZone,
+  OnDestroy,
+  ViewChild,
+  inject,
+  signal,
+} from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Search } from '../../components/search/search';
+import { CounterDirective } from '../../directives/counter.directive';
+import { HomeScrollStory } from './home-scroll-story';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [Search, RouterLink],
+  imports: [Search, RouterLink, CounterDirective],
   templateUrl: './home.html',
   styleUrl: './home.css',
 })
-export class Home {
+export class Home implements AfterViewInit, OnDestroy {
   isHelpMenuOpen = signal(false);
+
+  /** Host dos efeitos até o fim da página — ver home-scroll-story.ts */
+  @ViewChild('storyHost', { read: ElementRef }) private storyHost?: ElementRef<HTMLElement>;
+
+  private readonly zone = inject(NgZone);
+  private scrollStory?: HomeScrollStory;
+
+  /** Rodapé com href="#" (placeholders): evita saltar ao topo e “piscar” a viewport */
+  preventFooterPlaceholder(event: Event): void {
+    event.preventDefault();
+  }
 
   /**
    * Scroll suave para seção
@@ -23,7 +46,18 @@ export class Home {
   }
 
   scrollToTop(): void {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }
+
+  ngAfterViewInit(): void {
+    const el = this.storyHost?.nativeElement;
+    if (!el || typeof window === 'undefined') return;
+    this.scrollStory = new HomeScrollStory(el, this.zone);
+    this.scrollStory.init();
+  }
+
+  ngOnDestroy(): void {
+    this.scrollStory?.destroy();
   }
 
   toggleHelpMenu(): void {

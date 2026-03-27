@@ -1,6 +1,5 @@
-import { afterNextRender, Component, HostListener, inject } from '@angular/core';
+import { Component, HostListener, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { MouseParallaxService } from './services/mouse-parallax.service';
 import { SidebarService } from './services/sidebar.service';
 
 @Component({
@@ -11,11 +10,6 @@ import { SidebarService } from './services/sidebar.service';
 })
 export class App {
   readonly sidebar = inject(SidebarService);
-  private readonly mouseParallax = inject(MouseParallaxService);
-
-  constructor() {
-    afterNextRender(() => this.mouseParallax.start());
-  }
 
   @HostListener('document:keydown', ['$event'])
   onDocumentKeydown(event: KeyboardEvent): void {

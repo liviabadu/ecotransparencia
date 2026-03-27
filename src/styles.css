@@ -21,8 +21,8 @@
   --danger: #ef4444;
   --warn: #f59e0b;
 
-  --shadow-1: 0 10px 30px rgba(0, 0, 0, 0.35);
-  --shadow-2: 0 18px 60px rgba(0, 0, 0, 0.45);
+  --shadow-1: 0 8px 24px rgba(0, 0, 0, 0.22);
+  --shadow-2: 0 14px 40px rgba(0, 0, 0, 0.28);
 
   --radius-md: 14px;
   --radius-lg: 20px;
@@ -47,6 +47,11 @@
   box-sizing: border-box;
 }
 
+/* instantâneo no documento: evita scroll “arrastado” ao trocar de rota (páginas longas) */
+html {
+  scroll-behavior: auto;
+}
+
 html,
 body {
   height: 100%;
@@ -61,66 +66,17 @@ body {
     radial-gradient(1000px 700px at 70% 90%, rgba(52, 211, 153, 0.12), transparent 55%),
     linear-gradient(180deg, var(--bg-0), var(--bg-1));
   overflow-x: hidden;
-  text-rendering: optimizeLegibility;
+  /* optimizeLegibility pode custar mais durante repaint ao rolar */
+  text-rendering: auto;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  background-image: radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.06) 1px, transparent 0);
-  background-size: 28px 28px;
-  opacity: 0.35;
-  mask-image: radial-gradient(closest-side at 50% 20%, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0));
-}
-
-body::after {
-  content: "";
-  position: fixed;
-  inset: -30%;
-  pointer-events: none;
-  background: conic-gradient(
-    from 180deg at 50% 50%,
-    rgba(34, 197, 94, 0.12),
-    rgba(52, 211, 153, 0.1),
-    rgba(45, 212, 191, 0.1),
-    rgba(34, 197, 94, 0.12)
-  );
-  filter: blur(40px);
-  opacity: 0.28;
-  animation: ambientGlow 18s linear infinite;
-}
-
-@keyframes ambientGlow {
-  0% {
-    transform: translate3d(0, 0, 0) rotate(0deg);
-  }
-  50% {
-    transform: translate3d(2%, -1%, 0) rotate(180deg);
-  }
-  100% {
-    transform: translate3d(0, 0, 0) rotate(360deg);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  body::after {
-    animation: none;
-  }
-}
-
-/* Parallax por mouse (transform aplicado via MouseParallaxService) */
-.parallax {
-  will-change: transform;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .parallax {
-    will-change: auto;
-  }
+/* Mesmo fundo do body até o Angular pintar o outlet (evita faixa “vazia” no F5) */
+app-root {
+  display: block;
+  min-height: 100%;
+  background: inherit;
 }
 
 a {
@@ -181,10 +137,8 @@ small {
 }
 
 .glass {
-  background: color-mix(in srgb, var(--surface-0), transparent 0%);
+  background: rgba(255, 255, 255, 0.09);
   border: 1px solid var(--border-0);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
   box-shadow: var(--shadow-1);
 }
 
@@ -218,3 +172,74 @@ small {
   background: rgba(255, 255, 255, 0.06);
   box-shadow: var(--shadow-1);
 }
+
+/* ============================================================================
+   .counter — odômetro (diretiva CounterDirective)
+   ============================================================================ */
+.counter.counter--odometer {
+  display: inline-flex;
+  align-items: flex-end;
+  justify-content: center;
+  flex-wrap: nowrap;
+  gap: 0.04em;
+  line-height: 1;
+  vertical-align: bottom;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+/* Só o texto dos números — sem caixa, borda nem sombra no odômetro */
+.counter,
+.counter * {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  filter: none;
+}
+
+.odometer-digit {
+  display: inline-block;
+  position: relative;
+  overflow: hidden;
+  vertical-align: bottom;
+  height: 1em;
+  min-width: 0.52em;
+  text-align: center;
+}
+
+.odometer-digit__strip {
+  display: flex;
+  flex-direction: column;
+  will-change: transform;
+}
+
+.odometer-cell {
+  display: block;
+  height: 1em;
+  line-height: 1em;
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.counter-static,
+.counter-suffix {
+  display: inline-block;
+  align-self: flex-end;
+  line-height: 1;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.stat-number .odometer-cell {
+  color: #a7f3d0;
+}
+
+/* Cor sólida (sem background/clip no texto) para +, M+, / */
+.stat-number .counter-suffix,
+.stat-number .counter-static {
+  -webkit-background-clip: unset;
+  background-clip: unset;
+  color: #a7f3d0;
+}
+

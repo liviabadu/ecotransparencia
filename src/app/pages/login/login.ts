@@ -10,7 +10,7 @@ import { isFocusInTextEntryField } from '../../utils/form-focus.util';
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './login.html',
-  styleUrl: './login.css',
+  styleUrls: ['../auth/auth-modal.shared.css', './login.css'],
 })
 export class Login {
   private authService = inject(AuthService);
@@ -20,27 +20,75 @@ export class Login {
   onEscapeLeavePage(event: KeyboardEvent): void {
     if (event.key !== 'Escape') return;
     if (isFocusInTextEntryField()) return;
-    this.router.navigate(['/']);
+    this.goHome();
     event.preventDefault();
   }
 
   email = signal('');
   password = signal('');
   errorMessage = signal<string | null>(null);
+  infoMessage = signal<string | null>(null);
   isLoading = signal(false);
+
+  /** Fecha a tela e vai ao início sem empilhar histórico (resposta imediata ao X / Esc) */
+  goHome(): void {
+    void this.router.navigateByUrl('/', { replaceUrl: true });
+  }
+
+  onPhone(): void {
+    this.errorMessage.set(null);
+    this.infoMessage.set('Login com telefone estará disponível em breve.');
+  }
+
+  async onGoogle(): Promise<void> {
+    this.errorMessage.set(null);
+    this.infoMessage.set(null);
+    this.isLoading.set(true);
+    try {
+      await this.authService.loginWithGoogle();
+      await this.router.navigate(['/']);
+    } catch (error: unknown) {
+      this.errorMessage.set(this.mapGoogleError(error));
+    } finally {
+      this.isLoading.set(false);
+    }
+  }
 
   async onSubmit(event: Event): Promise<void> {
     event.preventDefault();
     this.errorMessage.set(null);
+    this.infoMessage.set(null);
     this.isLoading.set(true);
 
     try {
       await this.authService.login(this.email(), this.password());
-      this.router.navigate(['/']);
-    } catch (error: any) {
-      this.errorMessage.set(this.getErrorMessage(error.code));
+      await this.router.navigate(['/']);
+    } catch (error: unknown) {
+      this.errorMessage.set(this.getErrorMessage(this.codeOf(error)));
     } finally {
       this.isLoading.set(false);
+    }
+  }
+
+  private codeOf(error: unknown): string {
+    if (error && typeof error === 'object' && 'code' in error) {
+      return String((error as { code: string }).code);
+    }
+    return '';
+  }
+
+  private mapGoogleError(error: unknown): string {
+    const code = this.codeOf(error);
+    switch (code) {
+      case 'auth/popup-closed-by-user':
+      case 'auth/cancelled-popup-request':
+        return 'Login cancelado.';
+      case 'auth/popup-blocked':
+        return 'Permita pop-ups para este site e tente de novo.';
+      case 'auth/account-exists-with-different-credential':
+        return 'Já existe uma conta com este e-mail usando outro método de login.';
+      default:
+        return 'Não foi possível entrar com o Google. Tente novamente.';
     }
   }
 

@@ -6,7 +6,7 @@
   <div class="header-inner">
     <!-- Logo -->
     <div class="logo-container">
-      <a routerLink="/" class="logo-link">
+      <a routerLink="/" class="logo-link" aria-label="Voltar para a página inicial">
         <div class="logo-box">
           <span class="logo-text">eco</span>
           <span class="logo-sub">TRANSPARÊNCIA</span>
@@ -285,10 +285,10 @@
     </div>
 
     <div class="footer-links">
-      <a href="#" class="footer-link">Termos de Uso</a>
-      <a href="#" class="footer-link">Política de Privacidade</a>
-      <a href="#" class="footer-link">Contato</a>
-      <a href="#" class="footer-link">Acessibilidade</a>
+      <a href="#" class="footer-link" (click)="preventFooterPlaceholder($event)">Termos de Uso</a>
+      <a href="#" class="footer-link" (click)="preventFooterPlaceholder($event)">Política de Privacidade</a>
+      <a href="#" class="footer-link" (click)="preventFooterPlaceholder($event)">Contato</a>
+      <a href="#" class="footer-link" (click)="preventFooterPlaceholder($event)">Acessibilidade</a>
     </div>
 
     <div class="footer-copy">

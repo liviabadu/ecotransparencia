@@ -42,6 +42,13 @@
  * Largura abre o espaço + o painel desliza em translate3d (GPU).
  */
 .app-sidebar-drawer {
+  /* Cor alinhada ao header da home (rgb 11,18,32), opaca; separador refinado */
+  --app-sidebar-surface: #0b1220;
+  --app-sidebar-surface-top: #0d1528;
+  --app-sidebar-surface-bottom: #090f1a;
+  --app-sidebar-edge: rgba(52, 125, 102, 0.38);
+  --app-sidebar-edge-accent: rgba(42, 98, 80, 0.22);
+
   /* Painel: até 280px, nunca invade a viewport além de uma folga (mobile) */
   --app-sidebar-panel: min(
     280px,
@@ -60,7 +67,7 @@
   flex-direction: row;
   flex-wrap: nowrap;
   align-items: stretch;
-  box-shadow: 12px 0 40px rgba(0, 0, 0, 0.55);
+  box-shadow: none;
   overflow: visible;
   transition: width var(--app-sidebar-open-duration) var(--app-sidebar-ease);
   pointer-events: none;
@@ -91,9 +98,15 @@
     env(safe-area-inset-bottom)
   );
   pointer-events: auto;
-  background: linear-gradient(180deg, #05080e 0%, #070b12 40%, #0b1220 100%);
-  border-right: 1px solid rgba(255, 255, 255, 0.07);
-  box-shadow: inset -1px 0 0 rgba(34, 197, 94, 0.14);
+  background: linear-gradient(
+    180deg,
+    var(--app-sidebar-surface-top) 0%,
+    var(--app-sidebar-surface) 45%,
+    var(--app-sidebar-surface-bottom) 100%
+  );
+  /* Borda verde + filete interno (par com o header da home) */
+  border-right: 1px solid var(--app-sidebar-edge);
+  box-shadow: inset -1px 0 0 var(--app-sidebar-edge-accent);
 }
 
 .app-rail-top,
@@ -265,11 +278,14 @@
   display: flex;
   flex-direction: column;
   gap: 0;
-  background: linear-gradient(180deg, #05080e 0%, #070b12 40%, #0b1220 100%);
-  border-right: 1px solid rgba(255, 255, 255, 0.07);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.05),
-    inset -1px 0 0 rgba(34, 197, 94, 0.14);
+  background: linear-gradient(
+    180deg,
+    var(--app-sidebar-surface-top) 0%,
+    var(--app-sidebar-surface) 45%,
+    var(--app-sidebar-surface-bottom) 100%
+  );
+  border-right: 1px solid var(--app-sidebar-edge);
+  box-shadow: inset -1px 0 0 var(--app-sidebar-edge-accent);
   transform: translate3d(-100%, 0, 0);
   transition: transform var(--app-sidebar-open-duration) var(--app-sidebar-ease);
 }
@@ -558,11 +574,16 @@
 
 .app-main {
   min-height: 100vh;
+  min-height: 100dvh;
   width: 100%;
   position: relative;
   padding-left: var(--app-left-rail-width, 56px);
   box-sizing: border-box;
+  /* Evita “flash” de empilhamento durante troca de rota */
+  isolation: isolate;
 }
+
+/* Sem fade no outlet: opacity:0 no 1º frame causava “piscar” no F5 e após lazy load */
 
 @media (max-width: 380px) {
   .app-sidebar-inner {

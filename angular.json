@@ -39,8 +39,8 @@
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "6kB",
-                  "maximumError": "12kB"
+                  "maximumWarning": "10kB",
+                  "maximumError": "18kB"
                 }
               ],
               "outputHashing": "all"
@@ -55,9 +55,16 @@
         },
         "serve": {
           "builder": "@angular/build:dev-server",
+          "options": {
+            "buildTarget": "ecotransparencia:build:development",
+            "liveReload": true,
+            "watch": true,
+            "hmr": true
+          },
           "configurations": {
             "production": {
-              "buildTarget": "ecotransparencia:build:production"
+              "buildTarget": "ecotransparencia:build:production",
+              "hmr": false
             },
             "development": {
               "buildTarget": "ecotransparencia:build:development"

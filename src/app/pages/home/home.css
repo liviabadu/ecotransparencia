@@ -7,7 +7,7 @@
   position: absolute;
   top: -100px;
   left: 0;
-  background: rgba(11, 18, 32, 0.9);
+  background: rgba(11, 18, 32, 0.97);
   color: rgba(255, 255, 255, 0.92);
   border: 1px solid rgba(255, 255, 255, 0.18);
   padding: 12px 24px;
@@ -15,7 +15,6 @@
   text-decoration: none;
   font-weight: 600;
   border-radius: 12px;
-  backdrop-filter: blur(10px);
 }
 
 .skip-link:focus {
@@ -26,7 +25,8 @@
    HEADER
    ============================================================================ */
 .header {
-  background: rgba(11, 18, 32, 0.55);
+  /* Fundo sólido em vez de backdrop-filter: blur custa muito a cada frame de scroll */
+  background: rgba(11, 18, 32, 0.94);
   padding: 16px 0;
   position: fixed;
   top: 0;
@@ -34,9 +34,7 @@
   right: 0;
   /* Abaixo da barra vertical (1025) para ela “passar por cima” à esquerda */
   z-index: 1018;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(52, 125, 102, 0.38);
 }
 
 .header-inner {
@@ -86,7 +84,10 @@
   line-height: 1;
   border: 1px solid rgba(255, 255, 255, 0.14);
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
-  transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease;
 }
 
 .logo-link:hover .logo-box {
@@ -130,7 +131,7 @@
 .nav-btn {
   padding: 10px 20px;
   border: 1px solid rgba(255, 255, 255, 0.16);
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(255, 255, 255, 0.07);
   color: rgba(255, 255, 255, 0.86);
   text-decoration: none;
   font-size: 14px;
@@ -141,7 +142,6 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  backdrop-filter: blur(10px);
   min-height: 42px;
   line-height: 1;
   white-space: nowrap;
@@ -213,13 +213,11 @@
   max-width: min(280px, calc(100vw - 24px));
   max-height: min(70vh, 360px);
   overflow-y: auto;
-  background: rgba(28, 28, 30, 0.96);
   border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: 16px;
   padding: 10px;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  background: rgba(18, 22, 30, 0.98);
 }
 
 .help-item {
@@ -254,15 +252,21 @@
 
 .hero-bg {
   position: absolute;
-  top: 0;
   left: 0;
   right: 0;
-  bottom: 0;
+  top: -14vh;
+  height: calc(100% + 28vh);
+  bottom: auto;
   background: radial-gradient(1200px 700px at 18% 0%, rgba(34, 197, 94, 0.22), transparent 55%),
     radial-gradient(1000px 600px at 82% 22%, rgba(45, 212, 191, 0.14), transparent 60%),
     radial-gradient(1000px 700px at 60% 95%, rgba(52, 211, 153, 0.12), transparent 60%),
     linear-gradient(180deg, #070b12, #0b1220);
   z-index: -2;
+}
+
+/* Parallax no scroll aplica transform via JS — will-change só neste elemento */
+.hero-bg.parallax-scroll {
+  will-change: transform;
 }
 
 .hero-bg::before {
@@ -276,45 +280,40 @@
   opacity: 0.65;
 }
 
+/* Camada extra com blur grande no hero → artefactos ao scroll; gradientes do .hero-bg bastam */
 .hero-bg::after {
-  content: "";
-  position: absolute;
-  inset: -40%;
-  background: conic-gradient(
-    from 180deg at 50% 50%,
-    rgba(34, 197, 94, 0.12),
-    rgba(52, 211, 153, 0.10),
-    rgba(45, 212, 191, 0.10),
-    rgba(34, 197, 94, 0.12)
-  );
-  filter: blur(36px);
-  opacity: 0.35;
-  animation: heroGlow 16s linear infinite;
-}
-
-@keyframes heroGlow {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .hero-bg::after {
-    animation: none;
-  }
+  display: none;
 }
 
 .hero-content {
+  flex: 1 1 auto;
+  width: 100%;
   max-width: 800px;
   text-align: center;
   position: relative;
   z-index: 1;
   display: grid;
+  grid-template-rows: auto auto 1fr auto;
   justify-items: center;
+  align-items: center;
   gap: 14px;
+  min-height: 0;
+}
+
+/* Wrapper interno: fade-in não conflita com hover translate do .badge */
+.badge__reveal {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+/* Conteúdo do card: fade-in separado do hover do .step-card */
+.step-card__reveal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
 }
 
 .hero-title {
@@ -323,8 +322,11 @@
   color: #FFFFFF;
   line-height: 1.1;
   margin-bottom: 0;
-  text-shadow: 0 10px 40px rgba(0, 0, 0, 0.45);
+  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.35);
   font-family: "Space Grotesk", Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  /* Evita “tremida” ao fim de animações com transform no mesmo elemento */
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 .hero-highlight {
@@ -333,6 +335,10 @@
   background-clip: text;
   color: transparent;
   display: block;
+  /* Camada estável para gradiente + clip; reduz refino subpixel após scale/translate no pai */
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 .hero-subtitle {
@@ -343,11 +349,12 @@
   max-width: 60ch;
 }
 
-/* Search Wrapper */
+/* Search Wrapper — linha do grid 1fr: centraliza entre subtítulo e badges */
 .search-wrapper {
   max-width: 700px;
-  margin: 10px auto 22px;
+  margin: 0;
   width: 100%;
+  align-self: center;
 }
 
 /* Badges */
@@ -356,7 +363,8 @@
   justify-content: center;
   gap: 14px;
   flex-wrap: wrap;
-  margin-top: 8px;
+  margin-top: 0;
+  align-self: start;
 }
 
 .badge {
@@ -368,8 +376,8 @@
   box-sizing: border-box;
   background: linear-gradient(
     145deg,
-    rgba(255, 255, 255, 0.09) 0%,
-    rgba(255, 255, 255, 0.04) 100%
+    rgba(255, 255, 255, 0.12) 0%,
+    rgba(255, 255, 255, 0.065) 100%
   );
   border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: 14px;
@@ -377,8 +385,6 @@
   font-size: 14px;
   font-weight: 600;
   letter-spacing: 0.01em;
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.06) inset,
     0 12px 40px rgba(0, 0, 0, 0.25),
@@ -424,9 +430,61 @@
    COMO FUNCIONA
    ============================================================================ */
 .how-section {
-  padding: 100px 24px;
-  background: rgba(255, 255, 255, 0.02);
-  border-top: 1px solid rgba(255, 255, 255, 0.10);
+  position: relative;
+  z-index: 0;
+  margin-top: -1px;
+  padding: 28px 24px 108px;
+  overflow: hidden;
+  background-color: #070f18;
+  background-image:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.018) 0%, transparent 42%, transparent 68%, rgba(34, 197, 94, 0.03) 100%),
+    radial-gradient(900px 520px at 12% 0%, rgba(34, 197, 94, 0.12), transparent 55%),
+    radial-gradient(700px 420px at 92% 60%, rgba(45, 212, 191, 0.08), transparent 50%);
+}
+
+/* Separador entre blocos: largura total, cor suave, some nas pontas */
+.how-section::before,
+.about-section::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  width: 100%;
+  height: 1.5px;
+  border-radius: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    transparent 8%,
+    rgba(45, 212, 191, 0.07) 22%,
+    rgba(45, 212, 191, 0.11) 50%,
+    rgba(45, 212, 191, 0.07) 78%,
+    transparent 92%,
+    transparent 100%
+  );
+  z-index: 2;
+  pointer-events: none;
+}
+
+.how-section .container {
+  position: relative;
+  z-index: 1;
+}
+
+.how-section__title {
+  margin-bottom: 12px;
+}
+
+.how-section__lead {
+  max-width: 42rem;
+  margin: 18px auto 52px;
+  text-align: center;
+  font-size: clamp(1rem, 2.2vw, 1.125rem);
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.62);
+  font-weight: 500;
+  letter-spacing: 0.01em;
 }
 
 .container {
@@ -435,88 +493,176 @@
 }
 
 .section-title {
-  font-size: clamp(2rem, 4vw, 2.5rem);
+  font-family: "Space Grotesk", Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  font-size: clamp(2.25rem, 5vw, 3rem);
   font-weight: 800;
-  color: rgba(255, 255, 255, 0.92);
+  line-height: 1.08;
+  letter-spacing: -0.04em;
   text-align: center;
-  margin-bottom: 60px;
+  margin-bottom: 48px;
   position: relative;
   text-wrap: balance;
+  background: linear-gradient(
+    118deg,
+    #ffffff 0%,
+    #f1f5f9 38%,
+    #d1fae5 68%,
+    #5eead4 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  filter: drop-shadow(0 3px 22px rgba(0, 0, 0, 0.42));
 }
 
-.section-title::after {
-  content: '';
-  display: block;
-  width: 60px;
-  height: 4px;
-  background: linear-gradient(90deg, #22c55e, #2dd4bf);
-  margin: 16px auto 0;
-  border-radius: 2px;
+.how-section .section-title {
+  margin-bottom: 0;
 }
 
 .steps-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 32px;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  gap: clamp(20px, 3vw, 28px);
+  align-items: stretch;
 }
 
 .step-card {
-  background: rgba(255, 255, 255, 0.06);
-  padding: 40px 32px;
-  border-radius: 20px;
+  --step-accent: rgba(34, 197, 94, 0.22);
+  background: linear-gradient(
+    165deg,
+    rgba(255, 255, 255, 0.075) 0%,
+    rgba(255, 255, 255, 0.038) 48%,
+    rgba(7, 11, 18, 0.35) 100%
+  );
+  padding: 44px 28px 40px;
+  border-radius: 22px;
   text-align: center;
-  box-shadow: 0 16px 60px rgba(0, 0, 0, 0.35);
-  transition: all 0.3s ease;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.06) inset,
+    0 4px 24px rgba(0, 0, 0, 0.2);
+  transition:
+    transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.28s ease,
+    box-shadow 0.28s ease;
   position: relative;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.step-card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--step-accent), rgba(45, 212, 191, 0.25), transparent);
+  opacity: 0.28;
+  transition: opacity 0.28s ease;
 }
 
 .step-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 22px 80px rgba(0, 0, 0, 0.45);
+  transform: translateY(-6px);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.08) inset,
+    0 16px 40px rgba(0, 0, 0, 0.28),
+    0 0 0 1px rgba(34, 197, 94, 0.12);
   border-color: rgba(34, 197, 94, 0.28);
 }
 
+.step-card:hover::before {
+  opacity: 1;
+}
+
 .step-card:hover .step-number {
-  background: linear-gradient(135deg, rgba(34, 197, 94, 0.9), rgba(45, 212, 191, 0.9));
+  color: #0b1220;
+  background: linear-gradient(135deg, #34d399, #22c55e);
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 14px rgba(34, 197, 94, 0.35);
 }
 
 .step-number {
   position: absolute;
-  top: 20px;
-  right: 20px;
-  width: 32px;
-  height: 32px;
-  background: rgba(255, 255, 255, 0.08);
-  color: rgba(255, 255, 255, 0.92);
-  border-radius: 50%;
-  display: flex;
+  top: 12px;
+  right: 12px;
+  z-index: 1;
+  min-width: 36px;
+  height: 28px;
+  padding: 0 8px;
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.78);
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   font-weight: 700;
-  font-size: 14px;
-  transition: background 0.3s ease;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  font-variant-numeric: tabular-nums;
+  transition:
+    background 0.3s ease,
+    color 0.3s ease,
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
 }
 
-.step-icon {
-  font-size: 48px;
-  margin-bottom: 20px;
+.step-icon-wrap {
+  width: 76px;
+  height: 76px;
+  margin: 8px auto 24px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: linear-gradient(
+    145deg,
+    rgba(34, 197, 94, 0.16) 0%,
+    rgba(45, 212, 191, 0.08) 100%
+  );
+  border: 1px solid rgba(34, 197, 94, 0.28);
+  color: #6ee7b7;
+  box-shadow:
+    0 8px 28px rgba(0, 0, 0, 0.22),
+    0 1px 0 rgba(255, 255, 255, 0.08) inset;
+}
+
+.step-icon-wrap.reveal-scale {
+  display: flex;
+}
+
+.step-icon-svg {
+  display: block;
+  flex-shrink: 0;
+}
+
+.step-card:hover .step-icon-wrap {
+  border-color: rgba(52, 211, 153, 0.45);
+  color: #a7f3d0;
+  box-shadow:
+    0 10px 32px rgba(34, 197, 94, 0.15),
+    0 1px 0 rgba(255, 255, 255, 0.1) inset;
 }
 
 .step-title {
-  font-size: 1.5rem;
+  font-size: clamp(1.25rem, 2.5vw, 1.45rem);
   font-weight: 700;
-  color: rgba(255, 255, 255, 0.92);
-  margin-bottom: 12px;
+  color: rgba(255, 255, 255, 0.94);
+  margin-bottom: 14px;
   text-wrap: balance;
+  letter-spacing: -0.02em;
 }
 
 .step-desc {
-  font-size: 1rem;
-  color: rgba(255, 255, 255, 0.7);
-  line-height: 1.6;
+  font-size: 0.9375rem;
+  color: rgba(255, 255, 255, 0.66);
+  line-height: 1.65;
+  max-width: 32ch;
+  margin: 0 auto;
 }
 
 /* ============================================================================
@@ -524,15 +670,44 @@
    ============================================================================ */
 .about-section {
   position: relative;
-  padding: 84px 24px;
-  background: #08111b;
-  isolation: isolate;
+  overflow: hidden;
+  margin-top: -1px;
+  padding: 97px 24px 100px;
+  z-index: 0;
+  background-color: #070f18;
+  background-image:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.018) 0%, transparent 42%, transparent 68%, rgba(34, 197, 94, 0.03) 100%),
+    radial-gradient(900px 520px at 12% 0%, rgba(34, 197, 94, 0.12), transparent 55%),
+    radial-gradient(700px 420px at 92% 60%, rgba(45, 212, 191, 0.08), transparent 50%);
+}
+
+.about-section .container {
+  position: relative;
+  z-index: 1;
+}
+
+/* Camada decorativa com parallax (home-scroll-story.ts) */
+.about-parallax-layer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -12vh;
+  height: calc(100% + 24vh);
+  bottom: auto;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 100% 70% at 50% 0%,
+    rgba(34, 197, 94, 0.12),
+    transparent 58%
+  );
+  opacity: 0.95;
 }
 
 .about-content {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 60px;
+  gap: 48px;
   align-items: center;
 }
 
@@ -546,7 +721,8 @@
 
 @media (min-width: 768px) {
   .about-content {
-    grid-template-columns: 1.5fr 1fr;
+    grid-template-columns: 1.45fr 1fr;
+    gap: 56px;
   }
 }
 
@@ -566,41 +742,82 @@
   font-weight: 600;
 }
 
+/* Resumo para leitores de tela (números animados são decorativos) */
+.about-stats-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 .about-stats {
+  position: relative;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
+  gap: 14px;
+  padding: 20px;
+  border-radius: 20px;
+  background: rgba(11, 18, 32, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
 @media (min-width: 768px) {
   .about-stats {
     grid-template-columns: 1fr;
+    gap: 12px;
+    padding: 22px;
   }
 }
 
 .stat-item {
   text-align: center;
-  padding: 24px;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.10);
+  padding: 22px 16px;
+  background: rgba(7, 15, 24, 0.4);
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  transition:
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.stat-item:hover {
+  border-color: rgba(52, 211, 153, 0.2);
+  transform: translateY(-1px);
 }
 
 .stat-number {
-  display: block;
-  font-size: 2rem;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  min-height: 1.25em;
+  font-size: clamp(1.75rem, 4vw, 2.35rem);
   font-weight: 800;
-  background: linear-gradient(90deg, #22c55e, #2dd4bf);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  margin-bottom: 4px;
+  font-variant-numeric: tabular-nums;
+  font-family: "Space Grotesk", Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  margin-bottom: 8px;
+}
+
+.stat-number--uptime {
+  /* alinha odômetro 24/7 com os outros blocos */
+  padding-top: 2px;
 }
 
 .stat-label {
-  font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.62);
-  font-weight: 500;
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.58);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 /* ============================================================================
@@ -695,6 +912,129 @@
 }
 
 /* ============================================================================
+   STORYTELLING / SCROLL (lógica em home-scroll-story.ts)
+   Classes: .fade-in, .reveal-scale, .parallax-scroll
+   ============================================================================ */
+
+/* Wrapper Angular: filhos participam do fluxo como se o nó não existisse */
+.home-story-root {
+  display: contents;
+}
+
+/**
+ * Entrada na viewport: IntersectionObserver adiciona .is-inview.
+ * Ao sair, .is-inview é removido — a animação pode repetir.
+ */
+.fade-in {
+  opacity: 0;
+  transform: translate3d(0, 28px, 0);
+  transition:
+    opacity 0.75s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.fade-in.is-inview {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+.fade-in--delay-1 {
+  transition-delay: 0.08s;
+}
+
+.fade-in--delay-2 {
+  transition-delay: 0.16s;
+}
+
+.fade-in--delay-3 {
+  transition-delay: 0.24s;
+}
+
+/**
+ * Hero principal (área da busca CNPJ): entrada mais longa, mais deslocamento
+ * e leve escala — só filhos diretos de .hero-content (não afeta badges nem seções abaixo).
+ */
+.hero-content > .fade-in {
+  opacity: 0;
+  transform: translate3d(0, 48px, 0);
+  transition:
+    opacity 1s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hero-content > .fade-in.is-inview {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+/* Só translateY (sem scale): scale no título costuma tremer “Socioambiental” com background-clip:text */
+.hero-content > .hero-title.fade-in {
+  transform: translate3d(0, 58px, 0);
+  transition:
+    opacity 1.05s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 1.05s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hero-content > .hero-title.fade-in.is-inview {
+  transform: translate3d(0, 0, 0);
+}
+
+.hero-content > .hero-subtitle.fade-in {
+  transform: translate3d(0, 44px, 0);
+}
+
+.hero-content > .hero-subtitle.fade-in.is-inview {
+  transform: translate3d(0, 0, 0);
+}
+
+.hero-content > .search-wrapper.fade-in {
+  transform: translate3d(0, 52px, 0) scale(0.9);
+  transition:
+    opacity 0.68s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.68s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.hero-content > .search-wrapper.fade-in.is-inview {
+  transform: translate3d(0, 0, 0) scale(1);
+}
+
+/* Escalonamento mais perceptível: título → texto explicativo → busca */
+.hero-content > .hero-subtitle.fade-in.fade-in--delay-1 {
+  transition-delay: 0.24s;
+}
+
+.hero-content > .search-wrapper.fade-in.fade-in--delay-2 {
+  transition-delay: 0.16s;
+}
+
+/**
+ * Escala ao entrar/sair da viewport (ícones, emoji, logo do rodapé).
+ */
+.reveal-scale {
+  display: inline-block;
+  transform: scale(0.9);
+  opacity: 0.88;
+  transition:
+    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.65s ease;
+}
+
+.reveal-scale.is-inview {
+  transform: scale(1);
+  opacity: 1;
+}
+
+.badge-icon-wrap.reveal-scale {
+  display: flex;
+}
+
+/* Após chegar ao fim da home: sem transição extra (layout “normal”) */
+.home-story-root.home-story--settled .fade-in,
+.home-story-root.home-story--settled .reveal-scale {
+  transition: none;
+}
+
+/* ============================================================================
    RESPONSIVIDADE
    ============================================================================ */
 @media (max-width: 768px) {
@@ -729,6 +1069,14 @@
     flex-direction: column;
     align-items: center;
   }
+
+  .how-section__lead {
+    margin: 18px auto 40px;
+  }
+
+  .step-card {
+    padding: 40px 22px 36px;
+  }
 }
 
 /* ============================================================================
@@ -743,10 +1091,4 @@
     transition-duration: 0.01ms !important;
   }
 
-  .hero-content,
-  .search-wrapper,
-  .badges {
-    transform: none;
-    will-change: auto;
-  }
 }

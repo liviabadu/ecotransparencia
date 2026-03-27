@@ -1,0 +1,13 @@
+<div class="auth-behind-root">
+  <div class="auth-behind-home-layer" aria-hidden="true">
+    <app-home />
+  </div>
+  <div class="auth-behind-dim" aria-hidden="true"></div>
+  <div class="auth-behind-front">
+    @if (authMode() === 'cadastro') {
+      <app-cadastro />
+    } @else {
+      <app-login />
+    }
+  </div>
+</div>
