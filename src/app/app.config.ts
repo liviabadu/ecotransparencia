@@ -2,6 +2,7 @@ import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/
 import { provideRouter, withInMemoryScrolling } from '@angular/router';
 import { provideHttpClient } from '@angular/common/http';
 
+import { provideCriticalFontsReady } from './font-initializers';
 import { routes } from './app.routes';
 import {initializeApp, provideFirebaseApp} from '@angular/fire/app';
 import {getAuth, provideAuth} from '@angular/fire/auth';
@@ -18,6 +19,7 @@ const firebaseConfig = {
 
 export const appConfig: ApplicationConfig = {
   providers: [
+    provideCriticalFontsReady(),
     provideBrowserGlobalErrorListeners(),
     provideRouter(
       routes,

@@ -63,11 +63,26 @@ export class CounterDirective implements AfterViewInit, OnDestroy {
 
     this.observeTarget = el.closest('.stat-item') ?? el.closest('.about-stats') ?? el;
 
+    /* Sem esperar document.fonts.ready (todas as faces): 2× rAF + após fontes do bloco “Sobre” */
     requestAnimationFrame(() => {
-      this.cacheDigitPx();
-      this.resetStripsToZero();
-      this.attachIntersectionObserver();
+      requestAnimationFrame(() => {
+        this.cacheDigitPx();
+        this.resetStripsToZero();
+        this.attachIntersectionObserver();
+      });
     });
+
+    if (typeof document === 'undefined' || !document.fonts?.load) return;
+
+    void Promise.all([
+      document.fonts.load('800 40px "Space Grotesk Variable"'),
+      document.fonts.load('700 40px "Space Grotesk Variable"'),
+    ])
+      .catch(() => undefined)
+      .then(() => {
+        if (!this.host.nativeElement.isConnected) return;
+        requestAnimationFrame(() => this.cacheDigitPx());
+      });
   }
 
   ngOnDestroy(): void {

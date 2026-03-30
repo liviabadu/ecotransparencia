@@ -1,0 +1,233 @@
+@let copy = language.modalCopy();
+
+<div
+  class="app-settings-overlay"
+  role="presentation"
+  [class.is-mounted]="mounted()"
+  [class.is-leaving]="leaving()"
+  (click)="onBackdropClick($event)"
+  (transitionend)="onOverlayTransitionEnd($event)"
+>
+  <div
+    class="app-settings-dialog"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="app-settings-title"
+    (click)="$event.stopPropagation()"
+  >
+    <div class="app-settings-layout">
+      <aside class="app-settings-nav" [attr.aria-label]="copy.navAria">
+        <button
+          type="button"
+          class="app-settings-close"
+          (click)="requestClose()"
+          [attr.aria-label]="copy.closeAria"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+            <path d="M18 6 6 18" />
+            <path d="m6 6 12 12" />
+          </svg>
+        </button>
+
+        <nav class="app-settings-nav-list">
+          <button
+            type="button"
+            class="app-settings-nav-item"
+            [class.is-active]="activePane() === 'geral'"
+            (click)="selectGeral()"
+          >
+            <span class="app-settings-nav-icon" aria-hidden="true">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
+                <path
+                  d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.26.604.852 1 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"
+                />
+              </svg>
+            </span>
+            <span>{{ copy.navGeral }}</span>
+          </button>
+
+          <button
+            type="button"
+            class="app-settings-nav-item"
+            [class.is-active]="activePane() === 'advanced'"
+            (click)="selectAdvanced()"
+          >
+            <span class="app-settings-nav-icon" aria-hidden="true">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round">
+                <ellipse cx="12" cy="5" rx="7" ry="2.5" />
+                <path d="M5 5v6c0 1.38 3.13 2.5 7 2.5s7-1.12 7-2.5V5" />
+                <path d="M5 11v6c0 1.38 3.13 2.5 7 2.5s7-1.12 7-2.5v-6" />
+                <circle cx="12" cy="17.5" r="1.35" fill="currentColor" stroke="none" />
+                <path d="M12 16.15V14" />
+              </svg>
+            </span>
+            <span>{{ copy.navData }}</span>
+          </button>
+        </nav>
+      </aside>
+
+      <section class="app-settings-main" [class.app-settings-main--chat]="activePane() === 'geral'">
+        @if (activePane() === 'geral') {
+          <div class="app-settings-chat-pane">
+            <h2 id="app-settings-title" class="app-settings-chat-title">{{ copy.geralTitle }}</h2>
+            <div class="app-settings-chat-rule" aria-hidden="true"></div>
+
+            <div class="app-settings-chat-row">
+              <span class="app-settings-chat-label" id="label-appearance">{{ copy.appearance }}</span>
+              <div
+                class="app-settings-menu-wrap app-settings-dropdown app-settings-dropdown--appearance"
+                [class.is-open]="appearanceOpen()"
+              >
+                <button
+                  type="button"
+                  class="app-settings-inline-trigger"
+                  id="appearance-trigger"
+                  [attr.aria-expanded]="appearanceOpen()"
+                  aria-haspopup="listbox"
+                  aria-labelledby="label-appearance appearance-trigger"
+                  (click)="toggleAppearanceMenu($event)"
+                >
+                  <span>{{ appearanceLabel() }}</span>
+                  <svg class="app-settings-inline-chevron" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="m6 9 6 6 6-6" />
+                  </svg>
+                </button>
+                @if (appearanceOpen()) {
+                  <div class="app-settings-menu-popover" role="listbox" aria-labelledby="label-appearance">
+                    <button
+                      type="button"
+                      role="option"
+                      class="app-settings-menu-item"
+                      [class.is-selected]="theme.mode() === 'system'"
+                      (click)="pickAppearance('system', $event)"
+                    >
+                      <span>{{ copy.themeSystem }}</span>
+                      <svg class="app-settings-menu-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M20 6 9 17l-5-5" />
+                      </svg>
+                    </button>
+                    <button
+                      type="button"
+                      role="option"
+                      class="app-settings-menu-item"
+                      [class.is-selected]="theme.mode() === 'dark'"
+                      (click)="pickAppearance('dark', $event)"
+                    >
+                      <span>{{ copy.themeDark }}</span>
+                      <svg class="app-settings-menu-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M20 6 9 17l-5-5" />
+                      </svg>
+                    </button>
+                    <button
+                      type="button"
+                      role="option"
+                      class="app-settings-menu-item"
+                      [class.is-selected]="theme.mode() === 'light'"
+                      (click)="pickAppearance('light', $event)"
+                    >
+                      <span>{{ copy.themeLight }}</span>
+                      <svg class="app-settings-menu-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M20 6 9 17l-5-5" />
+                      </svg>
+                    </button>
+                  </div>
+                }
+              </div>
+            </div>
+
+            <div class="app-settings-chat-row app-settings-chat-row--bordered">
+              <span class="app-settings-chat-label" id="label-language">{{ copy.language }}</span>
+              <div
+                class="app-settings-menu-wrap app-settings-dropdown app-settings-dropdown--language"
+                [class.is-open]="languageOpen()"
+              >
+                <button
+                  type="button"
+                  class="app-settings-inline-trigger"
+                  id="language-trigger"
+                  [attr.aria-expanded]="languageOpen()"
+                  aria-haspopup="listbox"
+                  aria-labelledby="label-language language-trigger"
+                  (click)="toggleLanguageMenu($event)"
+                >
+                  <span>{{ languageLabel() }}</span>
+                  <svg class="app-settings-inline-chevron" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="m6 9 6 6 6-6" />
+                  </svg>
+                </button>
+                @if (languageOpen()) {
+                  <div class="app-settings-menu-popover" role="listbox" aria-labelledby="label-language">
+                    <button
+                      type="button"
+                      role="option"
+                      class="app-settings-menu-item"
+                      [class.is-selected]="language.lang() === 'auto'"
+                      (click)="pickLanguage('auto', $event)"
+                    >
+                      <span>{{ copy.langAuto }}</span>
+                      <svg class="app-settings-menu-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M20 6 9 17l-5-5" />
+                      </svg>
+                    </button>
+                    <button
+                      type="button"
+                      role="option"
+                      class="app-settings-menu-item"
+                      [class.is-selected]="language.lang() === 'pt-BR'"
+                      (click)="pickLanguage('pt-BR', $event)"
+                    >
+                      <span>{{ copy.langPt }}</span>
+                      <svg class="app-settings-menu-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M20 6 9 17l-5-5" />
+                      </svg>
+                    </button>
+                    <button
+                      type="button"
+                      role="option"
+                      class="app-settings-menu-item"
+                      [class.is-selected]="language.lang() === 'en'"
+                      (click)="pickLanguage('en', $event)"
+                    >
+                      <span>{{ copy.langEn }}</span>
+                      <svg class="app-settings-menu-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M20 6 9 17l-5-5" />
+                      </svg>
+                    </button>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+        } @else {
+          <h2 id="app-settings-title" class="app-settings-main-title">{{ copy.dataTitle }}</h2>
+          <p class="app-settings-main-subtitle">{{ copy.dataSubtitle }}</p>
+          <div class="app-settings-divider" role="separator"></div>
+
+          @if (auth.isLoading()) {
+            <p class="app-settings-advanced-lead">{{ copy.loading }}</p>
+          } @else if (auth.isAuthenticated()) {
+            <div class="app-settings-advanced">
+              <p class="app-settings-advanced-lead">
+                {{ copy.loggedInLead }}
+              </p>
+              @if (auth.getUserEmail(); as email) {
+                <p class="app-settings-advanced-email">{{ email }}</p>
+              }
+            </div>
+          } @else {
+            <div class="app-settings-advanced">
+              <p class="app-settings-advanced-lead">
+                {{ copy.guestLead }}
+              </p>
+              <div class="app-settings-advanced-actions">
+                <a routerLink="/login" class="app-settings-btn-primary" (click)="requestClose()">{{ copy.signIn }}</a>
+                <a routerLink="/cadastro" class="app-settings-btn-secondary" (click)="requestClose()">{{ copy.signUp }}</a>
+              </div>
+            </div>
+          }
+        }
+      </section>
+    </div>
+  </div>
+</div>

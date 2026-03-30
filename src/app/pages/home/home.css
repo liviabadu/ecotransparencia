@@ -108,7 +108,7 @@
   font-weight: 800;
   color: rgba(255, 255, 255, 0.92);
   letter-spacing: 2px;
-  font-family: "Space Grotesk", Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  font-family: var(--font-display);
 }
 
 .logo-sub {
@@ -138,7 +138,12 @@
   font-weight: 600;
   border-radius: 8px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition:
+    background 0.3s ease,
+    border-color 0.3s ease,
+    color 0.3s ease,
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -264,11 +269,6 @@
   z-index: -2;
 }
 
-/* Parallax no scroll aplica transform via JS — will-change só neste elemento */
-.hero-bg.parallax-scroll {
-  will-change: transform;
-}
-
 .hero-bg::before {
   content: '';
   position: absolute;
@@ -319,11 +319,13 @@
 .hero-title {
   font-size: clamp(2.5rem, 6vw, 4rem);
   font-weight: 800;
-  color: #FFFFFF;
+  color: #ffffff;
   line-height: 1.1;
+  /* Reserva altura ~2 linhas antes da webfont — reduz CLS quando a métrica estabiliza */
+  min-height: 2.35lh;
   margin-bottom: 0;
   text-shadow: 0 2px 16px rgba(0, 0, 0, 0.35);
-  font-family: "Space Grotesk", Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  font-family: var(--font-display);
   /* Evita “tremida” ao fim de animações com transform no mesmo elemento */
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
@@ -493,7 +495,7 @@
 }
 
 .section-title {
-  font-family: "Space Grotesk", Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  font-family: var(--font-display);
   font-size: clamp(2.25rem, 5vw, 3rem);
   font-weight: 800;
   line-height: 1.08;
@@ -686,7 +688,7 @@
   z-index: 1;
 }
 
-/* Camada decorativa com parallax (home-scroll-story.ts) */
+/* Camada decorativa estática (sem parallax JS) */
 .about-parallax-layer {
   position: absolute;
   left: 0;
@@ -801,7 +803,7 @@
   font-size: clamp(1.75rem, 4vw, 2.35rem);
   font-weight: 800;
   font-variant-numeric: tabular-nums;
-  font-family: "Space Grotesk", Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  font-family: var(--font-display);
   line-height: 1.15;
   letter-spacing: -0.02em;
   margin-bottom: 8px;
@@ -855,7 +857,7 @@
   font-weight: 800;
   color: rgba(255, 255, 255, 0.92);
   letter-spacing: 2px;
-  font-family: "Space Grotesk", Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  font-family: var(--font-display);
 }
 
 .logo-sub-small {
@@ -913,12 +915,23 @@
 
 /* ============================================================================
    STORYTELLING / SCROLL (lógica em home-scroll-story.ts)
-   Classes: .fade-in, .reveal-scale, .parallax-scroll
+   Classes: .fade-in, .reveal-scale; fim: .home-story-end-sentinel (IO)
    ============================================================================ */
 
 /* Wrapper Angular: filhos participam do fluxo como se o nó não existisse */
 .home-story-root {
   display: contents;
+}
+
+/* 1px no fim do fluxo: IntersectionObserver detecta “cheguei ao fim” sem scroll listener */
+.home-story-end-sentinel {
+  height: 1px;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  pointer-events: none;
+  visibility: hidden;
 }
 
 /**
@@ -929,8 +942,8 @@
   opacity: 0;
   transform: translate3d(0, 28px, 0);
   transition:
-    opacity 0.75s cubic-bezier(0.22, 1, 0.36, 1),
-    transform 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+    opacity 0.52s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.52s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .fade-in.is-inview {
@@ -939,15 +952,15 @@
 }
 
 .fade-in--delay-1 {
-  transition-delay: 0.08s;
+  transition-delay: 0.05s;
 }
 
 .fade-in--delay-2 {
-  transition-delay: 0.16s;
+  transition-delay: 0.1s;
 }
 
 .fade-in--delay-3 {
-  transition-delay: 0.24s;
+  transition-delay: 0.15s;
 }
 
 /**
@@ -956,10 +969,10 @@
  */
 .hero-content > .fade-in {
   opacity: 0;
-  transform: translate3d(0, 48px, 0);
+  transform: translate3d(0, 40px, 0);
   transition:
-    opacity 1s cubic-bezier(0.16, 1, 0.3, 1),
-    transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+    opacity 0.68s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.68s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .hero-content > .fade-in.is-inview {
@@ -969,10 +982,10 @@
 
 /* Só translateY (sem scale): scale no título costuma tremer “Socioambiental” com background-clip:text */
 .hero-content > .hero-title.fade-in {
-  transform: translate3d(0, 58px, 0);
+  transform: translate3d(0, 48px, 0);
   transition:
-    opacity 1.05s cubic-bezier(0.16, 1, 0.3, 1),
-    transform 1.05s cubic-bezier(0.16, 1, 0.3, 1);
+    opacity 0.72s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.72s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .hero-content > .hero-title.fade-in.is-inview {
@@ -980,7 +993,7 @@
 }
 
 .hero-content > .hero-subtitle.fade-in {
-  transform: translate3d(0, 44px, 0);
+  transform: translate3d(0, 36px, 0);
 }
 
 .hero-content > .hero-subtitle.fade-in.is-inview {
@@ -988,10 +1001,10 @@
 }
 
 .hero-content > .search-wrapper.fade-in {
-  transform: translate3d(0, 52px, 0) scale(0.9);
+  transform: translate3d(0, 44px, 0) scale(0.94);
   transition:
-    opacity 0.68s cubic-bezier(0.16, 1, 0.3, 1),
-    transform 0.68s cubic-bezier(0.22, 1, 0.36, 1);
+    opacity 0.55s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .hero-content > .search-wrapper.fade-in.is-inview {
@@ -1000,11 +1013,11 @@
 
 /* Escalonamento mais perceptível: título → texto explicativo → busca */
 .hero-content > .hero-subtitle.fade-in.fade-in--delay-1 {
-  transition-delay: 0.24s;
+  transition-delay: 0.14s;
 }
 
 .hero-content > .search-wrapper.fade-in.fade-in--delay-2 {
-  transition-delay: 0.16s;
+  transition-delay: 0.1s;
 }
 
 /**
@@ -1012,11 +1025,11 @@
  */
 .reveal-scale {
   display: inline-block;
-  transform: scale(0.9);
-  opacity: 0.88;
+  transform: scale(0.94);
+  opacity: 0.92;
   transition:
-    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1),
-    opacity 0.65s ease;
+    transform 0.48s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.45s ease;
 }
 
 .reveal-scale.is-inview {
@@ -1076,6 +1089,126 @@
 
   .step-card {
     padding: 40px 22px 36px;
+  }
+}
+
+/* ============================================================================
+   HOME + MODO CLARO (variáveis globais já mudam no html; aqui corrigimos cores fixas)
+   ============================================================================ */
+
+:host-context(html[data-app-theme="light"]) .skip-link {
+  background: rgba(15, 23, 42, 0.96);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+:host-context(html[data-app-theme="light"]) .header {
+  background: rgba(248, 250, 252, 0.96);
+  border-bottom-color: rgba(52, 125, 102, 0.28);
+}
+
+:host-context(html[data-app-theme="light"]) .nav-btn {
+  color: rgba(15, 23, 42, 0.88);
+  border-color: rgba(15, 23, 42, 0.14);
+  background: rgba(15, 23, 42, 0.05);
+}
+
+:host-context(html[data-app-theme="light"]) .nav-btn:hover {
+  color: rgba(15, 23, 42, 0.95);
+  border-color: rgba(34, 197, 94, 0.45);
+  background: rgba(34, 197, 94, 0.08);
+}
+
+:host-context(html[data-app-theme="light"]) .logo-box {
+  border-color: rgba(15, 23, 42, 0.12);
+}
+
+:host-context(html[data-app-theme="light"]) .logo-text {
+  color: var(--text-0);
+}
+
+:host-context(html[data-app-theme="light"]) .logo-sub {
+  color: var(--text-1);
+}
+
+:host-context(html[data-app-theme="light"]) .hero-title {
+  color: var(--text-0);
+  text-shadow: 0 1px 12px rgba(15, 23, 42, 0.12);
+}
+
+:host-context(html[data-app-theme="light"]) .hero-subtitle {
+  color: var(--text-1);
+}
+
+:host-context(html[data-app-theme="light"]) .how-section,
+:host-context(html[data-app-theme="light"]) .about-section {
+  background-color: #f8fafc;
+}
+
+:host-context(html[data-app-theme="light"]) .footer {
+  background: #eef2f7;
+  border-top-color: rgba(15, 23, 42, 0.08);
+}
+
+:host-context(html[data-app-theme="light"]) .footer-copy p,
+:host-context(html[data-app-theme="light"]) .footer-tagline,
+:host-context(html[data-app-theme="light"]) .footer-link {
+  color: var(--text-2);
+}
+
+@media (prefers-color-scheme: light) {
+  :host-context(html[data-app-theme="system"]) .skip-link {
+    background: rgba(15, 23, 42, 0.96);
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+
+  :host-context(html[data-app-theme="system"]) .header {
+    background: rgba(248, 250, 252, 0.96);
+    border-bottom-color: rgba(52, 125, 102, 0.28);
+  }
+
+  :host-context(html[data-app-theme="system"]) .nav-btn {
+    color: rgba(15, 23, 42, 0.88);
+    border-color: rgba(15, 23, 42, 0.14);
+    background: rgba(15, 23, 42, 0.05);
+  }
+
+  :host-context(html[data-app-theme="system"]) .nav-btn:hover {
+    color: rgba(15, 23, 42, 0.95);
+    border-color: rgba(34, 197, 94, 0.45);
+    background: rgba(34, 197, 94, 0.08);
+  }
+
+  :host-context(html[data-app-theme="system"]) .logo-box {
+    border-color: rgba(15, 23, 42, 0.12);
+  }
+
+  :host-context(html[data-app-theme="system"]) .logo-text {
+    color: var(--text-0);
+  }
+
+  :host-context(html[data-app-theme="system"]) .logo-sub {
+    color: var(--text-1);
+  }
+
+  :host-context(html[data-app-theme="system"]) .hero-title {
+    color: var(--text-0);
+    text-shadow: 0 1px 12px rgba(15, 23, 42, 0.12);
+  }
+
+  :host-context(html[data-app-theme="system"]) .hero-subtitle {
+    color: var(--text-1);
+  }
+
+  :host-context(html[data-app-theme="system"]) .how-section,
+  :host-context(html[data-app-theme="system"]) .about-section {
+    background-color: #f8fafc;
+  }
+
+  :host-context(html[data-app-theme="system"]) .footer {
+    background: #eef2f7;
+    border-top-color: rgba(15, 23, 42, 0.08);
   }
 }
 

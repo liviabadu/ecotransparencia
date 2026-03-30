@@ -41,12 +41,8 @@
   <!-- ========== HERO SECTION ========== -->
   <main id="main-content">
     <section class="hero">
-      <!-- Parallax vertical no scroll (data-parallax-speed negativo = sensação de fundo mais “longe”) -->
-      <div
-        class="hero-bg parallax-scroll"
-        data-parallax-speed="-0.26"
-        aria-hidden="true"
-      ></div>
+      <!-- Fundo estático: parallax em JS gerava layout a cada frame e deixava o scroll pesado -->
+      <div class="hero-bg" aria-hidden="true"></div>
       <div class="hero-content">
         <h1 class="hero-title fade-in">
           Transparência<br/>
@@ -276,6 +272,8 @@
       </div>
     </div>
   </footer>
+  <!-- Fim da “jornada” da home: IntersectionObserver encerra efeitos (sem listener de scroll) -->
+  <div class="home-story-end-sentinel" aria-hidden="true"></div>
 </div>
 
 <!-- Ajuda fixa: canto inferior direito (somente nesta página) -->

@@ -192,4 +192,8 @@
   <div class="app-main">
     <router-outlet />
   </div>
+
+  @if (settingsOpen()) {
+    <app-settings-modal (closed)="closeSettings()" />
+  }
 </div>

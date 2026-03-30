@@ -3,43 +3,31 @@ import { NgZone } from '@angular/core';
 /**
  * Storytelling na home (só até o fim da primeira leitura da página):
  *
- * - Enquanto o usuário desce a home: fade-in / reveal-scale (IntersectionObserver,
- *   só adiciona .is-inview, não remove) + parallax no scroll (rAF).
- * - Ao chegar ao final da página (ou página curta que não rola): “encerra” — tudo fica
- *   estático, observers e parallax desligados; voltar ao hero fica normal, sem efeito extra.
+ * - Enquanto o usuário desce: fade-in / reveal-scale (IntersectionObserver,
+ *   só adiciona .is-inview, não remove).
+ * - Ao chegar ao final (sentinel visível): “encerra” — tudo estático, observers desligados.
  *
- * Sem interação com o mouse (tilt removido).
- * prefers-reduced-motion: estados finais imediatos, sem listeners.
- *
- * Por que o texto “some” ao salvar/recarregar no dev:
- * .fade-in começa em opacity:0 até receber .is-inview. O IO dispara após o layout;
- * por isso markVisibleIfAlreadyInViewport() (e rAF duplo) corre logo após montar os observers.
+ * Sem listener de scroll: o fim da página é detectado por IO no .home-story-end-sentinel
+ * (o parallax em JS foi removido — getBoundingClientRect a cada frame deixava o scroll pesado).
+ * prefers-reduced-motion: estados finais imediatos, sem observers.
  */
 
 const IO_FADE_MARGIN = '0px 0px -10% 0px';
 const IO_FADE_THRESHOLD = 0.06;
 const IO_SCALE_THRESHOLD = 0.12;
-/** Pixels do fim do documento para considerar “desceu a home inteira” */
+/** Mesma folga que antes (checkReachedBottom): considerar “chegou ao fim” um pouco antes */
 const BOTTOM_SLACK_PX = 56;
 /** Página que quase não rola: encerra efeitos de uma vez */
 const SHORT_PAGE_EXTRA_PX = 64;
 
 export class HomeScrollStory {
-  private readonly parallaxEls: HTMLElement[] = [];
-
   private ioFade: IntersectionObserver | null = null;
   private ioScale: IntersectionObserver | null = null;
+  private ioBottom: IntersectionObserver | null = null;
 
-  private rafScroll = 0;
   private settled = false;
 
   private readonly reduced: boolean;
-
-  private readonly onScrollOrResize = (): void => {
-    if (this.settled) return;
-    this.checkReachedBottom();
-    this.scheduleParallax();
-  };
 
   constructor(
     private readonly root: HTMLElement,
@@ -51,27 +39,25 @@ export class HomeScrollStory {
   }
 
   init(): void {
-    this.zone.runOutsideAngular(() => {
-      if (this.reduced) {
+    if (this.reduced) {
+      this.zone.runOutsideAngular(() => {
         this.applyReducedMotionDefaults();
         this.root.classList.add('home-story--settled');
-        return;
-      }
+      });
+      return;
+    }
 
-      /* Antes dos observers: marcar viewport (reduz 1 frame com hero invisível no F5) */
+    /**
+     * Fontes críticas já foram aguardadas no APP_INITIALIZER (font-initializers.ts)
+     * antes do bootstrap — o primeiro paint do Angular usa Inter/Space Grotesk estáveis.
+     */
+    this.zone.runOutsideAngular(() => {
       this.markVisibleIfAlreadyInViewport();
 
       this.setupFadeInObserver();
       this.setupRevealScaleObserver();
-      this.setupParallaxScroll();
+      this.setupBottomSentinelObserver();
 
-      if (typeof window !== 'undefined') {
-        window.addEventListener('scroll', this.onScrollOrResize, { passive: true });
-        window.addEventListener('resize', this.onScrollOrResize, { passive: true });
-      }
-
-      this.scheduleParallax();
-      this.checkReachedBottom();
       this.maybeSettleShortPage();
 
       this.markVisibleIfAlreadyInViewport();
@@ -119,21 +105,12 @@ export class HomeScrollStory {
   }
 
   destroy(): void {
-    this.teardownScrollListeners();
-
-    if (this.rafScroll) {
-      cancelAnimationFrame(this.rafScroll);
-      this.rafScroll = 0;
-    }
-
     this.ioFade?.disconnect();
     this.ioFade = null;
     this.ioScale?.disconnect();
     this.ioScale = null;
-
-    for (const el of this.parallaxEls) {
-      el.style.transform = '';
-    }
+    this.ioBottom?.disconnect();
+    this.ioBottom = null;
   }
 
   /** Página menor que a viewport: não há “descida”; aplica estado final. */
@@ -145,19 +122,8 @@ export class HomeScrollStory {
     }
   }
 
-  /** Doc quase no fim → encerra jornada de efeitos. */
-  private checkReachedBottom(): void {
-    if (this.settled || typeof window === 'undefined') return;
-    const doc = document.documentElement;
-    const y = window.scrollY || doc.scrollTop;
-    const remaining = doc.scrollHeight - y - window.innerHeight;
-    if (remaining <= BOTTOM_SLACK_PX) {
-      this.settle();
-    }
-  }
-
   /**
-   * Estado “normal”: tudo visível, parallax zerado, sem observers nem scroll handler.
+   * Estado “normal”: tudo visível, sem observers.
    */
   private settle(): void {
     if (this.settled) return;
@@ -167,13 +133,8 @@ export class HomeScrollStory {
     this.ioFade = null;
     this.ioScale?.disconnect();
     this.ioScale = null;
-
-    this.teardownScrollListeners();
-
-    if (this.rafScroll) {
-      cancelAnimationFrame(this.rafScroll);
-      this.rafScroll = 0;
-    }
+    this.ioBottom?.disconnect();
+    this.ioBottom = null;
 
     for (const el of this.root.querySelectorAll('.fade-in')) {
       el.classList.add('is-inview');
@@ -181,18 +142,8 @@ export class HomeScrollStory {
     for (const el of this.root.querySelectorAll('.reveal-scale')) {
       el.classList.add('is-inview');
     }
-    for (const el of this.parallaxEls) {
-      el.style.transform = '';
-    }
 
     this.root.classList.add('home-story--settled');
-  }
-
-  private teardownScrollListeners(): void {
-    if (typeof window !== 'undefined') {
-      window.removeEventListener('scroll', this.onScrollOrResize);
-      window.removeEventListener('resize', this.onScrollOrResize);
-    }
   }
 
   private applyReducedMotionDefaults(): void {
@@ -202,6 +153,29 @@ export class HomeScrollStory {
     for (const el of this.root.querySelectorAll('.reveal-scale')) {
       el.classList.add('is-inview');
     }
+  }
+
+  /**
+   * Fim da home: rootMargin inferior amplia a zona — equivalente ao “slack” do scroll antigo.
+   */
+  private setupBottomSentinelObserver(): void {
+    const sentinel = this.root.querySelector('.home-story-end-sentinel');
+    if (!sentinel) return;
+
+    const margin = `0px 0px ${BOTTOM_SLACK_PX}px 0px`;
+    this.ioBottom = new IntersectionObserver(
+      (entries) => {
+        if (this.settled) return;
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            this.settle();
+            return;
+          }
+        }
+      },
+      { root: null, rootMargin: margin, threshold: 0 },
+    );
+    this.ioBottom.observe(sentinel);
   }
 
   /**
@@ -242,33 +216,5 @@ export class HomeScrollStory {
     for (const el of this.root.querySelectorAll('.reveal-scale')) {
       this.ioScale.observe(el);
     }
-  }
-
-  private setupParallaxScroll(): void {
-    this.parallaxEls.length = 0;
-    for (const el of this.root.querySelectorAll('.parallax-scroll')) {
-      this.parallaxEls.push(el as HTMLElement);
-    }
-  }
-
-  private scheduleParallax(): void {
-    if (this.settled || !this.parallaxEls.length || this.rafScroll) return;
-    this.rafScroll = requestAnimationFrame(() => {
-      this.rafScroll = 0;
-      if (this.settled) return;
-
-      const vh = typeof window !== 'undefined' ? window.innerHeight : 0;
-      const mid = vh * 0.5;
-
-      for (const el of this.parallaxEls) {
-        const speed = Number.parseFloat(el.dataset['parallaxSpeed'] ?? '0.15');
-        const s = Number.isFinite(speed) ? speed : 0.15;
-        const rect = el.getBoundingClientRect();
-        const centerY = rect.top + rect.height * 0.5;
-        const offset = centerY - mid;
-        const ty = -offset * s * 0.08;
-        el.style.transform = `translate3d(0, ${ty.toFixed(2)}px, 0)`;
-      }
-    });
   }
 }
