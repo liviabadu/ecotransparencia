@@ -1,11 +1,16 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
+import { APP_INITIALIZER, ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
 import { provideRouter, withInMemoryScrolling } from '@angular/router';
 import { provideHttpClient } from '@angular/common/http';
 
 import { provideCriticalFontsReady } from './font-initializers';
 import { routes } from './app.routes';
-import {initializeApp, provideFirebaseApp} from '@angular/fire/app';
-import {getAuth, provideAuth} from '@angular/fire/auth';
+import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
+import { Auth, getAuth, provideAuth } from '@angular/fire/auth';
+
+/** Primeira pintura só depois da sessão Firebase estar restaurada (evita flash na home). */
+export function firebaseAuthStateReadyFactory(auth: Auth) {
+  return () => auth.authStateReady();
+}
 
 const firebaseConfig = {
   apiKey: "AIzaSyAqhgimtb9EAWDFGwLqS2_pgfkze8dbtFA",
@@ -31,6 +36,12 @@ export const appConfig: ApplicationConfig = {
     ),
     provideHttpClient(),
     provideFirebaseApp(() => initializeApp(firebaseConfig)),
-    provideAuth(() => getAuth()), // Adicione outros serviços aqui (Firestore, etc.)
+    provideAuth(() => getAuth()),
+    {
+      provide: APP_INITIALIZER,
+      multi: true,
+      useFactory: firebaseAuthStateReadyFactory,
+      deps: [Auth],
+    },
   ]
 };

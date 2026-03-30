@@ -1,0 +1,236 @@
+<a href="#dash-main" class="home-dash-skip">Pular para o painel</a>
+
+<div class="home-dash">
+  <header class="home-dash-header">
+    <div class="home-dash-header__inner">
+      <a
+        routerLink="/"
+        class="home-dash-logo"
+        (click)="scrollToTop()"
+        aria-label="Eco Transparência — início"
+      >
+        <span class="home-dash-logo__mark">
+          <span class="home-dash-logo__eco">eco</span>
+          <span class="home-dash-logo__sub">TRANSPARÊNCIA</span>
+        </span>
+      </a>
+
+      <div class="home-dash-header__actions">
+        <a routerLink="/assinaturas" class="home-dash-link-subtle">Assinaturas</a>
+        <a routerLink="/metodologia" class="home-dash-link-subtle">Metodologia</a>
+
+        <div class="home-dash-user" #userMenuRoot>
+          <span class="home-dash-greeting" aria-live="polite">
+            Olá, {{ auth.getDisplayName() }} 👋
+          </span>
+          <div class="home-dash-user-menu">
+            <button
+              type="button"
+              class="home-dash-avatar-btn"
+              [attr.aria-expanded]="userMenuOpen()"
+              aria-haspopup="menu"
+              aria-label="Menu da conta"
+              (click)="toggleUserMenu($event)"
+            >
+              @if (auth.getPhotoUrl(); as photo) {
+                <img [src]="photo" alt="" class="home-dash-avatar-img" width="40" height="40" />
+              } @else {
+                <span class="home-dash-avatar-fallback" aria-hidden="true">{{ auth.getInitials() }}</span>
+              }
+            </button>
+
+            @if (userMenuOpen()) {
+              <div class="home-dash-dropdown" role="menu">
+                <button type="button" class="home-dash-dropdown__item" role="menuitem" (click)="onProfileClick($event)">
+                  Perfil
+                </button>
+                <button type="button" class="home-dash-dropdown__item" role="menuitem" (click)="openSettings()">
+                  Configurações
+                </button>
+                <button type="button" class="home-dash-dropdown__item home-dash-dropdown__item--danger" role="menuitem" (click)="requestLogout()">
+                  Sair
+                </button>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main id="dash-main" class="home-dash-main">
+    <section class="home-dash-search-block" aria-labelledby="dash-search-title">
+      <div class="home-dash-search-block__intro">
+        <span class="home-dash-search-kicker">Área principal</span>
+        <h1 id="dash-search-title" class="home-dash-title">
+          Buscar <span class="home-dash-title-highlight">empresas</span>
+        </h1>
+        <p class="home-dash-subtitle">Consulte dados e riscos socioambientais em um só lugar</p>
+      </div>
+      <div class="home-dash-search-spotlight">
+        <div class="home-dash-search-spotlight__glow" aria-hidden="true"></div>
+        <div class="home-dash-search-wrap">
+          <div class="home-dash-search-wrap__head" aria-hidden="true">
+            <span class="home-dash-search-wrap__icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8" />
+                <path d="m21 21-4.3-4.3" />
+              </svg>
+            </span>
+            <span class="home-dash-search-wrap__label">Pesquisa por CNPJ</span>
+          </div>
+          <app-search
+            [searchPlaceholder]="dashSearchPlaceholder"
+            [dashboardLayout]="true"
+          />
+        </div>
+      </div>
+    </section>
+
+    <section class="home-dash-section" aria-labelledby="dash-cards-title">
+      <h2 id="dash-cards-title" class="home-dash-section-title">Visão geral</h2>
+      <div class="home-dash-card-grid">
+        <article class="dash-card">
+          <div class="dash-card__icon" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8" />
+              <path d="m21 21-4.3-4.3" />
+            </svg>
+          </div>
+          <h3 class="dash-card__title">Últimas pesquisas</h3>
+          @if (recentCompanies().length === 0) {
+            <p class="dash-card__empty">Nenhuma empresa pesquisada recentemente.</p>
+          } @else {
+            <ul class="dash-card__list">
+              @for (item of recentCompanies(); track item) {
+                <li>{{ item }}</li>
+              }
+            </ul>
+          }
+        </article>
+
+        <article class="dash-card">
+          <div class="dash-card__icon" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+            </svg>
+          </div>
+          <h3 class="dash-card__title">Empresas favoritas</h3>
+          @if (favoriteIds().length === 0) {
+            <p class="dash-card__empty">Salve empresas para acessar aqui com um clique.</p>
+          } @else {
+            <ul class="dash-card__list">
+              @for (item of favoriteIds(); track item) {
+                <li>{{ item }}</li>
+              }
+            </ul>
+          }
+        </article>
+
+        <article class="dash-card">
+          <div class="dash-card__icon" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 3v18h18" />
+              <path d="M18 9l-5 5-4-4-3 3" />
+            </svg>
+          </div>
+          <h3 class="dash-card__title">Histórico de consultas</h3>
+          @if (historyLines().length === 0) {
+            <p class="dash-card__empty">Seu histórico de consultas aparecerá aqui.</p>
+          } @else {
+            <ul class="dash-card__list">
+              @for (line of historyLines(); track line) {
+                <li>{{ line }}</li>
+              }
+            </ul>
+          }
+        </article>
+
+        <article class="dash-card">
+          <div class="dash-card__icon" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+              <line x1="12" y1="9" x2="12" y2="13" />
+              <line x1="12" y1="17" x2="12.01" y2="17" />
+            </svg>
+          </div>
+          <h3 class="dash-card__title">Alertas recentes</h3>
+          @if (alertLines().length === 0) {
+            <p class="dash-card__empty">Sem alertas no momento.</p>
+          } @else {
+            <ul class="dash-card__list">
+              @for (line of alertLines(); track line) {
+                <li>{{ line }}</li>
+              }
+            </ul>
+          }
+        </article>
+      </div>
+    </section>
+
+    <section class="home-dash-section" aria-labelledby="dash-fav-title">
+      <div class="home-dash-section-head">
+        <h2 id="dash-fav-title" class="home-dash-section-title">Favoritos</h2>
+        <p class="home-dash-section-lead">Empresas salvas com score e indicador de risco</p>
+      </div>
+      @if (favoriteRows().length === 0) {
+        <div class="home-dash-empty-panel">
+          <p>Você ainda não tem favoritos. Use a busca acima e salve empresas quando a função estiver disponível.</p>
+        </div>
+      } @else {
+        <div class="home-dash-table-wrap">
+          <table class="home-dash-table">
+            <thead>
+              <tr>
+                <th scope="col">Empresa</th>
+                <th scope="col">Score</th>
+                <th scope="col">Risco</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of favoriteRows(); track row.name) {
+                <tr>
+                  <td>{{ row.name }}</td>
+                  <td>{{ row.score }}</td>
+                  <td>
+                    <span class="home-dash-risk" [class]="'home-dash-risk--' + row.risk">{{ row.risk === 'low' ? 'Baixo' : row.risk === 'medium' ? 'Médio' : 'Alto' }}</span>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </section>
+
+    <section class="home-dash-section home-dash-section--insights" aria-labelledby="dash-insights-title">
+      <h2 id="dash-insights-title" class="home-dash-section-title">Insights</h2>
+      <div class="home-dash-insights-grid">
+        <article class="dash-insight-card">
+          <h3 class="dash-insight-card__title">Empresas com maior risco recente</h3>
+          @if (highRiskPreview().length === 0) {
+            <p class="dash-card__empty">Dados agregados em breve.</p>
+          } @else {
+            <ul class="dash-card__list">
+              @for (line of highRiskPreview(); track line) {
+                <li>{{ line }}</li>
+              }
+            </ul>
+          }
+        </article>
+        <article class="dash-insight-card">
+          <h3 class="dash-insight-card__title">Setores mais críticos</h3>
+          @if (criticalSectors().length === 0) {
+            <p class="dash-card__empty">Análise por setor em breve.</p>
+          } @else {
+            <ul class="dash-card__list">
+              @for (line of criticalSectors(); track line) {
+                <li>{{ line }}</li>
+              }
+            </ul>
+          }
+        </article>
+      </div>
+    </section>
+  </main>
+</div>

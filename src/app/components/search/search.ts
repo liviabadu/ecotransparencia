@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, input, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DocumentValidationService } from '../../services/document-validation.service';
@@ -18,6 +18,11 @@ export class Search {
   private documentValidationService = inject(DocumentValidationService);
   private apiService = inject(ApiService);
   protected scoreService = inject(ScoreService);
+
+  /** Placeholder do input (landing vs dashboard podem diferir). */
+  readonly searchPlaceholder = input('Digite o CNPJ da empresa');
+  /** Estilo de painel autenticado (largura total, tipografia). */
+  readonly dashboardLayout = input(false);
 
   // Signals for reactive state
   searchTerm = signal('');

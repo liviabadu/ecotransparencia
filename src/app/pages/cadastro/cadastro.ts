@@ -35,6 +35,12 @@ export class Cadastro {
     void this.router.navigateByUrl('/', { replaceUrl: true });
   }
 
+  onBackdropClick(event: MouseEvent): void {
+    if (event.target === event.currentTarget) {
+      this.goHome();
+    }
+  }
+
   onPhone(): void {
     this.errorMessage.set(null);
     this.infoMessage.set('Cadastro com telefone estará disponível em breve.');

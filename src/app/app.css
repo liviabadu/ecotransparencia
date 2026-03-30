@@ -21,6 +21,7 @@
 .app-sidebar-backdrop {
   position: fixed;
   inset: 0;
+  /* Acima do conteúdo principal; abaixo da gaveta (1040) para o painel continuar clicável */
   z-index: 1038;
   /* Sem blur: backdrop-filter deixa a UI pesada com a gaveta aberta */
   background: rgba(0, 0, 0, 0.5);
@@ -42,12 +43,7 @@
  * Largura abre o espaço + o painel desliza em translate3d (GPU).
  */
 .app-sidebar-drawer {
-  /* Cor alinhada ao header da home (rgb 11,18,32), opaca; separador refinado */
-  --app-sidebar-surface: #0b1220;
-  --app-sidebar-surface-top: #0d1528;
-  --app-sidebar-surface-bottom: #090f1a;
-  --app-sidebar-edge: rgba(52, 125, 102, 0.38);
-  --app-sidebar-edge-accent: rgba(42, 98, 80, 0.22);
+  /* Cores da rail: :root (--app-sidebar-surface*, --app-sidebar-edge*) */
 
   /* Painel: até 280px, nunca invade a viewport além de uma folga (mobile) */
   --app-sidebar-panel: min(
@@ -80,6 +76,7 @@
 
 /* Coluna dos ícones: mesmo visual da rail fixa; cliques quando gaveta fechada */
 .app-sidebar-rail {
+  position: relative;
   flex: 0 0 var(--app-left-rail-width, 56px);
   width: var(--app-left-rail-width, 56px);
   min-width: var(--app-left-rail-width, 56px);
@@ -104,13 +101,29 @@
     var(--app-sidebar-surface) 45%,
     var(--app-sidebar-surface-bottom) 100%
   );
-  /* Borda verde + filete interno (par com o header da home) */
+  /* Borda verde + filete interno (alinhado ao header pós-login / dashboard) */
   border-right: 1px solid var(--app-sidebar-edge);
   box-shadow: inset -1px 0 0 var(--app-sidebar-edge-accent);
 }
 
+/*
+ * O backdrop do menu fica atrás da gaveta inteira (z menor que 1040), então a rail não era
+ * escurecida. Este scrim alinha o visual ao restante da tela; pointer-events: none mantém
+ * hambúrguer/configurações clicáveis por baixo.
+ */
+.app-sidebar-drawer.is-open .app-sidebar-rail::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: rgba(0, 0, 0, 0.4);
+  pointer-events: none;
+}
+
 .app-rail-top,
 .app-rail-bottom {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -355,8 +368,8 @@
   border-radius: 999px;
   border: 1px solid rgba(255, 255, 255, 0.22);
   background: transparent;
-  color: rgba(255, 255, 255, 0.95);
-  font-size: 0.875rem;
+  color: #fff;
+  font-size: 0.9375rem;
   font-weight: 700;
   text-decoration: none;
   cursor: pointer;
@@ -376,6 +389,11 @@
 .app-sidebar-nav-cta-btn:focus-visible {
   outline: none;
   box-shadow: var(--ring, 0 0 0 3px rgba(45, 212, 191, 0.35));
+}
+
+.app-sidebar-nav-link--emphasis {
+  font-size: 0.98rem;
+  color: rgba(255, 255, 255, 0.97);
 }
 
 .app-sidebar-nav-link {
@@ -502,18 +520,19 @@
 }
 
 .app-sidebar-nav-link--muted {
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.98rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
   background: rgba(0, 0, 0, 0.15);
 }
 
 .app-sidebar-nav-link--muted .app-sidebar-nav-icon {
   background: rgba(255, 255, 255, 0.05);
-  color: rgba(255, 255, 255, 0.88);
+  color: rgba(255, 255, 255, 0.94);
 }
 
 .app-sidebar-nav-link--muted:hover {
-  color: rgba(255, 255, 255, 0.95);
+  color: #fff;
 }
 
 .app-sidebar-nav-link--muted:hover .app-sidebar-nav-icon {
@@ -579,7 +598,7 @@
   position: relative;
   padding-left: var(--app-left-rail-width, 56px);
   box-sizing: border-box;
-  /* Evita “flash” de empilhamento durante troca de rota */
+  /* Evita “flash” de empilhamento na home pré-login e em trocas de rota */
   isolation: isolate;
 }
 

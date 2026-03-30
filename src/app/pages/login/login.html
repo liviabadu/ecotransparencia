@@ -1,5 +1,15 @@
-<div class="auth-page">
-  <div class="auth-modal" role="dialog" aria-modal="true" aria-labelledby="login-title">
+<div
+  class="auth-page"
+  role="presentation"
+  (click)="onBackdropClick($event)"
+>
+  <div
+    class="auth-modal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="login-title"
+    (click)="$event.stopPropagation()"
+  >
     <div class="auth-modal__header">
       <span class="auth-modal__header-balance" aria-hidden="true"></span>
       <h1 id="login-title" class="auth-modal__title auth-modal__title--single-line">

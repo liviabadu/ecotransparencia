@@ -35,6 +35,13 @@ export class Login {
     void this.router.navigateByUrl('/', { replaceUrl: true });
   }
 
+  /** Clique no fundo ao redor do cartão (como o modal de configurações) */
+  onBackdropClick(event: MouseEvent): void {
+    if (event.target === event.currentTarget) {
+      this.goHome();
+    }
+  }
+
   onPhone(): void {
     this.errorMessage.set(null);
     this.infoMessage.set('Login com telefone estará disponível em breve.');

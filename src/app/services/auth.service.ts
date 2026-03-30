@@ -19,14 +19,16 @@ export class AuthService {
   // Signals for reactive state
   currentUser = signal<User | null>(null);
   isAuthenticated = signal(false);
-  isLoading = signal(true);
+  /** Reservado para UI legada; a app espera `authStateReady` no APP_INITIALIZER antes do bootstrap. */
+  isLoading = signal(false);
 
   constructor() {
-    // Listen to auth state changes
+    const u = this.auth.currentUser;
+    this.currentUser.set(u);
+    this.isAuthenticated.set(!!u);
     onAuthStateChanged(this.auth, (user) => {
       this.currentUser.set(user);
       this.isAuthenticated.set(!!user);
-      this.isLoading.set(false);
     });
   }
 
@@ -67,5 +69,32 @@ export class AuthService {
    */
   getUserEmail(): string | null {
     return this.currentUser()?.email || null;
+  }
+
+  /** Nome amigável para saudação (displayName, parte do e-mail ou “Usuário”). */
+  getDisplayName(): string {
+    const u = this.currentUser();
+    if (!u) return '';
+    const d = u.displayName?.trim();
+    if (d) return d;
+    const local = u.email?.split('@')[0]?.trim();
+    if (local) {
+      return local.charAt(0).toUpperCase() + local.slice(1);
+    }
+    return 'Usuário';
+  }
+
+  getPhotoUrl(): string | null {
+    return this.currentUser()?.photoURL ?? null;
+  }
+
+  /** Iniciais para avatar quando não há foto. */
+  getInitials(): string {
+    const name = this.getDisplayName();
+    const parts = name.split(/\s+/).filter(Boolean);
+    if (parts.length >= 2) {
+      return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
+    }
+    return name.slice(0, 2).toUpperCase() || '?';
   }
 }

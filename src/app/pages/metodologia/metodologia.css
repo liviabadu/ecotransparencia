@@ -63,13 +63,18 @@
 }
 
 .logo-box {
-  background: #2d5a47;
-  padding: 12px 20px;
-  border-radius: 8px;
+  background: var(--logo-mark-brand-bg);
+  padding: 11px 22px 12px;
+  border-radius: 12px;
   display: flex;
   flex-direction: column;
   align-items: center;
   line-height: 1;
+  border: 1px solid var(--app-sidebar-edge);
+  box-shadow:
+    inset -1px 0 0 var(--app-sidebar-edge-accent),
+    inset 0 1px 0 rgba(52, 211, 153, 0.08),
+    0 4px 18px rgba(0, 0, 0, 0.35);
   transition: transform 0.3s ease;
 }
 
@@ -78,19 +83,30 @@
 }
 
 .logo-text {
-  font-size: 28px;
-  font-weight: 800;
-  color: #ffffff;
-  letter-spacing: 2px;
-  font-family: Georgia, serif;
+  font-size: 1.625rem;
+  font-weight: 700;
+  letter-spacing: -0.045em;
+  line-height: 1;
+  font-family: var(--font-display, "Space Grotesk", system-ui, sans-serif);
+  background: none;
+  -webkit-background-clip: unset;
+  background-clip: unset;
+  color: var(--logo-eco-text-dark);
+  text-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.45),
+    0 0 20px var(--logo-eco-glow-dark);
 }
 
 .logo-sub {
-  font-size: 10px;
+  margin-top: 7px;
+  padding-top: 6px;
+  border-top: 1px solid rgba(167, 243, 208, 0.2);
+  font-size: 0.5625rem;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.9);
-  letter-spacing: 3px;
-  margin-top: 2px;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: rgba(209, 250, 229, 0.65);
+  font-family: var(--font-sans, system-ui, sans-serif);
 }
 
 /* Navegação */
@@ -591,25 +607,42 @@
   display: inline-flex;
   flex-direction: column;
   align-items: center;
-  background: #2d5a47;
-  padding: 12px 20px;
-  border-radius: 8px;
+  background: var(--logo-mark-brand-bg);
+  padding: 9px 18px 10px;
+  border-radius: 11px;
   margin-bottom: 16px;
+  border: 1px solid var(--app-sidebar-edge);
+  box-shadow:
+    inset -1px 0 0 var(--app-sidebar-edge-accent),
+    inset 0 1px 0 rgba(52, 211, 153, 0.08),
+    0 4px 16px rgba(0, 0, 0, 0.32);
 }
 
 .logo-text-small {
-  font-size: 20px;
-  font-weight: 800;
-  color: #ffffff;
-  letter-spacing: 2px;
-  font-family: Georgia, serif;
+  font-size: 1.3125rem;
+  font-weight: 700;
+  letter-spacing: -0.045em;
+  line-height: 1;
+  font-family: var(--font-display, "Space Grotesk", system-ui, sans-serif);
+  background: none;
+  -webkit-background-clip: unset;
+  background-clip: unset;
+  color: var(--logo-eco-text-dark);
+  text-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.4),
+    0 0 16px var(--logo-eco-glow-dark);
 }
 
 .logo-sub-small {
-  font-size: 8px;
+  margin-top: 6px;
+  padding-top: 5px;
+  border-top: 1px solid rgba(167, 243, 208, 0.18);
+  font-size: 0.5rem;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.9);
-  letter-spacing: 2px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: rgba(209, 250, 229, 0.6);
+  font-family: var(--font-sans, system-ui, sans-serif);
 }
 
 .footer-tagline {

@@ -1,9 +1,10 @@
-<div class="auth-behind-root">
-  <div class="auth-behind-home-layer" aria-hidden="true">
-    <app-home />
-  </div>
-  <div class="auth-behind-dim" aria-hidden="true"></div>
-  <div class="auth-behind-front">
+<div class="auth-behind-root" [class.is-leaving]="leaving()">
+  <div
+    class="auth-behind-dim"
+    [class.is-mounted]="dimMounted()"
+    aria-hidden="true"
+  ></div>
+  <div class="auth-behind-front" [class.is-mounted]="panelMounted()">
     @if (authMode() === 'cadastro') {
       <app-cadastro />
     } @else {

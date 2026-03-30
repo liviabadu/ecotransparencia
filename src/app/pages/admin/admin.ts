@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { LogoutDialogService } from '../../services/logout-dialog.service';
 
 interface ScoreWeight {
   fonte: string;
@@ -27,6 +28,7 @@ interface RiskThreshold {
 export class Admin implements OnInit {
   protected authService = inject(AuthService);
   private router = inject(Router);
+  private logoutDialog = inject(LogoutDialogService);
 
   // Methodology configuration
   scoreWeights = signal<ScoreWeight[]>([
@@ -46,9 +48,13 @@ export class Admin implements OnInit {
   successMessage = signal<string | null>(null);
   errorMessage = signal<string | null>(null);
   isEditing = signal(false);
-
   @HostListener('document:keydown', ['$event'])
   onEscapeCancelEdit(event: KeyboardEvent): void {
+    if (event.key === 'Escape' && this.logoutDialog.open()) {
+      this.logoutDialog.dismiss();
+      event.preventDefault();
+      return;
+    }
     if (event.key !== 'Escape' || !this.isEditing()) return;
     this.cancelEditing();
     event.preventDefault();
@@ -56,18 +62,18 @@ export class Admin implements OnInit {
 
   ngOnInit(): void {
     // Check if user is authenticated
-    if (!this.authService.isAuthenticated() && !this.authService.isLoading()) {
+    if (!this.authService.isAuthenticated()) {
       this.router.navigate(['/login']);
     }
   }
 
-  async logout(): Promise<void> {
-    try {
-      await this.authService.logout();
-      this.router.navigate(['/']);
-    } catch (error) {
-      this.errorMessage.set('Erro ao fazer logout.');
-    }
+  openLogoutConfirm(): void {
+    this.logoutDialog.request({
+      afterLogout: async () => {
+        await this.router.navigateByUrl('/');
+      },
+      onError: () => this.errorMessage.set('Erro ao fazer logout.'),
+    });
   }
 
   startEditing(): void {

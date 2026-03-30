@@ -32,9 +32,8 @@ export interface SettingsModalCopy {
   langEnDesc: string;
   dataTitle: string;
   dataSubtitle: string;
-  loading: string;
   loggedInLead: string;
-  guestLead: string;
+  advancedGuestTagline: string;
   signIn: string;
   signUp: string;
 }
@@ -44,7 +43,7 @@ const MODAL_COPY: Record<ModalLocale, SettingsModalCopy> = {
     closeAria: 'Fechar configurações',
     navAria: 'Seções',
     navGeral: 'Geral',
-    navData: 'Controlar dados',
+    navData: 'Configurações avançadas',
     geralTitle: 'Geral',
     geralSubtitle: 'Preferências gerais do site neste dispositivo',
     appearance: 'Aparência',
@@ -62,13 +61,10 @@ const MODAL_COPY: Record<ModalLocale, SettingsModalCopy> = {
     langPtDesc: 'Português (Brasil)',
     langEn: 'English',
     langEnDesc: 'English (US)',
-    dataTitle: 'Controlar dados',
-    dataSubtitle: 'Conta, segurança e privacidade neste dispositivo',
-    loading: 'Carregando…',
-    loggedInLead:
-      'Sua sessão está ativa com segurança. Recursos extras e gestão de dados ficam disponíveis quando você usa a conta conectada.',
-    guestLead:
-      'Faça login para aproveitar melhores experiências no site, com proteção dos seus dados e privacidade reforçada.',
+    dataTitle: 'Configurações avançadas',
+    dataSubtitle: 'Conta e sessão neste dispositivo',
+    loggedInLead: 'Você está conectado. Sua sessão está ativa neste dispositivo.',
+    advancedGuestTagline: 'Entre com sua conta para salvar consultas e usar recursos extras.',
     signIn: 'Entrar',
     signUp: 'Criar conta',
   },
@@ -76,7 +72,7 @@ const MODAL_COPY: Record<ModalLocale, SettingsModalCopy> = {
     closeAria: 'Close settings',
     navAria: 'Sections',
     navGeral: 'General',
-    navData: 'Data controls',
+    navData: 'Advanced settings',
     geralTitle: 'General',
     geralSubtitle: 'Site preferences on this device',
     appearance: 'Appearance',
@@ -94,13 +90,10 @@ const MODAL_COPY: Record<ModalLocale, SettingsModalCopy> = {
     langPtDesc: 'Portuguese (Brazil)',
     langEn: 'English',
     langEnDesc: 'English (US)',
-    dataTitle: 'Data controls',
-    dataSubtitle: 'Account, security, and privacy on this device',
-    loading: 'Loading…',
-    loggedInLead:
-      'Your session is active and secure. Extra features and data management are available when you use your connected account.',
-    guestLead:
-      'Sign in to get a better experience, stronger protection for your data, and improved privacy.',
+    dataTitle: 'Advanced settings',
+    dataSubtitle: 'Account and session on this device',
+    loggedInLead: 'You’re signed in. Your session is active on this device.',
+    advancedGuestTagline: 'Sign in to save searches and use extra features with your account.',
     signIn: 'Sign in',
     signUp: 'Create account',
   },

@@ -1,14 +1,14 @@
-<div class="search-container">
+<div class="search-container" [class.search-container--dashboard]="dashboardLayout()">
   <!-- CA01 - Search Form -->
   <form class="search-form" (submit)="onSubmit($event)">
     <div class="search-input-group">
       <input
         type="text"
         class="search-input"
-        placeholder="Digite o CNPJ da empresa"
+        [attr.placeholder]="searchPlaceholder()"
         [value]="searchTerm()"
         (input)="onInputChange($any($event.target).value)"
-        [attr.aria-label]="'Campo de busca por CNPJ'"
+        [attr.aria-label]="dashboardLayout() ? 'Buscar empresa por nome ou CNPJ' : 'Campo de busca por CNPJ'"
         [attr.aria-describedby]="errorMessage() ? 'error-message' : null"
         maxlength="18"
       />

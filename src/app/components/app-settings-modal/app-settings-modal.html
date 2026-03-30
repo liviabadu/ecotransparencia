@@ -1,7 +1,7 @@
 @let copy = language.modalCopy();
 
 <div
-  class="app-settings-overlay"
+  class="app-modal-scrim app-settings-overlay"
   role="presentation"
   [class.is-mounted]="mounted()"
   [class.is-leaving]="leaving()"
@@ -13,7 +13,6 @@
     role="dialog"
     aria-modal="true"
     aria-labelledby="app-settings-title"
-    (click)="$event.stopPropagation()"
   >
     <div class="app-settings-layout">
       <aside class="app-settings-nav" [attr.aria-label]="copy.navAria">
@@ -53,13 +52,17 @@
             [class.is-active]="activePane() === 'advanced'"
             (click)="selectAdvanced()"
           >
-            <span class="app-settings-nav-icon" aria-hidden="true">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round">
-                <ellipse cx="12" cy="5" rx="7" ry="2.5" />
-                <path d="M5 5v6c0 1.38 3.13 2.5 7 2.5s7-1.12 7-2.5V5" />
-                <path d="M5 11v6c0 1.38 3.13 2.5 7 2.5s7-1.12 7-2.5v-6" />
-                <circle cx="12" cy="17.5" r="1.35" fill="currentColor" stroke="none" />
-                <path d="M12 16.15V14" />
+            <span class="app-settings-nav-icon app-settings-nav-icon--advanced" aria-hidden="true">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="4" y1="21" x2="4" y2="14" />
+                <line x1="4" y1="10" x2="4" y2="3" />
+                <line x1="12" y1="21" x2="12" y2="12" />
+                <line x1="12" y1="8" x2="12" y2="3" />
+                <line x1="20" y1="21" x2="20" y2="16" />
+                <line x1="20" y1="12" x2="20" y2="3" />
+                <line x1="2" y1="14" x2="7" y2="14" />
+                <line x1="9" y1="8" x2="15" y2="8" />
+                <line x1="17" y1="16" x2="22" y2="16" />
               </svg>
             </span>
             <span>{{ copy.navData }}</span>
@@ -204,9 +207,7 @@
           <p class="app-settings-main-subtitle">{{ copy.dataSubtitle }}</p>
           <div class="app-settings-divider" role="separator"></div>
 
-          @if (auth.isLoading()) {
-            <p class="app-settings-advanced-lead">{{ copy.loading }}</p>
-          } @else if (auth.isAuthenticated()) {
+          @if (auth.isAuthenticated()) {
             <div class="app-settings-advanced">
               <p class="app-settings-advanced-lead">
                 {{ copy.loggedInLead }}
@@ -216,13 +217,32 @@
               }
             </div>
           } @else {
-            <div class="app-settings-advanced">
-              <p class="app-settings-advanced-lead">
-                {{ copy.guestLead }}
-              </p>
-              <div class="app-settings-advanced-actions">
-                <a routerLink="/login" class="app-settings-btn-primary" (click)="requestClose()">{{ copy.signIn }}</a>
-                <a routerLink="/cadastro" class="app-settings-btn-secondary" (click)="requestClose()">{{ copy.signUp }}</a>
+            <div class="app-settings-advanced-guest">
+              <div class="app-settings-advanced-guest__hero" aria-hidden="true">
+                <div class="app-settings-advanced-guest__glow"></div>
+                <svg
+                  class="app-settings-advanced-guest__icon"
+                  width="36"
+                  height="36"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                  <circle cx="9" cy="7" r="4" />
+                  <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                </svg>
+              </div>
+              <p class="app-settings-advanced-guest__tagline">{{ copy.advancedGuestTagline }}</p>
+              <div class="app-settings-advanced-guest__cta">
+                <div class="app-settings-advanced-actions">
+                  <a routerLink="/login" class="app-settings-btn-primary" (click)="requestClose()">{{ copy.signIn }}</a>
+                  <a routerLink="/cadastro" class="app-settings-btn-secondary" (click)="requestClose()">{{ copy.signUp }}</a>
+                </div>
               </div>
             </div>
           }

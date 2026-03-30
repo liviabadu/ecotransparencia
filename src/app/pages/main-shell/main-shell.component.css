@@ -1,0 +1,11 @@
+.main-shell {
+  position: relative;
+  min-height: 100vh;
+  min-height: 100dvh;
+  width: 100%;
+}
+
+.main-shell__home {
+  min-height: 100vh;
+  min-height: 100dvh;
+}

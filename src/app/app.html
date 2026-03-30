@@ -97,7 +97,7 @@
           </a>
           <a
             routerLink="/assinaturas"
-            class="app-sidebar-nav-link"
+            class="app-sidebar-nav-link app-sidebar-nav-link--emphasis"
             routerLinkActive="is-active"
             (click)="sidebar.close()"
           >
@@ -189,11 +189,23 @@
     </div>
   </aside>
 
+  @if (authRailScrimShow()) {
+    <div
+      class="app-auth-rail-scrim"
+      [class.is-mounted]="authRailScrimMounted()"
+      aria-hidden="true"
+    ></div>
+  }
+
   <div class="app-main">
     <router-outlet />
   </div>
 
   @if (settingsOpen()) {
     <app-settings-modal (closed)="closeSettings()" />
+  }
+
+  @if (logoutDialog.open()) {
+    <app-logout-confirm-dialog (dismissed)="onLogoutDismiss()" (confirmed)="onLogoutConfirm()" />
   }
 </div>
