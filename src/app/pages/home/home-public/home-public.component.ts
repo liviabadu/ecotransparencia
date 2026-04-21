@@ -23,7 +23,7 @@ import { HomeScrollStory } from '../home-scroll-story';
   standalone: true,
   imports: [Search, RouterLink, CounterDirective],
   templateUrl: './home-public.component.html',
-  styleUrl: './home-public.component.css',
+  styleUrls: ['./home-public.component.css', '../home-scroll-story.css'],
 })
 export class HomePublic implements AfterViewInit, OnDestroy {
   readonly footerContactEmail = 'contato@ecotransparencia.org';

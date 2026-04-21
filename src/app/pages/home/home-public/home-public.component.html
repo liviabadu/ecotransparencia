@@ -1,41 +1,6 @@
 <!-- Skip Link para Acessibilidade -->
 <a href="#main-content" class="skip-link">Pular para o conteúdo</a>
 
-<!-- ========== HEADER ========== -->
-<header class="header">
-  <div class="header-inner">
-    <div class="header-brand">
-      <!-- Logo (mesma do site) -->
-      <div class="logo-container">
-        <a
-          routerLink="/"
-          (click)="scrollToTop()"
-          class="logo-link"
-          aria-label="Voltar para a página inicial"
-        >
-          <div class="logo-box">
-            <span class="logo-text">eco</span>
-            <span class="logo-sub">TRANSPARÊNCIA</span>
-          </div>
-        </a>
-      </div>
-    </div>
-
-    <!-- Navegação -->
-    <nav class="nav-menu" aria-label="Menu principal">
-      <a routerLink="/assinaturas" class="nav-btn nav-btn-primary">
-        Assinaturas
-      </a>
-      <a routerLink="/login" class="nav-btn nav-btn-primary">
-        Entrar
-      </a>
-      <a routerLink="/cadastro" class="nav-btn nav-btn-primary">
-        Cadastre-se
-      </a>
-    </nav>
-  </div>
-</header>
-
 <!-- Raiz dos efeitos scroll/storytelling (home-scroll-story.ts); display:contents não altera o layout -->
 <div class="home-story-root" #storyHost>
   <!-- ========== HERO SECTION ========== -->
@@ -43,6 +8,40 @@
     <section class="hero">
       <!-- Fundo estático: parallax em JS gerava layout a cada frame e deixava o scroll pesado -->
       <div class="hero-bg" aria-hidden="true"></div>
+
+      <!-- Header dentro do hero: mesmo fundo (grade + glow); rola com a página -->
+      <header class="header">
+        <div class="header-inner">
+          <div class="header-brand">
+            <div class="logo-container">
+              <a
+                routerLink="/"
+                (click)="scrollToTop()"
+                class="logo-link"
+                aria-label="Voltar para a página inicial"
+              >
+                <div class="logo-box">
+                  <span class="logo-text">eco</span>
+                  <span class="logo-sub">TRANSPARÊNCIA</span>
+                </div>
+              </a>
+            </div>
+          </div>
+
+          <nav class="nav-menu" aria-label="Menu principal">
+            <a routerLink="/assinaturas" class="nav-btn nav-btn-primary">
+              Assinaturas
+            </a>
+            <a routerLink="/login" class="nav-btn nav-btn-primary">
+              Entrar
+            </a>
+            <a routerLink="/cadastro" class="nav-btn nav-btn-primary">
+              Cadastre-se
+            </a>
+          </nav>
+        </div>
+      </header>
+
       <div class="hero-content">
         <h1 class="hero-title fade-in">
           Transparência<br/>
@@ -383,9 +382,7 @@
 
   @if (isHelpMenuOpen()) {
     <div class="help-dropdown" role="menu" aria-label="Menu de ajuda">
-      <button type="button" class="help-item" role="menuitem">Sobre a empresa</button>
       <button type="button" class="help-item" role="menuitem">Central de ajuda</button>
-      <button type="button" class="help-item" role="menuitem">Termos e Políticas</button>
       <button type="button" class="help-item" role="menuitem">Notas de versão</button>
     </div>
   }

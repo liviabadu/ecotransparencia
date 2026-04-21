@@ -1,236 +1,344 @@
 <a href="#dash-main" class="home-dash-skip">Pular para o painel</a>
 
 <div class="home-dash">
-  <header class="home-dash-header">
-    <div class="home-dash-header__inner">
-      <a
-        routerLink="/"
-        class="home-dash-logo"
-        (click)="scrollToTop()"
-        aria-label="Eco Transparência — início"
-      >
-        <span class="home-dash-logo__mark">
-          <span class="home-dash-logo__eco">eco</span>
-          <span class="home-dash-logo__sub">TRANSPARÊNCIA</span>
-        </span>
-      </a>
-
-      <div class="home-dash-header__actions">
-        <a routerLink="/assinaturas" class="home-dash-link-subtle">Assinaturas</a>
-        <a routerLink="/metodologia" class="home-dash-link-subtle">Metodologia</a>
-
-        <div class="home-dash-user" #userMenuRoot>
-          <span class="home-dash-greeting" aria-live="polite">
-            Olá, {{ auth.getDisplayName() }} 👋
+  <div class="home-story-root" #storyHost>
+    <div class="home-dash-toolbar-rail">
+      <div class="home-dash-toolbar" aria-label="Topo do painel">
+        <a
+          routerLink="/"
+          class="home-dash-logo"
+          (click)="scrollToTop()"
+          aria-label="Eco Transparência — início"
+        >
+          <span class="home-dash-logo__mark">
+            <span class="home-dash-logo__eco">eco</span>
+            <span class="home-dash-logo__sub">TRANSPARÊNCIA</span>
           </span>
-          <div class="home-dash-user-menu">
-            <button
-              type="button"
-              class="home-dash-avatar-btn"
-              [attr.aria-expanded]="userMenuOpen()"
-              aria-haspopup="menu"
-              aria-label="Menu da conta"
-              (click)="toggleUserMenu($event)"
-            >
-              @if (auth.getPhotoUrl(); as photo) {
-                <img [src]="photo" alt="" class="home-dash-avatar-img" width="40" height="40" />
-              } @else {
-                <span class="home-dash-avatar-fallback" aria-hidden="true">{{ auth.getInitials() }}</span>
-              }
-            </button>
+        </a>
 
-            @if (userMenuOpen()) {
-              <div class="home-dash-dropdown" role="menu">
-                <button type="button" class="home-dash-dropdown__item" role="menuitem" (click)="onProfileClick($event)">
-                  Perfil
-                </button>
-                <button type="button" class="home-dash-dropdown__item" role="menuitem" (click)="openSettings()">
-                  Configurações
-                </button>
-                <button type="button" class="home-dash-dropdown__item home-dash-dropdown__item--danger" role="menuitem" (click)="requestLogout()">
-                  Sair
-                </button>
-              </div>
-            }
-          </div>
+        <div class="home-dash-toolbar__user">
+          <span
+            class="home-dash-greeting"
+            aria-live="polite"
+            [attr.title]="auth.getDisplayName() !== auth.getDashboardGreetingName() ? auth.getDisplayName() : null"
+          >
+            Olá, {{ auth.getDashboardGreetingName() }}
+          </span>
+          <span class="home-dash-name-badge" aria-hidden="true">{{ auth.getDashboardBadgeTwoLetters() }}</span>
         </div>
       </div>
     </div>
-  </header>
 
-  <main id="dash-main" class="home-dash-main">
-    <section class="home-dash-search-block" aria-labelledby="dash-search-title">
-      <div class="home-dash-search-block__intro">
-        <span class="home-dash-search-kicker">Área principal</span>
-        <h1 id="dash-search-title" class="home-dash-title">
-          Buscar <span class="home-dash-title-highlight">empresas</span>
-        </h1>
-        <p class="home-dash-subtitle">Consulte dados e riscos socioambientais em um só lugar</p>
-      </div>
-      <div class="home-dash-search-spotlight">
-        <div class="home-dash-search-spotlight__glow" aria-hidden="true"></div>
-        <div class="home-dash-search-wrap">
-          <div class="home-dash-search-wrap__head" aria-hidden="true">
-            <span class="home-dash-search-wrap__icon">
+    <main id="dash-main" class="home-dash-main">
+      <section class="home-dash-search-block" aria-labelledby="dash-search-title">
+        <div class="home-dash-search-block__intro">
+          <span class="home-dash-search-kicker fade-in">Área principal</span>
+          <h1 id="dash-search-title" class="home-dash-title fade-in fade-in--delay-1">
+            Buscar <span class="home-dash-title-highlight">empresas</span>
+          </h1>
+          <p class="home-dash-subtitle fade-in fade-in--delay-2">
+            Consulte dados e riscos socioambientais em um só lugar
+          </p>
+        </div>
+        <div class="home-dash-search-spotlight fade-in fade-in--delay-2">
+          <div class="home-dash-search-wrap">
+            <div class="home-dash-search-wrap__head" aria-hidden="true">
+              <span class="home-dash-search-wrap__icon reveal-scale">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="11" cy="11" r="8" />
+                  <path d="m21 21-4.3-4.3" />
+                </svg>
+              </span>
+              <span class="home-dash-search-wrap__label">Pesquisa por CNPJ</span>
+            </div>
+            <app-search
+              [searchPlaceholder]="dashSearchPlaceholder"
+              [dashboardLayout]="true"
+              [favoriteCnpjKeys]="favoriteCnpjKeysForSearch()"
+              (dashboardSearchSettled)="onDashboardSearchSettled($event)"
+              (dashboardFavoriteToggled)="onDashboardFavoriteToggled($event)"
+            />
+          </div>
+        </div>
+      </section>
+
+      <section class="home-dash-section" aria-labelledby="dash-cards-title">
+        <h2 id="dash-cards-title" class="home-dash-section-title fade-in">Visão geral</h2>
+        <div class="home-dash-card-grid">
+          <article
+            id="dash-ultimas-pesquisas"
+            class="dash-card dash-card--recent-searches fade-in fade-in--delay-1"
+            role="button"
+            tabindex="0"
+            [attr.aria-label]="
+              recentSearches().length === 0
+                ? 'Últimas pesquisas. Nenhuma pesquisa recente. Abrir histórico.'
+                : 'Últimas pesquisas. ' + recentSearches().length + ' no histórico. Abrir lista completa.'
+            "
+            (click)="openRecentSearchesHistory()"
+            (keydown)="onRecentSearchesCardKeydown($event)"
+          >
+            <div class="dash-card__icon reveal-scale" aria-hidden="true">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="11" cy="11" r="8" />
                 <path d="m21 21-4.3-4.3" />
               </svg>
+            </div>
+            <h3 class="dash-card__title">Últimas pesquisas</h3>
+            @if (recentSearches().length === 0) {
+              <p class="dash-card__empty">Nenhuma empresa pesquisada recentemente.</p>
+            } @else {
+              <ul class="dash-card__list">
+                @for (row of recentSearches().slice(0, recentCardPreviewLimit); track row.cnpj) {
+                  <li>{{ row.label }}</li>
+                }
+              </ul>
+              @if (recentSearches().length > recentCardPreviewLimit) {
+                <p class="dash-card__hint">Clique para consultar o histórico de pesquisas</p>
+              }
+            }
+          </article>
+
+          <article class="dash-card fade-in fade-in--delay-2">
+            <div class="dash-card__icon reveal-scale" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+              </svg>
+            </div>
+            <h3 class="dash-card__title">Empresas favoritas</h3>
+            @if (favoriteEntries().length === 0) {
+              <p class="dash-card__empty">
+                Nenhuma empresa favorita ainda. Use a estrela nos resultados da busca por CNPJ para salvar.
+              </p>
+            } @else {
+              <ul class="dash-card__list">
+                @for (f of favoriteEntries(); track f.cnpj) {
+                  <li>{{ f.label }}</li>
+                }
+              </ul>
+            }
+          </article>
+
+          <article
+            class="dash-card dash-card--high-risk-recent fade-in fade-in--delay-3"
+            aria-labelledby="dash-high-risk-recent-title"
+          >
+            <div class="dash-card__icon reveal-scale" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 3v18h18" />
+                <path d="M18 9l-5 5-4-4-3 3" />
+              </svg>
+            </div>
+            <h3 id="dash-high-risk-recent-title" class="dash-card__title">Empresas com maior risco recente</h3>
+            <p class="dash-card__lead">
+              Consultas recentes com score acima de 70 (alto risco na escala 0–100), entre as que você pesquisou neste painel.
+            </p>
+            @if (topRecentHighRiskRows().length === 0) {
+              <p class="dash-card__empty">
+                Nenhuma pesquisa recente com score acima de 70. Quando consultar uma empresa nessa faixa, ela aparecerá aqui.
+              </p>
+            } @else {
+              <ul class="dash-card__list dash-card__list--tight">
+                @for (row of topRecentHighRiskRows(); track row.cnpj) {
+                  <li>{{ row.line }}</li>
+                }
+              </ul>
+            }
+          </article>
+
+          <article class="dash-card fade-in">
+            <div class="dash-card__icon reveal-scale" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                <line x1="12" y1="9" x2="12" y2="13" />
+                <line x1="12" y1="17" x2="12.01" y2="17" />
+              </svg>
+            </div>
+            <h3 class="dash-card__title">Alertas recentes</h3>
+            <p class="dash-card__lead">
+              Avisos quando o score ou o risco de uma empresa consultada mudar em relação à última vez que você a pesquisou aqui.
+            </p>
+            @if (recentAlerts().length === 0) {
+              <p class="dash-card__empty">
+                Nenhuma mudança detectada ainda. Quando voltar a consultar a mesma empresa e os dados tiverem alterado, aparecerá aqui.
+              </p>
+            } @else {
+              <ul class="dash-card__list">
+                @for (a of recentAlerts(); track a.id) {
+                  <li>{{ a.message }}</li>
+                }
+              </ul>
+            }
+          </article>
+        </div>
+      </section>
+
+      <section class="home-dash-section home-dash-section--insights" aria-labelledby="dash-insights-title">
+        <h2 id="dash-insights-title" class="home-dash-section-title fade-in">Insights</h2>
+        <div class="home-dash-insights-grid">
+          <article class="dash-insight-card dash-insight-card--data-indicator fade-in fade-in--delay-1" aria-labelledby="dash-data-indicator-title">
+            <div class="dash-card__icon reveal-scale" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                <ellipse cx="12" cy="5" rx="8" ry="2.5" />
+                <path d="M4 5v5.5c0 1.38 3.58 2.5 8 2.5s8-1.12 8-2.5V5" />
+                <path d="M4 10.5V16c0 1.38 3.58 2.5 8 2.5s8-1.12 8-2.5v-5.5" />
+              </svg>
+            </div>
+            <h3 id="dash-data-indicator-title" class="dash-insight-card__title">Indicador de dados</h3>
+            <p class="dash-card__lead">
+              Transparência sobre a origem e a atualização das informações — não é o seu histórico de pesquisas.
+            </p>
+            <dl class="dash-card__indicator-facts dash-card__indicator-facts--panel">
+              <div class="dash-card__indicator-fact dash-card__indicator-fact--merged">
+                <div class="dash-card__indicator-fact__pair">
+                  <dt>Última atualização da base</dt>
+                  <dd>{{ dataIndicatorBaseRefreshLabel }}</dd>
+                </div>
+                <div class="dash-card__indicator-fact__pair">
+                  <dt>Fontes consultadas hoje</dt>
+                  <dd>{{ dataIndicatorSourcesTodayLabel }}</dd>
+                </div>
+              </div>
+              <div class="dash-card__indicator-facts__tail" aria-hidden="true"></div>
+            </dl>
+          </article>
+          <article
+            class="dash-insight-card dash-insight-card--glossary fade-in fade-in--delay-2"
+            aria-labelledby="dash-glossary-title"
+          >
+            <div class="dash-card__icon reveal-scale" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+                <path d="M8 7h8M8 11h6" />
+              </svg>
+            </div>
+            <h3 id="dash-glossary-title" class="dash-insight-card__title">Glossário mini</h3>
+            <p class="dash-card__lead">
+              Definições curtas para interpretar o score e as faixas de risco nos resultados da consulta.
+            </p>
+            <dl class="dash-card__glossary">
+              <div class="dash-card__glossary-block">
+                <dt>Score de risco (0–100)</dt>
+                <dd>
+                  Índice na escala 0 a 100 que resume, de forma sintética, sinais de risco socioambiental e correlatos
+                  encontrados nas fontes consultadas. Não substitui análise jurídica ou auditoria.
+                </dd>
+              </div>
+              <div class="dash-card__glossary-block">
+                <dt>Níveis de risco</dt>
+                <dd>
+                  Faixas ligadas ao score neste painel:
+                  <strong>Baixo</strong> 0–25,
+                  <strong>Médio</strong> 26–50,
+                  <strong>Alto</strong> 51–75 e
+                  <strong>Crítico</strong> 76–100 — para leitura rápida junto à barra e à pílula colorida.
+                </dd>
+              </div>
+            </dl>
+          </article>
+        </div>
+      </section>
+    </main>
+    <div class="home-story-end-sentinel" aria-hidden="true"></div>
+  </div>
+
+  @if (recentSearchesHistoryOpen()) {
+    <div
+      class="home-dash-recent-layer"
+      [class.home-dash-recent-layer--exiting]="recentSearchesHistoryExiting()"
+      (click)="closeRecentSearchesHistory()"
+    >
+      <div
+        class="home-dash-recent-panel"
+        [class.home-dash-recent-panel--exiting]="recentSearchesHistoryExiting()"
+        (animationend)="onRecentHistoryPanelAnimationEnd($event)"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="dash-recent-history-title"
+        (click)="$event.stopPropagation()"
+      >
+        <div class="home-dash-recent-panel__head">
+          <h2 id="dash-recent-history-title" class="home-dash-recent-panel__title">Histórico de pesquisas</h2>
+          <div class="home-dash-recent-panel__head-actions">
+            <span class="home-dash-recent-panel__clear-history-wrap">
+              <button
+                type="button"
+                class="home-dash-recent-panel__clear-history"
+                (click)="onClearDashboardHistoryClick($event)"
+                aria-label="Limpar histórico de pesquisas neste navegador"
+              >
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M3 6h18" />
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
+                  <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                  <line x1="10" x2="10" y1="11" y2="17" />
+                  <line x1="14" x2="14" y1="11" y2="17" />
+                </svg>
+              </button>
+              <span class="home-dash-recent-panel__clear-history-tooltip" aria-hidden="true">Limpar histórico</span>
             </span>
-            <span class="home-dash-search-wrap__label">Pesquisa por CNPJ</span>
+            <button
+              type="button"
+              class="home-dash-recent-panel__close"
+              (click)="closeRecentSearchesHistory()"
+              aria-label="Fechar histórico"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+                <path d="M18 6 6 18M6 6l12 12" />
+              </svg>
+            </button>
           </div>
-          <app-search
-            [searchPlaceholder]="dashSearchPlaceholder"
-            [dashboardLayout]="true"
-          />
         </div>
-      </div>
-    </section>
-
-    <section class="home-dash-section" aria-labelledby="dash-cards-title">
-      <h2 id="dash-cards-title" class="home-dash-section-title">Visão geral</h2>
-      <div class="home-dash-card-grid">
-        <article class="dash-card">
-          <div class="dash-card__icon" aria-hidden="true">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="11" cy="11" r="8" />
-              <path d="m21 21-4.3-4.3" />
-            </svg>
+        @if (recentSearches().length === 0) {
+          <p class="home-dash-recent-panel__empty">Nenhuma pesquisa por CNPJ registrada ainda. Use a busca acima para começar.</p>
+        } @else {
+          <p class="home-dash-recent-panel__meta">{{ recentSearches().length }} pesquisa(s) guardada(s)</p>
+          <ul #recentHistoryList class="home-dash-recent-panel__list">
+            @for (row of recentHistoryPageSlice(); track row.cnpj) {
+              <li class="home-dash-recent-panel__item">{{ row.label }}</li>
+            }
+          </ul>
+          <div class="home-dash-recent-panel__pager">
+            <span class="home-dash-recent-panel__pager-range">{{ recentHistoryRangeLabel() }}</span>
+            <div class="home-dash-recent-panel__pager-nav">
+              <button
+                type="button"
+                class="home-dash-recent-panel__pager-btn"
+                [disabled]="!recentHistoryCanPrev()"
+                (click)="recentHistoryGoPrev()"
+                aria-label="Página anterior"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="m15 18-6-6 6-6" />
+                </svg>
+              </button>
+              <button
+                type="button"
+                class="home-dash-recent-panel__pager-btn"
+                [disabled]="!recentHistoryCanNext()"
+                (click)="recentHistoryGoNext()"
+                aria-label="Próxima página"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="m9 18 6-6-6-6" />
+                </svg>
+              </button>
+            </div>
           </div>
-          <h3 class="dash-card__title">Últimas pesquisas</h3>
-          @if (recentCompanies().length === 0) {
-            <p class="dash-card__empty">Nenhuma empresa pesquisada recentemente.</p>
-          } @else {
-            <ul class="dash-card__list">
-              @for (item of recentCompanies(); track item) {
-                <li>{{ item }}</li>
-              }
-            </ul>
-          }
-        </article>
-
-        <article class="dash-card">
-          <div class="dash-card__icon" aria-hidden="true">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
-            </svg>
-          </div>
-          <h3 class="dash-card__title">Empresas favoritas</h3>
-          @if (favoriteIds().length === 0) {
-            <p class="dash-card__empty">Salve empresas para acessar aqui com um clique.</p>
-          } @else {
-            <ul class="dash-card__list">
-              @for (item of favoriteIds(); track item) {
-                <li>{{ item }}</li>
-              }
-            </ul>
-          }
-        </article>
-
-        <article class="dash-card">
-          <div class="dash-card__icon" aria-hidden="true">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M3 3v18h18" />
-              <path d="M18 9l-5 5-4-4-3 3" />
-            </svg>
-          </div>
-          <h3 class="dash-card__title">Histórico de consultas</h3>
-          @if (historyLines().length === 0) {
-            <p class="dash-card__empty">Seu histórico de consultas aparecerá aqui.</p>
-          } @else {
-            <ul class="dash-card__list">
-              @for (line of historyLines(); track line) {
-                <li>{{ line }}</li>
-              }
-            </ul>
-          }
-        </article>
-
-        <article class="dash-card">
-          <div class="dash-card__icon" aria-hidden="true">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
-              <line x1="12" y1="9" x2="12" y2="13" />
-              <line x1="12" y1="17" x2="12.01" y2="17" />
-            </svg>
-          </div>
-          <h3 class="dash-card__title">Alertas recentes</h3>
-          @if (alertLines().length === 0) {
-            <p class="dash-card__empty">Sem alertas no momento.</p>
-          } @else {
-            <ul class="dash-card__list">
-              @for (line of alertLines(); track line) {
-                <li>{{ line }}</li>
-              }
-            </ul>
-          }
-        </article>
+        }
       </div>
-    </section>
-
-    <section class="home-dash-section" aria-labelledby="dash-fav-title">
-      <div class="home-dash-section-head">
-        <h2 id="dash-fav-title" class="home-dash-section-title">Favoritos</h2>
-        <p class="home-dash-section-lead">Empresas salvas com score e indicador de risco</p>
-      </div>
-      @if (favoriteRows().length === 0) {
-        <div class="home-dash-empty-panel">
-          <p>Você ainda não tem favoritos. Use a busca acima e salve empresas quando a função estiver disponível.</p>
-        </div>
-      } @else {
-        <div class="home-dash-table-wrap">
-          <table class="home-dash-table">
-            <thead>
-              <tr>
-                <th scope="col">Empresa</th>
-                <th scope="col">Score</th>
-                <th scope="col">Risco</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (row of favoriteRows(); track row.name) {
-                <tr>
-                  <td>{{ row.name }}</td>
-                  <td>{{ row.score }}</td>
-                  <td>
-                    <span class="home-dash-risk" [class]="'home-dash-risk--' + row.risk">{{ row.risk === 'low' ? 'Baixo' : row.risk === 'medium' ? 'Médio' : 'Alto' }}</span>
-                  </td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        </div>
-      }
-    </section>
-
-    <section class="home-dash-section home-dash-section--insights" aria-labelledby="dash-insights-title">
-      <h2 id="dash-insights-title" class="home-dash-section-title">Insights</h2>
-      <div class="home-dash-insights-grid">
-        <article class="dash-insight-card">
-          <h3 class="dash-insight-card__title">Empresas com maior risco recente</h3>
-          @if (highRiskPreview().length === 0) {
-            <p class="dash-card__empty">Dados agregados em breve.</p>
-          } @else {
-            <ul class="dash-card__list">
-              @for (line of highRiskPreview(); track line) {
-                <li>{{ line }}</li>
-              }
-            </ul>
-          }
-        </article>
-        <article class="dash-insight-card">
-          <h3 class="dash-insight-card__title">Setores mais críticos</h3>
-          @if (criticalSectors().length === 0) {
-            <p class="dash-card__empty">Análise por setor em breve.</p>
-          } @else {
-            <ul class="dash-card__list">
-              @for (line of criticalSectors(); track line) {
-                <li>{{ line }}</li>
-              }
-            </ul>
-          }
-        </article>
-      </div>
-    </section>
-  </main>
+    </div>
+  }
 </div>
+

@@ -2,6 +2,12 @@ import { Injectable } from '@angular/core';
 import { Entity, Occurrence, SearchResult } from '../models/entity.model';
 import { ScoreService } from './score.service';
 
+/** Linha do widget “Setores mais críticos” no painel (derivada da amostra mock). */
+export interface DashboardCriticalSectorRow {
+  sectorKey: string;
+  line: string;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -21,6 +27,7 @@ export class MockDataService {
       name: 'Empresa Verde Sustentável Ltda',
       document: '11222333000181',
       documentType: 'cnpj',
+      sectorLabel: 'Fabricação leve',
       score: 15,
       riskLevel: 'Baixo',
       occurrences: [
@@ -42,6 +49,7 @@ export class MockDataService {
       name: 'Indústria Amarela S.A.',
       document: '22333444000181',
       documentType: 'cnpj',
+      sectorLabel: 'Indústria transformadora',
       score: 42,
       riskLevel: 'Médio',
       occurrences: [
@@ -72,6 +80,7 @@ export class MockDataService {
       name: 'Construtora Laranja Ltda',
       document: '33444555000181',
       documentType: 'cnpj',
+      sectorLabel: 'Construção civil',
       score: 68,
       riskLevel: 'Alto',
       occurrences: [
@@ -120,6 +129,7 @@ export class MockDataService {
       name: 'Mineradora Vermelha S.A.',
       document: '44555666000181',
       documentType: 'cnpj',
+      sectorLabel: 'Extração mineral',
       score: 89,
       riskLevel: 'Crítico',
       occurrences: [
@@ -198,6 +208,18 @@ export class MockDataService {
       ],
     });
 
+    // CNPJ sem ocorrências — score 0, faixa Baixo, sem pendências nas bases
+    this.entities.push({
+      id: '6',
+      name: 'Eco Limpo Comércio Ltda',
+      document: '60746977000184',
+      documentType: 'cnpj',
+      sectorLabel: 'Comércio',
+      score: 0,
+      riskLevel: 'Baixo',
+      occurrences: [],
+    });
+
     // Pessoa Física para Teste - João da Silva
     this.entities.push({
       id: '5',
@@ -246,6 +268,21 @@ export class MockDataService {
     await this.simulateDelay();
 
     const strippedDocument = this.stripMask(document);
+
+    if (type === 'cnpj' && strippedDocument === '18236120000158') {
+      return {
+        found: false,
+        bloqueadoPorSituacaoCadastral: true,
+        situacaoCadastral: {
+          dataConsulta: new Date().toISOString(),
+          mensagem:
+            'CNPJ de demonstração: situação cadastral irregular na Receita Federal. A análise ASG não está disponível para empresas inativas. Em produção, o texto viria da consulta oficial.',
+          situacao: 'Baixada',
+          valido: false,
+        },
+      };
+    }
+
     const entity = this.entities.find(
       (e) => e.documentType === type && this.stripMask(e.document) === strippedDocument
     );
@@ -290,5 +327,40 @@ export class MockDataService {
     }
 
     return { found: false };
+  }
+
+  /**
+   * Setores ordenados por score médio (maior primeiro), usando CNPJs da amostra com `sectorLabel`.
+   * Alinha-se à escala 0–100 do produto para o rótulo de risco.
+   */
+  getCriticalSectorsDashboardLines(maxRows = 5): DashboardCriticalSectorRow[] {
+    const cnpjs = this.entities.filter(
+      (e): e is Entity & { sectorLabel: string } =>
+        e.documentType === 'cnpj' && typeof e.sectorLabel === 'string' && e.sectorLabel.trim() !== ''
+    );
+    const bySector = new Map<string, number[]>();
+    for (const e of cnpjs) {
+      const key = e.sectorLabel.trim();
+      const list = bySector.get(key) ?? [];
+      list.push(e.score);
+      bySector.set(key, list);
+    }
+    const aggregated = [...bySector.entries()].map(([sectorKey, scores]) => {
+      const sum = scores.reduce((a, b) => a + b, 0);
+      const avg = Math.round(sum / scores.length);
+      return { sectorKey, avg, count: scores.length, risk: this.riskLabelFromScore(avg) };
+    });
+    aggregated.sort((a, b) => b.avg - a.avg);
+    return aggregated.slice(0, maxRows).map(({ sectorKey, avg, count, risk }) => ({
+      sectorKey,
+      line: `${sectorKey} — score médio ${avg} (${risk}), ${count} ${count === 1 ? 'empresa' : 'empresas'} na amostra`,
+    }));
+  }
+
+  private riskLabelFromScore(score: number): string {
+    if (score <= 25) return 'Baixo';
+    if (score <= 50) return 'Médio';
+    if (score <= 75) return 'Alto';
+    return 'Crítico';
   }
 }

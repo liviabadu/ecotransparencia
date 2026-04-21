@@ -1,0 +1,15 @@
+{
+  "name": "ecotransparencia-api",
+  "private": true,
+  "description": "API local compatível com ApiService (/api/search/document, /api/search/name)",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}

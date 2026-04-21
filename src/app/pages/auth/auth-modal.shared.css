@@ -217,6 +217,75 @@
   gap: 12px;
 }
 
+/* “Lembrar de mim”: checkbox nativo estilizado, alinhado ao tema escuro */
+.auth-remember {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 2px 0 0;
+  padding: 4px 4px 4px 8px;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.auth-remember__input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.auth-remember__box {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: 7px;
+  border: 1px solid var(--border-1);
+  background: var(--surface-0);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+}
+
+.auth-remember__input:checked + .auth-remember__box {
+  border-color: rgba(34, 197, 94, 0.65);
+  background: linear-gradient(145deg, rgba(34, 197, 94, 0.35), rgba(45, 212, 191, 0.2));
+  box-shadow: inset 0 0 0 1px rgba(34, 197, 94, 0.25);
+}
+
+.auth-remember__input:checked + .auth-remember__box::after {
+  content: '';
+  display: block;
+  width: 6px;
+  height: 10px;
+  margin: 3px auto 0;
+  border: solid rgba(255, 255, 255, 0.95);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.auth-remember__input:focus-visible + .auth-remember__box {
+  outline: 2px solid rgba(45, 212, 191, 0.75);
+  outline-offset: 2px;
+}
+
+.auth-remember:has(.auth-remember__input:disabled) {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.auth-remember__label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-1);
+  line-height: 1.35;
+}
+
 .auth-field {
   width: 100%;
   min-height: 52px;

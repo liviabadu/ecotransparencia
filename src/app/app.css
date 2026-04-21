@@ -1,21 +1,32 @@
 /*
- * Barra lateral: expansão suave (largura + deslize) + itens em stagger.
- *
- * Stack: Angular + CSS (não React/Framer/Tailwind). Estado: SidebarService.
- *
- * Deixar MAIS LENTO: suba --app-sidebar-open-duration, --app-sidebar-nav-item-duration,
- * --app-sidebar-stagger-base e --app-sidebar-stagger-step (ver comentário no .app-shell).
+ * Barra lateral pós-login (unificada): estilo ChatGPT — só a largura anima; coluna de ícones fixa à esquerda;
+ * rótulos com opacity + max-width. Pré-login (painel): stagger nos links.
  */
 
 .app-shell {
   min-height: 100vh;
   width: 100%;
   position: relative;
-  --app-sidebar-open-duration: 0.42s;
-  --app-sidebar-ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --app-sidebar-open-duration: 0.48s;
+  --app-sidebar-ease: cubic-bezier(0.22, 1, 0.36, 1);
   --app-sidebar-nav-item-duration: 0.32s;
   --app-sidebar-stagger-base: 0.06s;
   --app-sidebar-stagger-step: 0.038s;
+}
+
+/* Pós-login: colapsada estreita; expandida — só width anima */
+.app-shell.app-shell--authed {
+  --app-left-rail-width: 52px;
+  --app-left-rail-hit: calc(var(--app-left-rail-width) - 2 * var(--app-left-rail-pad-inline));
+  /* Hover do botão Configurações na rail */
+  --app-rail-settings-hover-bg: rgba(45, 212, 191, 0.12);
+  /* Hover dos itens da rail (Assinaturas, Metodologia, …) — reutilizado no eco/painel (barra expandida) */
+  --app-rail-nav-link-hover-bg: rgba(255, 255, 255, 0.07);
+}
+
+.app-shell.app-shell--sidebar-expanded {
+  --app-left-rail-width: min(236px, calc(100vw - 24px));
+  --app-left-rail-hit: calc(var(--app-left-rail-width) - 2 * var(--app-left-rail-pad-inline));
 }
 
 .app-sidebar-backdrop {
@@ -37,87 +48,76 @@
   }
 }
 
-/*
- * Fechado: largura só da rail; o menu fica no slot com overflow hidden (não na gaveta
- * inteira) para o tooltip “Configurações” poder aparecer à direita da rail.
- * Largura abre o espaço + o painel desliza em translate3d (GPU).
- */
-.app-sidebar-drawer {
-  /* Cores da rail: :root (--app-sidebar-surface*, --app-sidebar-edge*) */
-
-  /* Painel: até 280px, nunca invade a viewport além de uma folga (mobile) */
-  --app-sidebar-panel: min(
-    280px,
-    calc(100vw - var(--app-left-rail-width, 56px) - max(12px, env(safe-area-inset-right, 0px)))
-  );
-  --app-sidebar-full: calc(var(--app-left-rail-width, 56px) + var(--app-sidebar-panel));
+/* Gaveta pós-login (unificada): largura --app-left-rail-width (recolhida vs expandida) */
+.app-sidebar-drawer.app-sidebar-drawer--unified {
+  /* 52px rail − 20px padding = 32px úteis → hit = 32px (sem overflow lateral) */
+  --app-rail-icon-draw: 32px;
+  --app-rail-icon-hit: 32px;
+  --app-rail-row-height: 36px;
+  /* Igual expandida/recolhida: evita “pulo” horizontal nos ícones ao animar só a largura */
+  --app-rail-row-pad-end: 8px;
+  --app-rail-row-pad-start: 0px;
+  /* Compat: tamanho “desenhado” do glifo (eco / SVG) */
+  --app-rail-icon-col: var(--app-rail-icon-draw);
+  /* Tooltips flyout (links nav + eco) */
+  --app-rail-flyout-font-size: 12px;
+  --app-rail-flyout-font-weight: 600;
+  --app-rail-flyout-font-family: var(--font-sans);
+  --app-rail-flyout-line-height: 1.3;
   position: fixed;
   top: 0;
   left: 0;
   height: 100vh;
   height: 100dvh;
   width: var(--app-left-rail-width, 56px);
-  max-width: var(--app-sidebar-full);
   z-index: 1040;
   display: flex;
-  flex-direction: row;
-  flex-wrap: nowrap;
+  flex-direction: column;
   align-items: stretch;
   box-shadow: none;
   overflow: visible;
   transition: width var(--app-sidebar-open-duration) var(--app-sidebar-ease);
-  pointer-events: none;
-}
-
-.app-sidebar-drawer.is-open {
-  width: var(--app-sidebar-full);
   pointer-events: auto;
 }
 
-/* Coluna dos ícones: mesmo visual da rail fixa; cliques quando gaveta fechada */
-.app-sidebar-rail {
+/* Coluna única pós-login (ícones + rótulos quando expandido) */
+.app-sidebar-rail.app-sidebar-rail--unified {
   position: relative;
-  flex: 0 0 var(--app-left-rail-width, 56px);
-  width: var(--app-left-rail-width, 56px);
-  min-width: var(--app-left-rail-width, 56px);
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  align-items: center;
+  align-items: stretch;
   box-sizing: border-box;
   padding-left: var(--app-left-rail-pad-inline, 10px);
   padding-right: var(--app-left-rail-pad-inline, 10px);
   padding-top: calc(
     var(--app-left-rail-pad-block, 12px) + 8px + env(safe-area-inset-top, 0px)
   );
-  padding-bottom: max(
-    calc(var(--app-left-rail-pad-block, 12px) + 10px),
-    env(safe-area-inset-bottom)
-  );
-  pointer-events: auto;
   background: linear-gradient(
     180deg,
     var(--app-sidebar-surface-top) 0%,
     var(--app-sidebar-surface) 45%,
     var(--app-sidebar-surface-bottom) 100%
   );
-  /* Borda verde + filete interno (alinhado ao header pós-login / dashboard) */
   border-right: 1px solid var(--app-sidebar-edge);
   box-shadow: inset -1px 0 0 var(--app-sidebar-edge-accent);
 }
 
+.app-sidebar-rail--unified {
+  height: 100%;
+}
+
 /*
- * O backdrop do menu fica atrás da gaveta inteira (z menor que 1040), então a rail não era
- * escurecida. Este scrim alinha o visual ao restante da tela; pointer-events: none mantém
- * hambúrguer/configurações clicáveis por baixo.
+ * Pós-login: topo do ícone eco = topo da caixa da logo (.home-dash-toolbar-rail).
+ * Toolbar: padding-top max(14px, safe-area). Ícone: padding-top da rail + 1px (34px centrado no botão 36px).
+ * Logo: -1px no padding da rail; sem translateY no stack (ver .app-rail-icon-stack authed).
  */
-.app-sidebar-drawer.is-open .app-sidebar-rail::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  background: rgba(0, 0, 0, 0.4);
-  pointer-events: none;
+.app-shell.app-shell--authed .app-sidebar-rail.app-sidebar-rail--unified {
+  padding-top: calc(max(14px, env(safe-area-inset-top, 0px)) - 1px);
 }
 
 .app-rail-top,
@@ -131,6 +131,10 @@
   width: 100%;
 }
 
+.app-rail-top {
+  gap: 18px;
+}
+
 /* Menu (hambúrguer) */
 .hamburger-wrap {
   position: relative;
@@ -141,73 +145,6 @@
 }
 
 .hamburger-wrap::after {
-  content: attr(data-tooltip);
-  position: absolute;
-  top: calc(100% + 8px);
-  bottom: auto;
-  left: 50%;
-  transform: translateX(-50%) translateY(-4px);
-  padding: 5px 8px;
-  font-size: 11px;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.95);
-  background: rgba(15, 18, 24, 0.96);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 8px;
-  white-space: nowrap;
-  opacity: 0;
-  pointer-events: none;
-  transition:
-    opacity 0.09s ease-out,
-    transform 0.09s ease-out;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
-  z-index: 3;
-}
-
-.hamburger-wrap:hover::after {
-  opacity: 1;
-  transform: translateX(-50%) translateY(0);
-}
-
-.hamburger {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 4px;
-  width: var(--app-left-rail-hit, 36px);
-  height: var(--app-left-rail-hit, 36px);
-  padding: 0;
-  border: none;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.14);
-  cursor: pointer;
-  transition: background 0.12s ease-out;
-}
-
-.hamburger:hover {
-  background: rgba(255, 255, 255, 0.24);
-}
-
-.hamburger:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.35);
-}
-
-.hamburger-line {
-  display: block;
-  width: 18px;
-  height: 2.5px;
-  border-radius: 2px;
-  background: #fff;
-  box-shadow: 0 0 1px rgba(255, 255, 255, 0.45);
-}
-
-.app-settings-wrap {
-  position: relative;
-}
-
-.app-settings-wrap::after {
   content: attr(data-tooltip);
   position: absolute;
   top: 50%;
@@ -232,9 +169,269 @@
   z-index: 3;
 }
 
-.app-settings-wrap:hover::after {
+.hamburger-wrap:hover::after {
   opacity: 1;
   transform: translateY(-50%) translateX(0);
+}
+
+/* Base = barra expandida: uma linha como .app-rail-nav-link (evita column + maior especificidade que .app-rail-toggle-btn) */
+.hamburger.app-rail-toggle-btn {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  min-height: 44px;
+  height: auto;
+  padding: 8px 10px;
+  gap: 8px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.95);
+  cursor: pointer;
+  box-sizing: border-box;
+  transition: background 0.12s ease-out;
+}
+
+.app-sidebar-drawer.app-sidebar-drawer--unified:not(.is-expanded) .hamburger.app-rail-toggle-btn {
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  width: 100%;
+  height: var(--app-rail-row-height);
+  min-height: var(--app-rail-row-height);
+  max-height: var(--app-rail-row-height);
+  padding: 0 var(--app-rail-row-pad-end) 0 var(--app-rail-row-pad-start);
+  gap: var(--app-rail-expanded-icon-text-gap, 3px);
+  box-sizing: border-box;
+}
+
+.hamburger.app-rail-toggle-btn:hover {
+  background: rgba(45, 212, 191, 0.12);
+}
+
+.app-sidebar-drawer.app-sidebar-drawer--unified .hamburger.app-rail-toggle-btn:hover {
+  background: transparent;
+}
+
+.app-sidebar-drawer.app-sidebar-drawer--unified:not(.is-expanded) .hamburger.app-rail-toggle-btn:hover .app-rail-icon-stack {
+  background: rgba(45, 212, 191, 0.12);
+}
+
+.hamburger.app-rail-toggle-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.35);
+}
+
+.app-rail-icon-stack {
+  position: relative;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  transform: translateY(-10px);
+}
+
+.app-shell.app-shell--authed .app-rail-icon-stack {
+  transform: none;
+}
+
+/* Ícone eco: PNG 1024px — mais pixéis no ecrã + contraste moderado (sem crisp-edges agressivo) */
+.app-rail-icon-eco {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: block;
+  width: 34px;
+  height: 34px;
+  max-width: 100%;
+  object-fit: contain;
+  object-position: center;
+  pointer-events: none;
+  vertical-align: middle;
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  filter: contrast(1.14) brightness(1.02);
+  opacity: 1;
+  transition: opacity 0.12s ease-out;
+}
+
+.app-rail-icon-menu-hover {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: block;
+  width: 18px;
+  height: 18px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.12s ease-out;
+  box-sizing: content-box;
+}
+
+/* Igual ao .app-rail-toggle-chevron com barra expandida (padding + caixa 18px) */
+.app-sidebar-drawer.app-sidebar-drawer--unified:not(.is-expanded) .hamburger.app-rail-toggle-btn .app-rail-icon-menu-hover {
+  padding: 4px;
+}
+
+/* Troca eco ↔ ícone de painel só com barra recolhida; expandida mantém o eco no hover */
+.app-sidebar-drawer.app-sidebar-drawer--unified:not(.is-expanded) .hamburger.app-rail-toggle-btn:hover .app-rail-icon-eco {
+  opacity: 0;
+}
+
+.app-sidebar-drawer.app-sidebar-drawer--unified:not(.is-expanded) .hamburger.app-rail-toggle-btn:hover .app-rail-icon-menu-hover {
+  opacity: 1;
+}
+
+/*
+ * Recolhida (pós-login): ícone um pouco menor que 34px.
+ * 32px em vez de 31px: 1024÷32 = amostragem inteira no eixo → menos borrão no downscale.
+ */
+.app-sidebar-drawer.app-sidebar-drawer--unified .hamburger.app-rail-toggle-btn .app-rail-icon-stack {
+  position: relative;
+  width: var(--app-rail-icon-hit);
+  height: var(--app-rail-icon-hit);
+  flex: 0 0 var(--app-rail-icon-hit);
+  border-radius: 8px;
+  box-sizing: border-box;
+  transition: background 0.15s ease;
+}
+
+.app-sidebar-drawer.app-sidebar-drawer--unified .hamburger.app-rail-toggle-btn .app-rail-icon-eco {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: var(--app-rail-icon-draw);
+  height: var(--app-rail-icon-draw);
+  transform: translate3d(-50%, -50%, 0);
+  filter: contrast(1.1) brightness(1.02);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+.app-settings-wrap,
+.app-rail-quick-wrap,
+.app-rail-hover-wrap {
+  position: relative;
+}
+
+.app-settings-wrap::after,
+.app-rail-quick-wrap::after,
+.app-rail-hover-wrap::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  top: 50%;
+  left: calc(100% + 10px);
+  right: auto;
+  bottom: auto;
+  transform: translateY(-50%) translateX(-4px);
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: var(--font-sans, 'Inter Variable', system-ui, sans-serif);
+  color: rgba(255, 255, 255, 0.95);
+  background: rgba(15, 18, 24, 0.96);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 0.09s ease-out,
+    transform 0.09s ease-out;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  z-index: 3;
+}
+
+.app-settings-wrap:hover::after,
+.app-rail-quick-wrap:hover::after,
+.app-rail-hover-wrap:hover::after {
+  opacity: 1;
+  transform: translateY(-50%) translateX(0);
+}
+
+/* Recolhida: Abrir / Fechar — mesma fonte e tamanho do tooltip dos links (Assinaturas, …) */
+.app-sidebar-drawer.app-sidebar-drawer--unified:not(.is-expanded) .app-rail-hover-wrap--toggle::after,
+.app-sidebar-drawer.app-sidebar-drawer--unified:not(.is-expanded) .app-rail-hover-wrap--chevron-close::after {
+  font-size: var(--app-rail-flyout-font-size);
+  font-weight: var(--app-rail-flyout-font-weight);
+  font-family: var(--app-rail-flyout-font-family);
+  line-height: var(--app-rail-flyout-line-height);
+}
+
+.app-sidebar-drawer.app-sidebar-drawer--unified.is-expanded .app-rail-hover-wrap--toggle::after,
+.app-sidebar-drawer.app-sidebar-drawer--unified.is-expanded .app-settings-wrap::after {
+  display: none;
+}
+
+.app-sidebar-drawer.app-sidebar-drawer--unified.is-expanded .app-rail-hover-wrap--chevron-close::after {
+  top: calc(100% + 8px);
+  left: 50%;
+  right: auto;
+  bottom: auto;
+  transform: translateX(-50%) translateY(-4px);
+  white-space: nowrap;
+  max-width: none;
+  z-index: 20;
+  /* Uma unidade abaixo do 12px padrão dos tooltips da rail */
+  font-size: 11px;
+}
+
+.app-sidebar-drawer.app-sidebar-drawer--unified.is-expanded .app-rail-hover-wrap--chevron-close:hover::after {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.app-sidebar-drawer.app-sidebar-drawer--unified.is-expanded .app-rail-scroll {
+  overflow: visible;
+}
+
+.app-rail-quick {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  flex-shrink: 0;
+}
+
+.app-rail-quick-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--app-left-rail-hit, 36px);
+  height: var(--app-left-rail-hit, 36px);
+  padding: 0;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+  text-decoration: none;
+  transition:
+    background 0.12s ease-out,
+    color 0.12s ease-out;
+}
+
+.app-rail-quick-btn:hover {
+  background: rgba(45, 212, 191, 0.12);
+  color: #fff;
+}
+
+.app-rail-quick-btn.is-active {
+  background: rgba(45, 212, 191, 0.2);
+  color: #fff;
+}
+
+.app-rail-quick-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.35);
+}
+
+.app-rail-quick-icon {
+  display: block;
+  filter: drop-shadow(0 0 0.35px rgba(255, 255, 255, 0.9));
 }
 
 .app-settings-btn {
@@ -246,7 +443,7 @@
   padding: 0;
   border: none;
   border-radius: 10px;
-  background: rgba(255, 255, 255, 0.12);
+  background: transparent;
   color: #fff;
   cursor: pointer;
   transition:
@@ -255,7 +452,7 @@
 }
 
 .app-settings-btn:hover {
-  background: rgba(255, 255, 255, 0.22);
+  background: var(--app-rail-settings-hover-bg, rgba(45, 212, 191, 0.12));
   color: #fff;
 }
 
@@ -269,57 +466,67 @@
   filter: drop-shadow(0 0 0.35px rgba(255, 255, 255, 0.9));
 }
 
-/* overflow-hidden: conteúdo não “vaza” enquanto a largura anima */
-.app-sidebar-panel-slot {
-  flex: 1;
-  min-width: 0;
-  position: relative;
-  align-self: stretch;
-  overflow: hidden;
-}
-
-.app-sidebar-inner {
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: var(--app-sidebar-panel);
-  min-width: var(--app-sidebar-panel);
-  box-sizing: border-box;
-  padding: 18px 14px 20px;
-  overflow: hidden;
+/* Cabeçalho do painel (legado; painel deslizante removido) — estilo lista tipo referência */
+.app-sidebar-panel-header {
   display: flex;
-  flex-direction: column;
-  gap: 0;
-  background: linear-gradient(
-    180deg,
-    var(--app-sidebar-surface-top) 0%,
-    var(--app-sidebar-surface) 45%,
-    var(--app-sidebar-surface-bottom) 100%
-  );
-  border-right: 1px solid var(--app-sidebar-edge);
-  box-shadow: inset -1px 0 0 var(--app-sidebar-edge-accent);
-  transform: translate3d(-100%, 0, 0);
-  transition: transform var(--app-sidebar-open-duration) var(--app-sidebar-ease);
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-shrink: 0;
+  padding: 14px 14px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.app-sidebar-drawer.is-open .app-sidebar-inner {
-  transform: translate3d(0, 0, 0);
+.app-sidebar-panel-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
 }
 
-.app-sidebar-panel-head {
-  margin: 0 0 14px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
-}
-
-.app-sidebar-panel-kicker {
+.app-sidebar-panel-brand-icon {
   display: block;
-  font-size: 0.6875rem;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  object-fit: contain;
+  filter: contrast(1.14) brightness(1.02);
+}
+
+.app-sidebar-panel-brand-text {
+  font-size: 0.9375rem;
   font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.62);
+  letter-spacing: -0.02em;
+  color: rgba(255, 255, 255, 0.95);
+  font-family: var(--font-sans, 'Inter Variable', system-ui, sans-serif);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.app-sidebar-panel-collapse {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.95);
+  cursor: pointer;
+  transition: background 0.12s ease;
+}
+
+.app-sidebar-panel-collapse:hover {
+  background: rgba(45, 212, 191, 0.12);
+}
+
+.app-sidebar-panel-collapse:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.35);
 }
 
 .app-sidebar-nav {
@@ -332,12 +539,56 @@
   overflow-y: auto;
 }
 
+/* Lista principal: ícone + texto alinhados à esquerda, sem “cartões” pesados */
+.app-sidebar-nav.app-sidebar-nav--full {
+  gap: 2px;
+  padding: 6px 10px 0;
+}
+
+.app-sidebar-nav.app-sidebar-nav--full .app-sidebar-nav-link {
+  border: none;
+  background: transparent;
+  padding: 10px 10px;
+  min-height: 44px;
+  border-radius: 8px;
+  gap: 14px;
+}
+
+.app-sidebar-nav.app-sidebar-nav--full .app-sidebar-nav-link::before,
+.app-sidebar-nav.app-sidebar-nav--full .app-sidebar-nav-link::after {
+  display: none;
+}
+
+.app-sidebar-nav.app-sidebar-nav--full .app-sidebar-nav-link:hover {
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.app-sidebar-nav.app-sidebar-nav--full .app-sidebar-nav-link.is-active {
+  background: rgba(34, 197, 94, 0.14);
+  border-color: transparent;
+}
+
+.app-sidebar-nav.app-sidebar-nav--full .app-sidebar-nav-icon {
+  width: 22px;
+  height: 22px;
+  border-radius: 0;
+  background: transparent;
+}
+
+.app-sidebar-nav.app-sidebar-nav--full .app-sidebar-nav-link:hover .app-sidebar-nav-icon,
+.app-sidebar-nav.app-sidebar-nav--full .app-sidebar-nav-link.is-active .app-sidebar-nav-icon {
+  background: transparent;
+}
+
+.app-sidebar-nav.app-sidebar-nav--full .app-sidebar-nav-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
 .app-sidebar-nav-cta {
   flex-shrink: 0;
   margin-top: 18px;
-  padding-top: 18px;
-  padding-right: 4px;
-  margin-right: -8px;
+  padding: 18px 14px 20px;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
@@ -389,6 +640,106 @@
 .app-sidebar-nav-cta-btn:focus-visible {
   outline: none;
   box-shadow: var(--ring, 0 0 0 3px rgba(45, 212, 191, 0.35));
+}
+
+/* Pós-login: cartão de conta no lugar do CTA de cadastro */
+.app-sidebar-user-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+  margin-top: 18px;
+  padding: 18px 14px 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.app-sidebar-user-avatar--photo {
+  display: block;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.app-sidebar-user-avatar--initials {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.1);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.app-sidebar-drawer.app-sidebar-drawer--unified:not(.is-expanded) .app-sidebar-user-card--rail .app-sidebar-user-avatar--photo,
+.app-sidebar-drawer.app-sidebar-drawer--unified:not(.is-expanded) .app-sidebar-user-card--rail .app-sidebar-user-avatar--initials {
+  position: relative;
+  z-index: 1;
+  width: var(--app-rail-icon-col);
+  height: var(--app-rail-icon-col);
+  min-width: 0;
+  min-height: 0;
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+
+.app-sidebar-drawer.app-sidebar-drawer--unified:not(.is-expanded) .app-sidebar-user-card--rail .app-sidebar-user-avatar--photo {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: none;
+  border-radius: 50%;
+  overflow: hidden;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+}
+
+.app-sidebar-drawer.app-sidebar-drawer--unified:not(.is-expanded) .app-sidebar-user-card--rail .app-sidebar-user-avatar--initials {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.1);
+  font-size: 0.5625rem;
+  line-height: 1;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.app-sidebar-user-meta {
+  min-width: 0;
+  flex: 1;
+  text-align: left;
+}
+
+.app-sidebar-user-name {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  color: rgba(255, 255, 255, 0.95);
+  font-family: var(--font-sans, "Inter Variable", system-ui, sans-serif);
+}
+
+.app-sidebar-user-plan {
+  display: block;
+  margin-top: 3px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1.2;
+  color: rgba(255, 255, 255, 0.48);
+  font-family: var(--font-sans, "Inter Variable", system-ui, sans-serif);
 }
 
 .app-sidebar-nav-link--emphasis {
@@ -569,26 +920,497 @@
   }
 }
 
-/* Stagger: só quando o menu está aberto (repete ao reabrir) */
-.app-sidebar-drawer.is-open .app-sidebar-nav-link {
-  animation: appSidebarNavItemIn var(--app-sidebar-nav-item-duration) var(--app-sidebar-ease) both backwards;
+/* Área rolável + navegação tipo ChatGPT (ícones ↔ rótulos) */
+.app-rail-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
 }
 
-/* hr é o 4º filho; links: 1–3 e 5 (Entrar) */
-.app-sidebar-drawer.is-open .app-sidebar-nav-link:nth-child(1) {
-  animation-delay: calc(var(--app-sidebar-stagger-base) + 0 * var(--app-sidebar-stagger-step));
+/* Recolhida: tooltips (::after) não podem ser recortados por overflow-x: hidden do .app-rail-scroll */
+.app-sidebar-drawer.app-sidebar-drawer--unified:not(.is-expanded) .app-rail-scroll {
+  align-items: stretch;
+  overflow: visible;
 }
 
-.app-sidebar-drawer.is-open .app-sidebar-nav-link:nth-child(2) {
-  animation-delay: calc(var(--app-sidebar-stagger-base) + 1 * var(--app-sidebar-stagger-step));
+.app-sidebar-drawer.app-sidebar-drawer--unified:not(.is-expanded) .app-rail-hover-wrap--toggle {
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
 }
 
-.app-sidebar-drawer.is-open .app-sidebar-nav-link:nth-child(3) {
-  animation-delay: calc(var(--app-sidebar-stagger-base) + 2 * var(--app-sidebar-stagger-step));
+.app-sidebar-drawer.app-sidebar-drawer--unified:not(.is-expanded) .app-rail-nav {
+  width: 100%;
 }
 
-.app-sidebar-drawer.is-open .app-sidebar-nav-link:nth-child(5) {
-  animation-delay: calc(var(--app-sidebar-stagger-base) + 3 * var(--app-sidebar-stagger-step));
+.app-rail-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 100%;
+  padding-top: 4px;
+}
+
+.app-sidebar-drawer.app-sidebar-drawer--unified .app-rail-nav {
+  margin-top: 16px;
+}
+
+.app-sidebar-drawer.app-sidebar-drawer--unified:not(.is-expanded) .app-rail-nav {
+  padding-top: 0;
+}
+
+/* Expandida: mesmo espaçamento superior do nav que na recolhida (evita deslocar a coluna de ícones) */
+.app-sidebar-drawer.app-sidebar-drawer--unified.is-expanded .app-rail-nav {
+  padding-top: 0;
+}
+
+.app-rail-nav-link {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.92);
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition:
+    background 0.18s ease,
+    color 0.18s ease;
+}
+
+/* Mesmo aspeto que <a class="app-rail-nav-link"> (Metodologia, etc.): hover / ativo na rail recolhida e expandida */
+button.app-rail-nav-link {
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  appearance: none;
+  -webkit-appearance: none;
+  text-align: inherit;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.app-sidebar-drawer.app-sidebar-drawer--unified .app-rail-nav-link {
+  justify-content: flex-start;
+  align-items: center;
+  width: 100%;
+  height: var(--app-rail-row-height);
+  min-height: var(--app-rail-row-height);
+  max-height: var(--app-rail-row-height);
+  box-sizing: border-box;
+  gap: var(--app-rail-expanded-icon-text-gap, 3px);
+  padding: 0 var(--app-rail-row-pad-end) 0 var(--app-rail-row-pad-start);
+  background: transparent;
+}
+
+.app-sidebar-drawer.app-sidebar-drawer--unified .app-rail-nav-link .app-rail-nav-link-icon {
+  width: var(--app-rail-icon-hit);
+  height: var(--app-rail-icon-hit);
+  flex: 0 0 var(--app-rail-icon-hit);
+  border-radius: 8px;
+  box-sizing: border-box;
+  transition: background 0.15s ease;
+}
+
+/* Rodapé: sem animar transform no avatar/ícone ao abrir/fechar a barra (evita micro‑movimento) */
+.app-sidebar-drawer.app-sidebar-drawer--unified
+  .app-rail-footer
+  button.app-sidebar-user-card--rail
+  .app-sidebar-user-avatar--photo,
+.app-sidebar-drawer.app-sidebar-drawer--unified
+  .app-rail-footer
+  button.app-sidebar-user-card--rail
+  .app-sidebar-user-avatar--initials {
+  transition-property: background-color, opacity, box-shadow;
+  transition-duration: 0.15s;
+  transition-timing-function: ease;
+}
+
+.app-sidebar-drawer.app-sidebar-drawer--unified:not(.is-expanded) .app-rail-nav-link-text {
+  flex: 0 0 0;
+  width: 0;
+  min-width: 0;
+  max-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.app-rail-nav-link:hover {
+  background: var(--app-rail-nav-link-hover-bg, rgba(255, 255, 255, 0.07));
+  color: #fff;
+}
+
+.app-rail-nav-link.is-active {
+  background: rgba(34, 197, 94, 0.16);
+  color: #fff;
+}
+
+.app-sidebar-drawer.app-sidebar-drawer--unified .app-rail-nav-link:hover,
+.app-sidebar-drawer.app-sidebar-drawer--unified .app-rail-nav-link.is-active {
+  background: transparent;
+}
+
+.app-sidebar-drawer.app-sidebar-drawer--unified .app-rail-nav-link:hover .app-rail-nav-link-icon {
+  background: var(--app-rail-nav-link-hover-bg, rgba(255, 255, 255, 0.07));
+}
+
+.app-sidebar-drawer.app-sidebar-drawer--unified .app-rail-nav-link.is-active .app-rail-nav-link-icon {
+  background: rgba(34, 197, 94, 0.2);
+}
+
+.app-rail-nav-link:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.35);
+}
+
+.app-sidebar-drawer.app-sidebar-drawer--unified .app-rail-nav-link:focus-visible {
+  box-shadow: none;
+}
+
+.app-sidebar-drawer.app-sidebar-drawer--unified .app-rail-nav-link:focus-visible .app-rail-nav-link-icon {
+  box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.35);
+}
+
+.app-rail-nav-link-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  color: inherit;
+}
+
+.app-rail-nav-link-icon svg {
+  display: block;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  filter: drop-shadow(0 0 0.35px rgba(255, 255, 255, 0.75));
+}
+
+.app-rail-nav-link-text {
+  flex: 1 1 0;
+  min-width: 0;
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  opacity: 0;
+  max-width: 0;
+  transition: opacity 0.22s var(--app-sidebar-ease);
+}
+
+.app-sidebar-drawer.app-sidebar-drawer--unified.is-expanded .app-rail-nav-link-text {
+  flex: 1 1 0;
+  opacity: 1;
+  max-width: min(220px, 42vw);
+  visibility: visible;
+  pointer-events: auto;
+  transition: opacity 0.26s var(--app-sidebar-ease) 0.06s;
+}
+
+/* Barra expandida: clique/toque em todo o retângulo 32×32 do ícone (o SVG só cobre o traço; o hit vai para o <a>/<button>) */
+.app-sidebar-drawer.app-sidebar-drawer--unified.is-expanded .app-rail-nav-link .app-rail-nav-link-icon svg {
+  pointer-events: none;
+}
+
+/* Barra expandida: hover / ativo / foco no retângulo inteiro do link ou botão (recolhida mantém só na caixa do ícone) */
+.app-sidebar-drawer.app-sidebar-drawer--unified.is-expanded .app-rail-nav-link:hover {
+  background: var(--app-rail-nav-link-hover-bg, rgba(255, 255, 255, 0.07));
+}
+
+.app-sidebar-drawer.app-sidebar-drawer--unified.is-expanded .app-rail-nav-link.is-active {
+  background: rgba(34, 197, 94, 0.16);
+}
+
+.app-sidebar-drawer.app-sidebar-drawer--unified.is-expanded .app-rail-nav-link:hover .app-rail-nav-link-icon,
+.app-sidebar-drawer.app-sidebar-drawer--unified.is-expanded .app-rail-nav-link.is-active .app-rail-nav-link-icon {
+  background: transparent;
+}
+
+.app-sidebar-drawer.app-sidebar-drawer--unified.is-expanded .app-rail-nav-link:focus-visible {
+  box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.35);
+}
+
+.app-sidebar-drawer.app-sidebar-drawer--unified.is-expanded .app-rail-nav-link:focus-visible .app-rail-nav-link-icon {
+  box-shadow: none;
+}
+
+.app-rail-nav-link--emphasis {
+  color: rgba(255, 255, 255, 0.98);
+}
+
+.app-rail-nav-link--muted {
+  background: rgba(0, 0, 0, 0.12);
+}
+
+.app-rail-nav-divider {
+  margin: 10px 0 8px;
+  border: none;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.12) 20%,
+    rgba(255, 255, 255, 0.12) 80%,
+    transparent
+  );
+}
+
+/* Tooltip nos links quando recolhido */
+.app-rail-nav-link[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  top: 50%;
+  left: calc(100% + 10px);
+  transform: translateY(-50%) translateX(-4px);
+  padding: 6px 10px;
+  font-size: var(--app-rail-flyout-font-size, 12px);
+  font-weight: var(--app-rail-flyout-font-weight, 600);
+  font-family: var(--app-rail-flyout-font-family, var(--font-sans));
+  line-height: var(--app-rail-flyout-line-height, 1.3);
+  color: rgba(255, 255, 255, 0.95);
+  background: rgba(15, 18, 24, 0.96);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 0.09s ease-out,
+    transform 0.09s ease-out;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  z-index: 5;
+}
+
+.app-rail-nav-link[data-tooltip]:hover::after {
+  opacity: 1;
+  transform: translateY(-50%) translateX(0);
+}
+
+/* Barra recolhida (pós-login): Assinaturas, Metodologia, Configurações — 11px como o tooltip "Fechar barra lateral" */
+.app-sidebar-drawer.app-sidebar-drawer--unified:not(.is-expanded) .app-rail-nav-link[data-tooltip]::after,
+.app-sidebar-drawer.app-sidebar-drawer--unified:not(.is-expanded) .app-rail-footer > .app-rail-hover-wrap::after {
+  font-size: 11px;
+}
+
+.app-sidebar-drawer.app-sidebar-drawer--unified.is-expanded .app-rail-nav-link[data-tooltip]::after {
+  display: none;
+}
+
+/*
+ * Com a barra expandida o data-tooltip some do HTML, mas o ::after global de .app-rail-hover-wrap
+ * continuava ativo no hover — content vazio + fundo escuro = “retângulo preto” à direita (Configurações, Perfil).
+ */
+.app-sidebar-drawer.app-sidebar-drawer--unified.is-expanded .app-rail-footer > .app-rail-hover-wrap::after {
+  display: none;
+}
+
+/*
+ * Barra expandida (pós-login): ícones de nav (Assinaturas, Metodologia) na mesma coluna que recolhida
+ * (borda esquerda do ícone = início da área útil da rail, após o padding da rail; caixa 32×32).
+ * Rótulos abrem à direita sem deslocar o ícone. Footer / perfil seguem o mesmo gutter.
+ */
+.app-sidebar-drawer.app-sidebar-drawer--unified.is-expanded {
+  --app-rail-expanded-icon-gutter-left: 0px;
+  --app-rail-expanded-icon-text-gap: 3px;
+}
+
+/* Botão eco: layout fino em .hamburger.app-rail-toggle-btn; só display flex aqui por segurança */
+.app-rail-toggle-btn {
+  display: flex;
+}
+
+.app-sidebar-drawer.app-sidebar-drawer--unified.is-expanded .app-rail-hover-wrap--toggle {
+  flex: 0 0 auto;
+  width: 100%;
+}
+
+.app-sidebar-drawer.app-sidebar-drawer--unified.is-expanded .hamburger.app-rail-toggle-btn {
+  /* Igual à recolhida: flex-start na coluna de ícones; chevron à direita só com margin-left: auto (não space-between) */
+  justify-content: flex-start;
+  align-items: center;
+  width: 100%;
+  height: var(--app-rail-row-height);
+  min-height: var(--app-rail-row-height);
+  max-height: var(--app-rail-row-height);
+  gap: var(--app-rail-expanded-icon-text-gap, 3px);
+  cursor: default;
+  padding: 0 var(--app-rail-row-pad-end) 0 var(--app-rail-row-pad-start);
+  box-sizing: border-box;
+}
+
+.app-sidebar-drawer.app-sidebar-drawer--unified.is-expanded .hamburger.app-rail-toggle-btn:hover {
+  background: transparent;
+}
+
+.app-sidebar-drawer.app-sidebar-drawer--unified.is-expanded .hamburger.app-rail-toggle-btn .app-rail-icon-stack:hover,
+.app-sidebar-drawer.app-sidebar-drawer--unified.is-expanded .hamburger.app-rail-toggle-btn .app-rail-hover-wrap--chevron-close:hover {
+  background: var(--app-rail-nav-link-hover-bg, rgba(255, 255, 255, 0.07));
+  border-radius: 8px;
+}
+
+.app-sidebar-drawer.app-sidebar-drawer--unified.is-expanded .app-rail-hover-wrap--chevron-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  cursor: pointer;
+  margin-left: auto;
+  margin-right: calc(-1 * var(--app-left-rail-pad-inline, 10px) + 2px);
+  transform: none;
+}
+
+/* Coluna do eco: largura fixa como .app-rail-nav-link-icon (não estica com a animação da gaveta) */
+.app-sidebar-drawer.app-sidebar-drawer--unified .app-rail-toggle-inner {
+  flex: 0 0 auto;
+  width: auto;
+  min-width: 0;
+  justify-content: flex-start;
+}
+
+/* Recolhido: chevron não pode ocupar espaço (empurrava o eco para a direita vs. ícones centrados) */
+.app-sidebar-drawer.app-sidebar-drawer--unified:not(.is-expanded) .app-rail-hover-wrap--chevron-close {
+  display: none;
+}
+
+.app-sidebar-drawer.app-sidebar-drawer--unified:not(.is-expanded) .app-rail-toggle-chevron {
+  display: none;
+}
+
+.app-rail-toggle-inner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  flex: 1;
+}
+
+.app-rail-toggle-inner .app-rail-icon-stack {
+  flex-shrink: 0;
+}
+
+.app-rail-toggle-chevron {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  opacity: 0;
+  transform: rotate(180deg);
+  /* Só opacidade: rotação instantânea como os ícones de nav (sem “mexer” durante a largura) */
+  transition: opacity 0.18s ease;
+}
+
+.app-sidebar-drawer.app-sidebar-drawer--unified.is-expanded .app-rail-toggle-chevron {
+  padding: 4px;
+  box-sizing: content-box;
+  opacity: 1;
+  transform: rotate(0deg);
+  transition: opacity 0.18s ease, background 0.12s ease-out;
+}
+
+.app-rail-footer {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  width: 100%;
+  padding-bottom: max(
+    calc(var(--app-left-rail-pad-block, 12px) + 10px),
+    env(safe-area-inset-bottom)
+  );
+}
+
+.app-sidebar-drawer.app-sidebar-drawer--unified:not(.is-expanded) .app-rail-footer {
+  align-items: stretch;
+  /* Menos respiro por baixo do avatar: ícone do perfil mais baixo na rail recolhida */
+  padding-bottom: max(8px, calc(env(safe-area-inset-bottom, 0px) + 6px));
+}
+
+.app-sidebar-drawer.app-sidebar-drawer--unified:not(.is-expanded) .app-rail-footer > .app-rail-hover-wrap {
+  align-self: stretch;
+}
+
+.app-sidebar-nav-cta--rail {
+  display: none;
+  margin-top: 12px;
+  padding: 14px 4px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.app-sidebar-drawer.app-sidebar-drawer--unified.is-expanded .app-sidebar-nav-cta--rail {
+  display: block;
+}
+
+.app-sidebar-user-card--rail .app-sidebar-user-meta {
+  overflow: hidden;
+  opacity: 0;
+  max-width: 0;
+  flex: 0 1 0;
+  min-width: 0;
+  transition: opacity 0.22s var(--app-sidebar-ease);
+}
+
+.app-sidebar-drawer.app-sidebar-drawer--unified:not(.is-expanded) .app-sidebar-user-card--rail .app-sidebar-user-meta {
+  flex: 0 0 0;
+  width: 0;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.app-sidebar-drawer.app-sidebar-drawer--unified.is-expanded .app-sidebar-user-card--rail .app-sidebar-user-meta {
+  opacity: 1;
+  max-width: min(200px, 40vw);
+  flex: 1;
+  min-width: 0;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.app-sidebar-drawer.app-sidebar-drawer--unified.is-expanded .app-rail-footer > .app-rail-hover-wrap {
+  min-width: 0;
+  width: 100%;
+}
+
+/* Pós-login expandida: mesmo respiro inferior que na recolhida (avatar alinhado ao mesmo “nível” vertical) */
+.app-sidebar-drawer.app-sidebar-drawer--unified.is-expanded .app-rail-footer {
+  padding-bottom: max(8px, calc(env(safe-area-inset-bottom, 0px) + 6px));
+}
+
+.app-sidebar-drawer.app-sidebar-drawer--unified.is-expanded
+  button.app-sidebar-user-card--rail
+  .app-sidebar-user-avatar--photo,
+.app-sidebar-drawer.app-sidebar-drawer--unified.is-expanded
+  button.app-sidebar-user-card--rail
+  .app-sidebar-user-avatar--initials {
+  width: var(--app-rail-icon-col);
+  height: var(--app-rail-icon-col);
+  flex-shrink: 0;
+}
+
+.app-sidebar-drawer.app-sidebar-drawer--unified.is-expanded
+  button.app-sidebar-user-card--rail
+  .app-sidebar-user-avatar--photo {
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
 }
 
 .app-main {
@@ -598,6 +1420,7 @@
   position: relative;
   padding-left: var(--app-left-rail-width, 56px);
   box-sizing: border-box;
+  transition: padding-left var(--app-sidebar-open-duration) var(--app-sidebar-ease);
   /* Evita “flash” de empilhamento na home pré-login e em trocas de rota */
   isolation: isolate;
 }
@@ -605,22 +1428,44 @@
 /* Sem fade no outlet: opacity:0 no 1º frame causava “piscar” no F5 e após lazy load */
 
 @media (max-width: 380px) {
-  .app-sidebar-inner {
-    padding: 16px 12px;
+  .app-rail-nav-link {
+    min-height: 48px;
+    padding: 10px 8px;
   }
 
-  .app-sidebar-nav-link {
+  .app-sidebar-drawer.app-sidebar-drawer--unified .app-rail-nav-link {
+    height: 48px;
     min-height: 48px;
-    padding: 12px 10px;
+    max-height: 48px;
+    padding: 0 var(--app-rail-row-pad-end) 0 var(--app-rail-row-pad-start);
+  }
+
+  .app-sidebar-drawer.app-sidebar-drawer--unified:not(.is-expanded) .hamburger.app-rail-toggle-btn {
+    height: 48px;
+    min-height: 48px;
+    max-height: 48px;
+    padding: 0 var(--app-rail-row-pad-end) 0 var(--app-rail-row-pad-start);
+  }
+
+  .app-sidebar-drawer.app-sidebar-drawer--unified.is-expanded .hamburger.app-rail-toggle-btn {
+    height: 48px;
+    min-height: 48px;
+    max-height: 48px;
+    padding: 0 var(--app-rail-row-pad-end) 0 var(--app-rail-row-pad-start);
+  }
+
+  .app-sidebar-drawer.app-sidebar-drawer--unified:not(.is-expanded) button.app-sidebar-user-card--rail {
+    height: 48px;
+    min-height: 48px;
+    max-height: 48px;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .app-sidebar-drawer {
-    transition-duration: 0.01ms;
-  }
-
-  .app-sidebar-inner {
+  .app-sidebar-drawer.app-sidebar-drawer--unified,
+  .app-sidebar-drawer.app-sidebar-drawer--guest,
+  .app-sidebar-inner,
+  .app-main {
     transition-duration: 0.01ms;
   }
 
@@ -628,7 +1473,1257 @@
     animation: none;
   }
 
-  .app-sidebar-drawer.is-open .app-sidebar-nav-link {
+  .app-sidebar-drawer.app-sidebar-drawer--guest.is-open .app-sidebar-nav-link {
+    animation: none;
+  }
+
+  .app-rail-nav-link-text,
+  .app-sidebar-user-card--rail .app-sidebar-user-meta,
+  .app-sidebar-drawer.app-sidebar-drawer--unified button.app-sidebar-user-card--rail {
+    transition-duration: 0.01ms;
+  }
+}
+
+/* ========== Pré-login: gaveta + painel (restauro do layout original) ========== */
+
+.app-sidebar-drawer.app-sidebar-drawer--guest {
+  --app-sidebar-panel: min(
+    280px,
+    calc(100vw - var(--app-left-rail-width, 56px) - max(12px, env(safe-area-inset-right, 0px)))
+  );
+  --app-sidebar-full: calc(var(--app-left-rail-width, 56px) + var(--app-sidebar-panel));
+  /* Um único par de cores: hambúrguer e configurações usam sempre o mesmo fundo */
+  --guest-rail-icon-bg: rgba(255, 255, 255, 0.09);
+  --guest-rail-icon-bg-hover: rgba(255, 255, 255, 0.17);
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  height: 100dvh;
+  width: var(--app-left-rail-width, 56px);
+  max-width: var(--app-sidebar-full);
+  z-index: 1040;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  box-shadow: none;
+  overflow: visible;
+  transition: width var(--app-sidebar-open-duration) var(--app-sidebar-ease);
+  pointer-events: none;
+}
+
+.app-sidebar-drawer.app-sidebar-drawer--guest.is-open {
+  width: var(--app-sidebar-full);
+  pointer-events: auto;
+}
+
+.app-sidebar-drawer.app-sidebar-drawer--guest .app-sidebar-rail {
+  position: relative;
+  flex: 0 0 var(--app-left-rail-width, 56px);
+  width: var(--app-left-rail-width, 56px);
+  min-width: var(--app-left-rail-width, 56px);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  box-sizing: border-box;
+  padding-left: var(--app-left-rail-pad-inline, 10px);
+  padding-right: var(--app-left-rail-pad-inline, 10px);
+  padding-top: calc(
+    var(--app-left-rail-pad-block, 12px) + 8px + env(safe-area-inset-top, 0px)
+  );
+  padding-bottom: max(
+    calc(var(--app-left-rail-pad-block, 12px) + 10px),
+    env(safe-area-inset-bottom)
+  );
+  pointer-events: auto;
+  background: linear-gradient(
+    180deg,
+    var(--app-sidebar-surface-top) 0%,
+    var(--app-sidebar-surface) 45%,
+    var(--app-sidebar-surface-bottom) 100%
+  );
+  border-right: 1px solid var(--app-sidebar-edge);
+  box-shadow: inset -1px 0 0 var(--app-sidebar-edge-accent);
+}
+
+.app-sidebar-drawer.app-sidebar-drawer--guest.is-open .app-sidebar-rail::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: rgba(0, 0, 0, 0.4);
+  pointer-events: none;
+}
+
+/* overflow-hidden: conteúdo não “vaza” enquanto a largura anima */
+.app-sidebar-drawer.app-sidebar-drawer--guest .app-sidebar-panel-slot {
+  flex: 1;
+  min-width: 0;
+  position: relative;
+  align-self: stretch;
+  overflow: hidden;
+}
+
+.app-sidebar-drawer.app-sidebar-drawer--guest .app-sidebar-inner {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: var(--app-sidebar-panel);
+  min-width: var(--app-sidebar-panel);
+  box-sizing: border-box;
+  /* Em baixo: folga leve; em telemóveis com home indicator prevalece env(safe-area-inset-bottom) */
+  padding: 18px 14px max(12px, env(safe-area-inset-bottom, 0px));
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  background: linear-gradient(
+    180deg,
+    var(--app-sidebar-surface-top) 0%,
+    var(--app-sidebar-surface) 45%,
+    var(--app-sidebar-surface-bottom) 100%
+  );
+  border-right: 1px solid var(--app-sidebar-edge);
+  box-shadow: inset -1px 0 0 var(--app-sidebar-edge-accent);
+  transform: translate3d(-100%, 0, 0);
+  transition: transform var(--app-sidebar-open-duration) var(--app-sidebar-ease);
+}
+
+.app-sidebar-drawer.app-sidebar-drawer--guest.is-open .app-sidebar-inner {
+  transform: translate3d(0, 0, 0);
+}
+
+.app-sidebar-drawer.app-sidebar-drawer--guest .app-sidebar-panel-head {
+  margin: 0 0 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.app-sidebar-drawer.app-sidebar-drawer--guest .app-sidebar-panel-kicker {
+  display: block;
+  font-family: var(--font-sans, 'Inter Variable', system-ui, sans-serif);
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
+  line-height: 1.35;
+  -webkit-font-smoothing: antialiased;
+}
+
+.app-sidebar-drawer.app-sidebar-drawer--guest .hamburger-wrap::after {
+  top: calc(100% + 8px);
+  left: 50%;
+  right: auto;
+  bottom: auto;
+  transform: translateX(-50%) translateY(-4px);
+  padding: 5px 8px;
+  font-size: 11px;
+}
+
+.app-sidebar-drawer.app-sidebar-drawer--guest .hamburger-wrap:hover::after {
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Pré-login: só .hamburger (sem .app-rail-toggle-btn) — precisa do mesmo layout que o rail unificado */
+.app-sidebar-drawer.app-sidebar-drawer--guest .hamburger {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  width: var(--app-left-rail-hit, 36px);
+  height: var(--app-left-rail-hit, 36px);
+  padding: 0;
+  border: none;
+  border-radius: 8px;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  line-height: 0;
+  font-size: 0;
+  background: var(--guest-rail-icon-bg);
+  color: rgba(255, 255, 255, 0.95);
+  cursor: pointer;
+  transition: background 0.12s ease-out;
+}
+
+.app-sidebar-drawer.app-sidebar-drawer--guest .hamburger:hover {
+  background: var(--guest-rail-icon-bg-hover);
+}
+
+.app-sidebar-drawer.app-sidebar-drawer--guest .hamburger:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.35);
+}
+
+.app-sidebar-drawer.app-sidebar-drawer--guest .hamburger-line {
+  display: block;
+  flex-shrink: 0;
+  width: 18px;
+  /* Inteiro px: evita a linha do meio mais fina por subpixel / antialiasing */
+  height: 3px;
+  min-height: 3px;
+  border-radius: 1.5px;
+  background: #fff;
+  box-shadow: 0 0 1px rgba(255, 255, 255, 0.45);
+  transform: translateZ(0);
+}
+
+.app-sidebar-drawer.app-sidebar-drawer--guest .app-settings-btn {
+  border-radius: 8px;
+  background: var(--guest-rail-icon-bg);
+  transition:
+    background 0.12s ease-out,
+    color 0.12s ease-out;
+}
+
+.app-sidebar-drawer.app-sidebar-drawer--guest .app-settings-btn:hover {
+  background: var(--guest-rail-icon-bg-hover);
+  color: #fff;
+}
+
+/* Acima do scrim escuro da rail quando o painel está aberto (z-index 2 no ::after) */
+.app-sidebar-drawer.app-sidebar-drawer--guest .app-rail-top,
+.app-sidebar-drawer.app-sidebar-drawer--guest .app-rail-bottom {
+  position: relative;
+  z-index: 3;
+}
+
+.app-sidebar-drawer.app-sidebar-drawer--guest.is-open .app-sidebar-nav-link {
+  animation: appSidebarNavItemIn var(--app-sidebar-nav-item-duration) var(--app-sidebar-ease) both backwards;
+}
+
+.app-sidebar-drawer.app-sidebar-drawer--guest.is-open .app-sidebar-nav-link:nth-child(1) {
+  animation-delay: calc(var(--app-sidebar-stagger-base) + 0 * var(--app-sidebar-stagger-step));
+}
+
+.app-sidebar-drawer.app-sidebar-drawer--guest.is-open .app-sidebar-nav-link:nth-child(2) {
+  animation-delay: calc(var(--app-sidebar-stagger-base) + 1 * var(--app-sidebar-stagger-step));
+}
+
+.app-sidebar-drawer.app-sidebar-drawer--guest.is-open .app-sidebar-nav-link:nth-child(3) {
+  animation-delay: calc(var(--app-sidebar-stagger-base) + 2 * var(--app-sidebar-stagger-step));
+}
+
+.app-sidebar-drawer.app-sidebar-drawer--guest.is-open .app-sidebar-nav-link:nth-child(5) {
+  animation-delay: calc(var(--app-sidebar-stagger-base) + 3 * var(--app-sidebar-stagger-step));
+}
+
+/* Pré-login: nav ocupa o espaço central; CTA com altura natural e margin-top:auto fica na base (sem vazio entre linha e título) */
+.app-sidebar-drawer.app-sidebar-drawer--guest .app-sidebar-nav {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.app-sidebar-drawer.app-sidebar-drawer--guest .app-sidebar-nav-cta {
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 auto;
+  margin-top: auto;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  border-top: none;
+  padding: 0 0 4px;
+}
+
+.app-sidebar-drawer.app-sidebar-drawer--guest .app-sidebar-nav-cta::before {
+  content: '';
+  display: block;
+  height: 1px;
+  margin: 4px 0 18px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.12) 20%,
+    rgba(255, 255, 255, 0.12) 80%,
+    transparent
+  );
+  flex-shrink: 0;
+}
+
+.app-sidebar-drawer.app-sidebar-drawer--guest .app-sidebar-nav-cta-title,
+.app-sidebar-drawer.app-sidebar-drawer--guest .app-sidebar-nav-cta-text {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  padding: 0;
+  margin-left: 0;
+  margin-right: 0;
+  text-align: left;
+  overflow-wrap: break-word;
+  word-break: normal;
+}
+
+.app-sidebar-drawer.app-sidebar-drawer--guest .app-sidebar-nav-cta-title {
+  line-height: 1.42;
+  letter-spacing: -0.02em;
+}
+
+.app-sidebar-drawer.app-sidebar-drawer--guest .app-sidebar-nav-cta-text {
+  line-height: 1.38;
+  font-size: 0.8125rem;
+  text-wrap: pretty;
+  margin-bottom: 16px;
+}
+
+.app-sidebar-drawer.app-sidebar-drawer--guest .app-sidebar-nav-cta-btn {
+  width: calc(100% + 12px);
+  max-width: none;
+  margin-top: 0;
+  margin-left: -6px;
+  margin-right: -6px;
+  box-sizing: border-box;
+}
+
+@media (max-width: 380px) {
+  .app-sidebar-drawer.app-sidebar-drawer--guest .app-sidebar-inner {
+    padding: 16px 12px max(12px, env(safe-area-inset-bottom, 0px));
+  }
+
+  .app-sidebar-drawer.app-sidebar-drawer--guest .app-sidebar-nav-cta-btn {
+    width: calc(100% + 10px);
+    margin-left: -5px;
+    margin-right: -5px;
+  }
+}
+
+/* ========== Menu conta (rail recolhida pós-login) ========== */
+
+button.app-sidebar-user-card {
+  appearance: none;
+  -webkit-appearance: none;
+  /* Não usar border:none — repõe o topo que .app-sidebar-user-card define (evita “rasgo” no separador) */
+  border-width: 0;
+  border-style: solid;
+  border-color: transparent;
+  border-top-width: 1px;
+  border-top-color: rgba(255, 255, 255, 0.08);
+  background: transparent;
+  width: 100%;
+  font: inherit;
+  text-align: left;
+  color: inherit;
+  box-sizing: border-box;
+}
+
+.app-sidebar-drawer.app-sidebar-drawer--unified:not(.is-expanded) button.app-sidebar-user-card--rail {
+  cursor: pointer;
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  align-self: stretch;
+  text-align: left;
+  width: 100%;
+  height: var(--app-rail-row-height);
+  min-height: var(--app-rail-row-height);
+  max-height: var(--app-rail-row-height);
+  margin: 0;
+  margin-inline: 0;
+  padding: 0 var(--app-rail-row-pad-end) 0 var(--app-rail-row-pad-start);
+  gap: var(--app-rail-expanded-icon-text-gap, 3px);
+  box-sizing: border-box;
+  background-color: transparent;
+  border-width: 0;
+  border-top-width: 0;
+  box-shadow: none;
+  transform: none;
+  border-radius: 8px;
+  overflow: visible;
+  flex-shrink: 0;
+  isolation: isolate;
+  --app-rail-profile-hover-glow-scale: 1.08;
+  /* Anel do hover um pouco maior que o avatar (fica visível ao redor da foto) */
+  --app-rail-profile-hover-bg-ring: 2px;
+}
+
+.app-sidebar-drawer.app-sidebar-drawer--unified:not(.is-expanded) button.app-sidebar-user-card--rail::before {
+  content: '';
+  position: absolute;
+  left: calc(
+    var(--app-rail-row-pad-start) + (var(--app-rail-icon-col) - var(--app-rail-icon-hit)) / 2 -
+      var(--app-rail-profile-hover-bg-ring)
+  );
+  top: 50%;
+  width: calc(var(--app-rail-icon-hit) + 2 * var(--app-rail-profile-hover-bg-ring));
+  height: calc(var(--app-rail-icon-hit) + 2 * var(--app-rail-profile-hover-bg-ring));
+  z-index: 0;
+  border-radius: 50%;
+  background-color: transparent;
+  transform: translateY(-50%) scale(1);
+  transform-origin: center center;
+  pointer-events: none;
+  transition:
+    transform 0.12s ease-out,
+    background-color 0.12s ease-out;
+}
+
+.app-sidebar-drawer.app-sidebar-drawer--unified:not(.is-expanded) button.app-sidebar-user-card--rail:hover {
+  background-color: transparent;
+}
+
+.app-sidebar-drawer.app-sidebar-drawer--unified:not(.is-expanded) button.app-sidebar-user-card--rail:hover::before {
+  background-color: rgba(255, 255, 255, 0.14);
+  transform: translateY(-50%) scale(var(--app-rail-profile-hover-glow-scale));
+}
+
+.app-sidebar-drawer.app-sidebar-drawer--unified:not(.is-expanded) button.app-sidebar-user-card--rail:focus-visible::before {
+  background-color: rgba(255, 255, 255, 0.14);
+  transform: translateY(-50%) scale(var(--app-rail-profile-hover-glow-scale));
+}
+
+.app-sidebar-drawer.app-sidebar-drawer--unified:not(.is-expanded) button.app-sidebar-user-card--rail:focus-visible {
+  outline: 2px solid rgba(45, 212, 191, 0.55);
+  outline-offset: 2px;
+}
+
+/* Mesmo alinhamento que .app-rail-nav-link; fundo do hover via ::before (estende à esquerda sem mover o conteúdo). */
+.app-sidebar-drawer.app-sidebar-drawer--unified.is-expanded button.app-sidebar-user-card--rail {
+  position: relative;
+  z-index: 0;
+  overflow: visible;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  cursor: pointer;
+  margin-top: 0;
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
+  min-height: calc(var(--app-rail-row-height) + 8px);
+  height: auto;
+  max-height: none;
+  /* Alinhado à coluna dos links (pad-start 0); conteúdo um pouco mais à esquerda que com padding extra. */
+  padding: 4px calc(var(--app-rail-row-pad-end) + 2px) 4px var(--app-rail-row-pad-start);
+  gap: 10px;
+  box-sizing: border-box;
+  background-color: transparent;
+  /* Herdado de button.app-sidebar-user-card; na expandida não queremos a linha por cima do botão. */
+  border-top-width: 0;
+  border-top-color: transparent;
+  border-radius: 10px;
+}
+
+.app-sidebar-drawer.app-sidebar-drawer--unified.is-expanded button.app-sidebar-user-card--rail::before {
+  content: '';
+  position: absolute;
+  z-index: 0;
+  left: -4px;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  border-radius: 10px;
+  background-color: transparent;
+  pointer-events: none;
+  transition: background-color 0.15s ease;
+}
+
+.app-sidebar-drawer.app-sidebar-drawer--unified.is-expanded button.app-sidebar-user-card--rail:hover::before {
+  background-color: var(--app-rail-nav-link-hover-bg, rgba(255, 255, 255, 0.07));
+}
+
+.app-sidebar-drawer.app-sidebar-drawer--unified.is-expanded button.app-sidebar-user-card--rail > * {
+  position: relative;
+  z-index: 1;
+}
+
+.app-sidebar-drawer.app-sidebar-drawer--unified.is-expanded button.app-sidebar-user-card--rail:focus-visible {
+  outline: 2px solid rgba(45, 212, 191, 0.55);
+  outline-offset: 2px;
+}
+
+/* Nome do utilizador: mesma tipografia que o texto dos links da rail (Assinaturas / Metodologia). */
+.app-sidebar-drawer.app-sidebar-drawer--unified.is-expanded
+  button.app-sidebar-user-card--rail
+  .app-sidebar-user-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: normal;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+/* Sem transição de layout no perfil ao abrir/fechar (só estados visuais locais, como os links de nav) */
+.app-sidebar-drawer.app-sidebar-drawer--unified button.app-sidebar-user-card.app-sidebar-user-card--rail {
+  transition: none;
+}
+
+.app-rail-account-layer {
+  pointer-events: none;
+}
+
+.app-rail-account-layer > .app-rail-account-scrim {
+  pointer-events: auto;
+}
+
+.app-rail-account-popover-cluster .app-rail-account-popover,
+.app-rail-account-popover-cluster .app-rail-account-help-flyout {
+  pointer-events: auto;
+}
+
+.app-rail-edit-profile-layer {
+  pointer-events: none;
+}
+
+.app-rail-edit-profile-layer > .app-rail-edit-profile-scrim,
+.app-rail-edit-profile-layer > .app-rail-edit-profile {
+  pointer-events: auto;
+}
+
+.app-rail-account-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 1050;
+  background: rgba(0, 0, 0, 0.32);
+  animation: appRailAccountScrimIn 0.2s ease both;
+}
+
+@keyframes appRailAccountScrimIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Agrupa menu da conta + Ajuda; pointer-events none para cliques no “vazio” irem ao véu. */
+.app-rail-account-popover-cluster {
+  position: fixed;
+  z-index: 1051;
+  left: calc(var(--app-left-rail-width, 52px) + 10px);
+  bottom: max(16px, env(safe-area-inset-bottom, 0px) + 8px);
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  gap: 8px;
+  max-width: calc(100vw - var(--app-left-rail-width, 52px) - 20px);
+  pointer-events: none;
+  /*
+   * Não usar overflow-x: auto com overflow-y: visible — na spec o eixo Y passa a auto e o
+   * cluster vira scroll container; o transform do popover (abrir/fechar) pinta fora da caixa
+   * e dispara barra de rolagem verde (tema global) à direita por um instante.
+   */
+  overflow: visible;
+}
+
+/*
+ * Barra expandida: cluster alinhado ao conteúdo da rail e acima do cartão de perfil;
+ * largura do menu como no modo colapsado (pode ultrapassar a rail). Ajuda em linha à direita.
+ */
+.app-shell.app-shell--sidebar-expanded .app-rail-account-popover-cluster {
+  left: var(--app-left-rail-pad-inline, 10px);
+  max-width: calc(100vw - var(--app-left-rail-pad-inline, 10px) - 12px);
+  /* Rodapé da rail + altura do botão perfil + folga até ao menu (menor = menu mais baixo) */
+  bottom: calc(max(8px, env(safe-area-inset-bottom, 0px) + 6px) + 56px + 8px);
+  flex-direction: row;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.app-shell.app-shell--sidebar-expanded .app-rail-account-popover {
+  width: min(300px, calc(100vw - var(--app-left-rail-pad-inline, 10px) - 12px));
+}
+
+/* Largura igual ao menu de conta antes do flyout (não encolhe quando Ajuda abre). */
+.app-rail-account-popover {
+  position: relative;
+  z-index: 0;
+  flex: 0 0 auto;
+  width: min(300px, calc(100vw - var(--app-left-rail-width, 52px) - 20px));
+  max-height: min(520px, calc(100dvh - 24px));
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: 12px 0 10px;
+  border-radius: 14px;
+  background: #2d3038;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow:
+    0 20px 50px rgba(0, 0, 0, 0.55),
+    0 0 0 1px rgba(0, 0, 0, 0.2);
+  font-family: var(--font-sans, 'Inter Variable', system-ui, sans-serif);
+  /* Base tipográfica só deste painel (ligeiramente menor que antes) */
+  font-size: 0.8125rem;
+  animation: appRailAccountPopoverIn 0.22s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes appRailAccountHelpFlyoutIn {
+  from {
+    opacity: 0;
+    transform: translate3d(-8px, 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes appRailAccountHelpFlyoutOut {
+  from {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    opacity: 0;
+    transform: translate3d(-14px, 0, 0);
+  }
+}
+
+/* Painel Ajuda à direita: só este bloco é mais estreito; lista única como no mock. */
+.app-rail-account-help-flyout {
+  flex: 0 1 200px;
+  width: 200px;
+  min-width: 0;
+  max-width: 200px;
+  max-height: min(480px, calc(100dvh - 24px));
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: 10px 0 12px;
+  border-radius: 14px;
+  background: #2d3038;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow:
+    0 16px 40px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(0, 0, 0, 0.2);
+  font-family: var(--font-sans, 'Inter Variable', system-ui, sans-serif);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.95);
+  animation: appRailAccountHelpFlyoutIn 0.2s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.app-rail-account-help-flyout.app-rail-account-help-flyout--exiting {
+  animation: appRailAccountHelpFlyoutOut 0.22s cubic-bezier(0.4, 0, 1, 1) forwards;
+  pointer-events: none;
+}
+
+@keyframes appRailAccountPopoverIn {
+  from {
+    opacity: 0;
+    transform: translate3d(-6px, 4px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes appRailAccountScrimOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes appRailAccountPopoverOut {
+  from {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    opacity: 0;
+    transform: translate3d(-6px, 4px, 0);
+  }
+}
+
+@keyframes appRailEditProfileOut {
+  from {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    opacity: 0;
+    transform: translate3d(-6px, 4px, 0);
+  }
+}
+
+.app-rail-account-layer--exiting .app-rail-account-scrim {
+  animation: appRailAccountScrimOut 0.2s ease forwards;
+}
+
+.app-rail-account-layer--exiting .app-rail-account-popover {
+  animation: appRailAccountPopoverOut 0.22s cubic-bezier(0.4, 0, 1, 1) forwards;
+}
+
+.app-rail-account-popover__header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  /* Mesmo eixo horizontal que .app-rail-account-popover__row (margin 4px + padding 12px). */
+  padding: 6px 12px 12px 16px;
+}
+
+/*
+ * Largura de 22px como .app-rail-account-popover__icon (texto alinhado às linhas).
+ * Foto maior: borda esquerda do círculo = borda esquerda dos ícones; overflow no gap.
+ */
+.app-rail-account-popover__avatar-slot {
+  flex: 0 0 22px;
+  width: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex-shrink: 0;
+  overflow: visible;
+}
+
+.app-rail-account-popover__avatar--photo {
+  width: 32px;
+  height: 32px;
+  margin-left: -6px;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: center;
+  flex-shrink: 0;
+  display: block;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  image-rendering: auto;
+}
+
+.app-rail-account-popover__avatar--initials {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  margin-left: -6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  font-size: 0.68em;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #fff;
+  background: #e11d48;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.app-rail-account-popover__head-text {
+  min-width: 0;
+  flex: 1;
+}
+
+.app-rail-account-popover__name {
+  display: block;
+  font-size: 1.077em;
+  font-weight: 600;
+  line-height: 1.25;
+  color: rgba(255, 255, 255, 0.96);
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.app-rail-account-popover__plan {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.923em;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.app-rail-account-popover__rule {
+  margin: 6px 12px;
+  border: none;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.app-rail-account-popover__row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: calc(100% - 8px);
+  margin: 0 4px;
+  padding: 10px 12px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.12s ease;
+}
+
+.app-rail-account-popover__row:hover {
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.app-rail-account-popover__row:focus-visible {
+  outline: none;
+  background: rgba(255, 255, 255, 0.09);
+  box-shadow: 0 0 0 2px rgba(45, 212, 191, 0.35);
+}
+
+a.app-rail-account-popover__row.app-rail-account-popover__row--link {
+  text-decoration: none;
+  box-sizing: border-box;
+}
+
+.app-rail-account-popover__row--with-chevron {
+  padding-right: 10px;
+}
+
+.app-rail-account-popover__icon-help {
+  display: block;
+}
+
+.app-rail-account-popover__row--logout {
+  margin-top: 2px;
+}
+
+.app-rail-account-popover__row--logout:hover {
+  background: rgba(248, 113, 113, 0.2);
+  box-shadow: inset 0 0 0 1px rgba(248, 113, 113, 0.28);
+}
+
+.app-rail-account-popover__row--logout:hover .app-rail-account-popover__icon {
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.app-rail-account-popover__row--logout:focus-visible {
+  outline: none;
+  background: rgba(248, 113, 113, 0.24);
+  box-shadow:
+    inset 0 0 0 1px rgba(248, 113, 113, 0.32),
+    0 0 0 2px rgba(252, 165, 165, 0.45);
+}
+
+.app-rail-account-popover__row--logout:focus-visible .app-rail-account-popover__icon {
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.app-rail-account-popover__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.app-rail-account-popover__icon svg {
+  display: block;
+}
+
+.app-rail-account-popover__icon-cog {
+  display: block;
+  overflow: visible;
+}
+
+.app-rail-account-popover__icon-profile {
+  display: block;
+  overflow: visible;
+}
+
+.app-rail-account-popover__chevron {
+  margin-left: auto;
+  display: flex;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+/* Lista Ajuda: fundo único (sem caixa interior), alinhamento ícone + texto. */
+.app-rail-account-help {
+  padding: 0;
+}
+
+.app-rail-account-help__list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 0 6px;
+}
+
+.app-rail-account-help__row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  margin: 0;
+  padding: 10px 10px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  text-align: left;
+  cursor: default;
+  box-sizing: border-box;
+  transition: background 0.12s ease;
+}
+
+.app-rail-account-help__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.app-rail-account-help__icon svg {
+  display: block;
+}
+
+.app-rail-account-help__row:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.app-rail-account-help__row:focus-visible {
+  outline: none;
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 0 0 2px rgba(45, 212, 191, 0.35);
+}
+
+.app-rail-edit-profile-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 1052;
+  background: rgba(0, 0, 0, 0.4);
+  animation: appRailAccountScrimIn 0.2s ease both;
+}
+
+.app-rail-edit-profile {
+  position: fixed;
+  z-index: 1053;
+  left: calc(var(--app-left-rail-width, 52px) + 10px);
+  bottom: max(16px, env(safe-area-inset-bottom, 0px) + 8px);
+  width: min(300px, calc(100vw - var(--app-left-rail-width, 52px) - 20px));
+  max-height: min(90dvh, calc(100dvh - 24px));
+  overflow: auto;
+  padding: 16px 14px 14px;
+  border-radius: 14px;
+  background: #25272e;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow:
+    0 20px 50px rgba(0, 0, 0, 0.55),
+    0 0 0 1px rgba(0, 0, 0, 0.2);
+  font-family: var(--font-sans, 'Inter Variable', system-ui, sans-serif);
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.92);
+  animation: appRailAccountPopoverIn 0.22s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.app-rail-edit-profile-layer--exiting .app-rail-edit-profile-scrim {
+  animation: appRailAccountScrimOut 0.2s ease forwards;
+}
+
+.app-rail-edit-profile-layer--exiting .app-rail-edit-profile {
+  animation: appRailEditProfileOut 0.22s cubic-bezier(0.4, 0, 1, 1) forwards;
+}
+
+.app-rail-edit-profile__title {
+  margin: 0 0 14px;
+  font-size: 1.077em;
+  font-weight: 600;
+  line-height: 1.25;
+  color: #fff;
+}
+
+.app-rail-edit-profile__file-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.app-rail-edit-profile__avatar-block {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 18px;
+}
+
+.app-rail-edit-profile__avatar-ring {
+  position: relative;
+  width: 88px;
+  height: 88px;
+  flex-shrink: 0;
+}
+
+.app-rail-edit-profile__avatar-ring--busy {
+  /* Pré-visualização local já mostra a imagem; manter ring legível sem parecer “travado”. */
+  opacity: 0.92;
+  pointer-events: none;
+}
+
+.app-rail-edit-profile__avatar-button {
+  display: block;
+  width: 88px;
+  height: 88px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.app-rail-edit-profile__avatar-button:focus-visible {
+  box-shadow:
+    0 0 0 2px #25272e,
+    0 0 0 4px rgba(45, 212, 191, 0.5);
+}
+
+.app-rail-edit-profile__avatar-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.app-rail-edit-profile__avatar {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  box-sizing: border-box;
+}
+
+.app-rail-edit-profile__avatar--photo {
+  display: block;
+  object-fit: cover;
+  border: 2px solid rgba(255, 255, 255, 0.12);
+}
+
+.app-rail-edit-profile__avatar--initials {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.85rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #fff;
+  background: linear-gradient(145deg, #f97316, #ea580c);
+  border: 2px solid rgba(255, 255, 255, 0.12);
+}
+
+.app-rail-edit-profile__camera {
+  position: absolute;
+  right: -2px;
+  bottom: -2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 2px solid #25272e;
+  border-radius: 50%;
+  background: #1a1b20;
+  color: rgba(255, 255, 255, 0.92);
+  cursor: pointer;
+  opacity: 0.92;
+  transition: background 0.12s ease, opacity 0.12s ease;
+}
+
+.app-rail-edit-profile__camera:hover:not(:disabled) {
+  background: #252830;
+  color: #fff;
+}
+
+.app-rail-edit-profile__camera:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.app-rail-edit-profile__field {
+  display: block;
+  margin-bottom: 10px;
+}
+
+.app-rail-edit-profile__label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 0.846em;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.app-rail-edit-profile__input {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(0, 0, 0, 0.22);
+  color: #fff;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.12s ease, box-shadow 0.12s ease;
+}
+
+.app-rail-edit-profile__input:focus-visible {
+  border-color: rgba(45, 212, 191, 0.45);
+  box-shadow: 0 0 0 2px rgba(45, 212, 191, 0.2);
+}
+
+.app-rail-edit-profile__input--readonly {
+  color: rgba(255, 255, 255, 0.88);
+  cursor: not-allowed;
+  opacity: 0.92;
+}
+
+.app-rail-edit-profile__field--username-locked {
+  cursor: not-allowed;
+}
+
+.app-rail-edit-profile__username-locked-shell {
+  position: relative;
+}
+
+.app-rail-edit-profile__username-locked-shell .app-rail-edit-profile__input--readonly {
+  padding-right: 40px;
+}
+
+.app-rail-edit-profile__username-lock {
+  position: absolute;
+  right: 11px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  color: rgba(255, 255, 255, 0.38);
+  pointer-events: none;
+  transition: color 0.15s ease, opacity 0.15s ease;
+}
+
+.app-rail-edit-profile__field--username-locked:hover .app-rail-edit-profile__username-lock {
+  color: rgba(251, 191, 36, 0.75);
+}
+
+.app-rail-edit-profile__field--username-locked:hover .app-rail-edit-profile__input--readonly {
+  border-color: rgba(251, 191, 36, 0.35);
+  background: rgba(0, 0, 0, 0.3);
+  box-shadow: inset 0 0 0 1px rgba(251, 191, 36, 0.08);
+}
+
+.app-rail-edit-profile__field-hint {
+  margin: -4px 0 10px;
+  font-size: 0.8em;
+  line-height: 1.35;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.app-rail-edit-profile__hint {
+  margin: 4px 0 16px;
+  font-size: 0.846em;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.app-rail-edit-profile__feedback {
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 0.9em;
+  font-weight: 500;
+  line-height: 1.35;
+}
+
+@keyframes appRailEditProfileFeedbackSuccessIn {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 8px, 0) scale(0.98);
+    box-shadow: 0 0 0 0 rgba(52, 211, 153, 0);
+  }
+  55% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+    box-shadow: 0 0 0 4px rgba(52, 211, 153, 0.12);
+  }
+}
+
+.app-rail-edit-profile__feedback--success {
+  color: rgba(167, 243, 208, 0.98);
+  background: rgba(16, 185, 129, 0.14);
+  border: 1px solid rgba(52, 211, 153, 0.35);
+  transform-origin: center top;
+  animation: appRailEditProfileFeedbackSuccessIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.app-rail-edit-profile__feedback--error {
+  color: rgba(254, 202, 202, 0.98);
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(248, 113, 113, 0.4);
+}
+
+.app-rail-edit-profile__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.app-rail-edit-profile__btn {
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-size: 0.923em;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.12s ease, border-color 0.12s ease, opacity 0.12s ease;
+}
+
+.app-rail-edit-profile__btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.app-rail-edit-profile__btn--ghost {
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: transparent;
+  color: #fff;
+}
+
+.app-rail-edit-profile__btn--ghost:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.app-rail-edit-profile__btn--primary {
+  border: none;
+  background: #fff;
+  color: #111;
+}
+
+.app-rail-edit-profile__btn--primary:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.92);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-rail-account-scrim,
+  .app-rail-account-popover,
+  .app-rail-account-help-flyout,
+  .app-rail-edit-profile-scrim,
+  .app-rail-edit-profile,
+  .app-rail-account-layer--exiting .app-rail-account-scrim,
+  .app-rail-account-layer--exiting .app-rail-account-popover,
+  .app-rail-account-help-flyout.app-rail-account-help-flyout--exiting,
+  .app-rail-edit-profile-layer--exiting .app-rail-edit-profile-scrim,
+  .app-rail-edit-profile-layer--exiting .app-rail-edit-profile,
+  .app-rail-edit-profile__feedback--success {
     animation: none;
   }
 }

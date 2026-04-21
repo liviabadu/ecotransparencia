@@ -126,6 +126,22 @@
         [disabled]="isLoading()"
       />
 
+      @if (!auth.isAuthenticated()) {
+        <label class="auth-remember">
+          <input
+            type="checkbox"
+            class="auth-remember__input"
+            id="login-remember"
+            name="rememberMe"
+            [checked]="rememberMe()"
+            (change)="onRememberMeChange($any($event.target).checked)"
+            [disabled]="isLoading()"
+          />
+          <span class="auth-remember__box" aria-hidden="true"></span>
+          <span class="auth-remember__label">Lembrar de mim</span>
+        </label>
+      }
+
       <button type="submit" class="auth-pill-btn auth-pill-btn--primary" [disabled]="isLoading()">
         @if (isLoading()) {
           <span class="loading-dot" aria-hidden="true"></span>
@@ -136,9 +152,11 @@
       </button>
     </form>
 
-    <p class="auth-modal__footer">
-      Não tem conta?
-      <a routerLink="/cadastro">Cadastrar-se</a>
-    </p>
+    @if (!auth.isAuthenticated()) {
+      <p class="auth-modal__footer">
+        Não tem conta?
+        <a routerLink="/cadastro">Cadastrar-se</a>
+      </p>
+    }
   </div>
 </div>

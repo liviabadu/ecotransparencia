@@ -25,25 +25,27 @@
    HEADER
    ============================================================================ */
 .header {
-  background: rgba(11, 18, 32, 0.55);
-  padding: 16px 0;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  /* Abaixo da barra vertical (1025) para ela “passar por cima” à esquerda */
-  z-index: 1018;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.35);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  position: relative;
+  z-index: 2;
+  padding: 16px 0 8px;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
-/* Esquerda: após a rail global (z-index acima do header); direita: simétrica ao que era útil no mobile */
+/*
+ * .app-main já reserva a rail esquerda: padding-left só respiro até a logo.
+ * Direita: mesma ideia na borda do viewport (safe-area em notch).
+ */
 .header-inner {
   max-width: 1600px;
   margin: 0 auto;
-  padding: 0 24px 0 calc(var(--app-left-rail-width, 56px) + 14px);
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: max(2px, env(safe-area-inset-left, 0px));
+  padding-right: max(4px, env(safe-area-inset-right, 0px));
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -62,11 +64,7 @@
 .logo-container {
   display: flex;
   align-items: center;
-  margin-left: 0;
-}
-
-.nav-menu {
-  margin-right: -8px;
+  margin-left: -8px;
 }
 
 .logo-link {
@@ -151,6 +149,8 @@
   align-items: center;
   flex-wrap: wrap;
   justify-content: flex-end;
+  /* Desloca o grupo para a direita (ritmo com padding do .hero) */
+  margin-right: -12px;
 }
 
 .nav-btn {
@@ -205,8 +205,8 @@
 .help-menu {
   position: fixed;
   left: auto;
-  right: max(16px, env(safe-area-inset-right));
-  bottom: max(16px, env(safe-area-inset-bottom));
+  right: max(10px, env(safe-area-inset-right));
+  bottom: max(10px, env(safe-area-inset-bottom));
   width: auto;
   z-index: 1035;
   display: inline-flex;
@@ -216,13 +216,13 @@
 }
 
 .help-toggle {
-  width: 30px;
-  height: 30px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
-  border: 3px solid #0b1220;
+  border: 2px solid #0b1220;
   background: #ffffff;
   color: #0b1220;
-  font-size: 14px;
+  font-size: 11px;
   font-weight: 700;
   line-height: 1;
   cursor: pointer;
@@ -278,10 +278,11 @@
 .hero {
   min-height: 100vh;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
   position: relative;
-  padding: 120px 24px 80px;
+  padding: 0 24px 80px;
   overflow: hidden;
 }
 
@@ -319,14 +320,17 @@
   flex: 1 1 auto;
   width: 100%;
   max-width: 800px;
+  margin: 0 auto;
+  /* Sobe o conjunto título + busca + badges em relação ao centro vertical do hero */
+  margin-top: clamp(-2.25rem, -4vh, -0.75rem);
   text-align: center;
   position: relative;
   z-index: 1;
-  display: grid;
-  grid-template-rows: auto auto 1fr auto;
-  justify-items: center;
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 14px;
+  justify-content: center;
+  gap: clamp(14px, 2.8vw, 22px);
   min-height: 0;
 }
 
@@ -381,12 +385,21 @@
   max-width: 60ch;
 }
 
-/* Search Wrapper — linha do grid 1fr: centraliza entre subtítulo e badges */
+/* Search Wrapper */
 .search-wrapper {
   max-width: 700px;
   margin: 0;
   width: 100%;
-  align-self: center;
+}
+
+/* Menos padding/margem do app-search na landing (ritmo vertical do hero). */
+.hero .search-wrapper :deep(.search-container) {
+  padding-top: 0.35rem;
+  padding-bottom: 0.35rem;
+}
+
+.hero .search-wrapper :deep(.search-form) {
+  margin-bottom: 0;
 }
 
 /* Badges */
@@ -395,8 +408,7 @@
   justify-content: center;
   gap: 14px;
   flex-wrap: wrap;
-  margin-top: 0;
-  align-self: start;
+  margin-top: clamp(4px, 1vw, 10px);
 }
 
 .badge {
@@ -1186,56 +1198,6 @@
   }
 }
 
-/* ============================================================================
-   STORYTELLING / SCROLL (lógica em home-scroll-story.ts)
-   Classes: .fade-in, .reveal-scale; fim: .home-story-end-sentinel (IO)
-   ============================================================================ */
-
-/* Wrapper Angular: filhos participam do fluxo como se o nó não existisse */
-.home-story-root {
-  display: contents;
-}
-
-/* 1px no fim do fluxo: IntersectionObserver detecta “cheguei ao fim” sem scroll listener */
-.home-story-end-sentinel {
-  height: 1px;
-  width: 100%;
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-  pointer-events: none;
-  visibility: hidden;
-}
-
-/**
- * Entrada na viewport: IntersectionObserver adiciona .is-inview.
- * Ao sair, .is-inview é removido — a animação pode repetir.
- */
-.fade-in {
-  opacity: 0;
-  transform: translate3d(0, 28px, 0);
-  transition:
-    opacity 0.52s cubic-bezier(0.22, 1, 0.36, 1),
-    transform 0.52s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.fade-in.is-inview {
-  opacity: 1;
-  transform: translate3d(0, 0, 0);
-}
-
-.fade-in--delay-1 {
-  transition-delay: 0.05s;
-}
-
-.fade-in--delay-2 {
-  transition-delay: 0.1s;
-}
-
-.fade-in--delay-3 {
-  transition-delay: 0.15s;
-}
-
 /**
  * Hero principal (área da busca CNPJ): entrada mais longa, mais deslocamento
  * e leve escala — só filhos diretos de .hero-content (não afeta badges nem seções abaixo).
@@ -1293,33 +1255,6 @@
   transition-delay: 0.1s;
 }
 
-/**
- * Escala ao entrar/sair da viewport (ícones, emoji, logo do rodapé).
- */
-.reveal-scale {
-  display: inline-block;
-  transform: scale(0.94);
-  opacity: 0.92;
-  transition:
-    transform 0.48s cubic-bezier(0.22, 1, 0.36, 1),
-    opacity 0.45s ease;
-}
-
-.reveal-scale.is-inview {
-  transform: scale(1);
-  opacity: 1;
-}
-
-.badge-icon-wrap.reveal-scale {
-  display: flex;
-}
-
-/* Após chegar ao fim da home: sem transição extra (layout “normal”) */
-.home-story-root.home-story--settled .fade-in,
-.home-story-root.home-story--settled .reveal-scale {
-  transition: none;
-}
-
 /* ============================================================================
    RESPONSIVIDADE
    ============================================================================ */
@@ -1329,16 +1264,9 @@
     gap: 16px;
   }
 
-  .logo-container {
-    margin-left: 0;
-  }
-
-  .nav-menu {
-    margin-right: 0;
-  }
-
   .nav-menu {
     flex-direction: column;
+    margin-right: 0;
     width: 100%;
   }
 
@@ -1348,7 +1276,11 @@
   }
 
   .hero {
-    padding-top: 180px;
+    padding-top: 0;
+  }
+
+  .hero-content {
+    margin-top: clamp(-1.5rem, -3vh, -0.5rem);
   }
 
   .badges {
@@ -1376,11 +1308,11 @@
 }
 
 :host-context(html[data-app-theme="light"]) .header {
-  background: rgba(248, 250, 252, 0.96);
-  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.06);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
 :host-context(html[data-app-theme="light"]) .nav-btn {
@@ -1478,11 +1410,11 @@
   }
 
   :host-context(html[data-app-theme="system"]) .header {
-    background: rgba(248, 250, 252, 0.96);
-    border-bottom: 1px solid rgba(15, 23, 42, 0.08);
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.06);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
   }
 
   :host-context(html[data-app-theme="system"]) .nav-btn {

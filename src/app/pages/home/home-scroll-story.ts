@@ -1,11 +1,12 @@
 import { NgZone } from '@angular/core';
 
 /**
- * Storytelling na home (só até o fim da primeira leitura da página):
+ * Storytelling na home pública e no dashboard pós-login (até o fim da primeira leitura):
  *
  * - Enquanto o usuário desce: fade-in / reveal-scale (IntersectionObserver,
  *   só adiciona .is-inview, não remove).
  * - Ao chegar ao final (sentinel visível): “encerra” — tudo estático, observers desligados.
+ * - Opção {@link HomeScrollStoryOptions.revealAllOnStart}: dashboard revela tudo ao abrir, sem scroll.
  *
  * Sem listener de scroll: o fim da página é detectado por IO no .home-story-end-sentinel
  * (o parallax em JS foi removido — getBoundingClientRect a cada frame deixava o scroll pesado).
@@ -19,6 +20,16 @@ const IO_SCALE_THRESHOLD = 0.12;
 const BOTTOM_SLACK_PX = 56;
 /** Página que quase não rola: encerra efeitos de uma vez */
 const SHORT_PAGE_EXTRA_PX = 64;
+/** Após revelar tudo de uma vez: alinhar a `--dash-reveal-dur` do dashboard (+ folga) */
+const REVEAL_ALL_SETTLE_MS = 1100;
+
+export type HomeScrollStoryOptions = {
+  /**
+   * Dashboard pós-login: aplica .is-inview em todos os blocos ao entrar na tela,
+   * sem IntersectionObserver nem scroll até o fim da página.
+   */
+  revealAllOnStart?: boolean;
+};
 
 export class HomeScrollStory {
   private ioFade: IntersectionObserver | null = null;
@@ -32,6 +43,7 @@ export class HomeScrollStory {
   constructor(
     private readonly root: HTMLElement,
     private readonly zone: NgZone,
+    private readonly options: HomeScrollStoryOptions = {},
   ) {
     this.reduced =
       typeof globalThis.matchMedia === 'function' &&
@@ -43,6 +55,15 @@ export class HomeScrollStory {
       this.zone.runOutsideAngular(() => {
         this.applyReducedMotionDefaults();
         this.root.classList.add('home-story--settled');
+      });
+      return;
+    }
+
+    if (this.options.revealAllOnStart) {
+      this.zone.runOutsideAngular(() => {
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => this.revealAllThenSettleAfterTransitions());
+        });
       });
       return;
     }
@@ -66,6 +87,28 @@ export class HomeScrollStory {
         requestAnimationFrame(() => this.markVisibleIfAlreadyInViewport());
       });
     });
+  }
+
+  /**
+   * Dashboard: todos os blocos entram juntos (com transition-delay do CSS), depois estado settled.
+   */
+  private revealAllThenSettleAfterTransitions(): void {
+    if (this.settled || typeof window === 'undefined') return;
+
+    for (const el of this.root.querySelectorAll('.fade-in')) {
+      el.classList.add('is-inview');
+    }
+    for (const el of this.root.querySelectorAll('.reveal-scale')) {
+      el.classList.add('is-inview');
+    }
+
+    window.setTimeout(() => this.applySettledStateOnly(), REVEAL_ALL_SETTLE_MS);
+  }
+
+  private applySettledStateOnly(): void {
+    if (this.settled) return;
+    this.settled = true;
+    this.root.classList.add('home-story--settled');
   }
 
   /**

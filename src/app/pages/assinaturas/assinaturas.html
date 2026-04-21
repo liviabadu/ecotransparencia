@@ -1,5 +1,5 @@
-<main class="assinaturas-page">
-  <div class="assinaturas-card">
+<main class="assinaturas-page" role="presentation" (click)="onBackdropClick($event)">
+  <div class="assinaturas-card" (click)="$event.stopPropagation()">
     <p class="assinaturas-badge" role="status">Em desenvolvimento</p>
     <h1 class="assinaturas-title">Assinaturas</h1>
     <p class="assinaturas-lead">

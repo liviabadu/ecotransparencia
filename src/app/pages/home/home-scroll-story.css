@@ -1,0 +1,67 @@
+/* ============================================================================
+   STORYTELLING / SCROLL — lógica em home-scroll-story.ts
+   Classes: .fade-in, .reveal-scale; fim: .home-story-end-sentinel (IO)
+   Partilhado entre home pública e dashboard pós-login.
+   ============================================================================ */
+
+.home-story-root {
+  display: contents;
+}
+
+.home-story-end-sentinel {
+  height: 1px;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.fade-in {
+  opacity: 0;
+  transform: translate3d(0, 28px, 0);
+  transition:
+    opacity 0.52s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.52s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.fade-in.is-inview {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+.fade-in--delay-1 {
+  transition-delay: 0.05s;
+}
+
+.fade-in--delay-2 {
+  transition-delay: 0.1s;
+}
+
+.fade-in--delay-3 {
+  transition-delay: 0.15s;
+}
+
+.reveal-scale {
+  display: inline-block;
+  transform: scale(0.94);
+  opacity: 0.92;
+  transition:
+    transform 0.48s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.45s ease;
+}
+
+.reveal-scale.is-inview {
+  transform: scale(1);
+  opacity: 1;
+}
+
+.badge-icon-wrap.reveal-scale {
+  display: flex;
+}
+
+.home-story-root.home-story--settled .fade-in,
+.home-story-root.home-story--settled .reveal-scale {
+  transition: none;
+}

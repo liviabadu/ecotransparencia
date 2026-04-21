@@ -12,11 +12,22 @@ import { isFocusInTextEntryField } from '../../utils/form-focus.util';
 export class Assinaturas {
   private router = inject(Router);
 
+  /** Mesmo efeito do Esc: volta ao início. */
+  private leavePage(): void {
+    void this.router.navigate(['/']);
+  }
+
   @HostListener('document:keydown', ['$event'])
   onEscapeLeavePage(event: KeyboardEvent): void {
     if (event.key !== 'Escape') return;
     if (isFocusInTextEntryField()) return;
-    this.router.navigate(['/']);
+    this.leavePage();
     event.preventDefault();
+  }
+
+  /** Clique no espaço em volta do cartão (como login/cadastro). */
+  onBackdropClick(event: MouseEvent): void {
+    if (event.target !== event.currentTarget) return;
+    this.leavePage();
   }
 }

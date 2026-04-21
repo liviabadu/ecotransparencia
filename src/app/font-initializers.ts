@@ -5,7 +5,8 @@ import { APP_INITIALIZER } from '@angular/core';
  * Sem isso, o primeiro frame já pinta com fallback e depois troca — “cresce / trava / volta”.
  * Timeout máximo evita tela branca eterna se a rede falhar.
  */
-const FONT_WAIT_MS = 850;
+/** Teto se as fontes não carregarem; não bloquear o bootstrap além do necessário no reload */
+const FONT_WAIT_MS = 480;
 
 const CRITICAL_FONT_SPECS = [
   '400 16px "Inter Variable"',
