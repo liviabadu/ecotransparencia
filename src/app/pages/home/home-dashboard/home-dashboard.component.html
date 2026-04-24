@@ -340,5 +340,12 @@
       </div>
     </div>
   }
+
+  @if (clearSearchHistoryConfirmOpen()) {
+    <app-clear-search-history-confirm-dialog
+      (dismissed)="onClearSearchHistoryConfirmDismiss()"
+      (confirmed)="onClearSearchHistoryConfirm()"
+    />
+  }
 </div>
 

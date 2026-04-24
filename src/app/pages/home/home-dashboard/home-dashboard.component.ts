@@ -13,6 +13,7 @@ import {
 } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Search } from '../../../components/search/search';
+import { ClearSearchHistoryConfirmDialog } from '../../../components/clear-search-history-confirm-dialog/clear-search-history-confirm-dialog';
 import { AuthService } from '../../../services/auth.service';
 import { DocumentValidationService } from '../../../services/document-validation.service';
 import { DashboardRecentSearchesOpenerService } from '../../../services/dashboard-recent-searches-opener.service';
@@ -77,7 +78,7 @@ export interface DashRecentAlert {
 @Component({
   selector: 'app-home-dashboard',
   standalone: true,
-  imports: [RouterLink, Search],
+  imports: [RouterLink, Search, ClearSearchHistoryConfirmDialog],
   templateUrl: './home-dashboard.component.html',
   styleUrls: ['./home-dashboard.component.css', '../home-scroll-story.css'],
 })
@@ -102,6 +103,9 @@ export class HomeDashboard implements AfterViewInit, OnDestroy {
 
   /** Animação de fecho em curso (camada ainda no DOM). */
   protected readonly recentSearchesHistoryExiting = signal(false);
+
+  /** Confirmação antes de limpar histórico (substitui `window.confirm`). */
+  protected readonly clearSearchHistoryConfirmOpen = signal(false);
 
   private recentHistoryExitTimer: ReturnType<typeof setTimeout> | null = null;
 
@@ -543,12 +547,15 @@ export class HomeDashboard implements AfterViewInit, OnDestroy {
 
   onClearDashboardHistoryClick(ev: Event): void {
     ev.preventDefault();
-    const msg =
-      'Limpar todo o histórico de pesquisas guardado neste navegador?\n\n' +
-      'Serão removidos: últimas pesquisas, o ranking de maior risco recente, os alertas de mudança de score e a referência usada para comparar consultas.';
-    if (typeof globalThis.confirm === 'function' && !globalThis.confirm(msg)) {
-      return;
-    }
+    this.clearSearchHistoryConfirmOpen.set(true);
+  }
+
+  onClearSearchHistoryConfirmDismiss(): void {
+    this.clearSearchHistoryConfirmOpen.set(false);
+  }
+
+  onClearSearchHistoryConfirm(): void {
+    this.clearSearchHistoryConfirmOpen.set(false);
     this.clearDashboardHistory();
   }
 
