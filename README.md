@@ -11,7 +11,7 @@
 - [Visão Geral](#visão-geral)
 - [Visão de Negócio](#visão-de-negócio)
   - [O Problema](#o-problema)
-  - [Nossa Solução](#nossa-solução)
+  - [Solução](#solução)
   - [Público-Alvo](#público-alvo)
   - [Proposta de Valor](#proposta-de-valor)
   - [Fontes de Dados](#fontes-de-dados)
