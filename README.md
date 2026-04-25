@@ -53,7 +53,7 @@ O Brasil enfrenta um desafio crítico na gestão de informações socioambientai
 
 5. **Barreiras para Pequenos Atores**: Pequenas empresas e organizações não têm recursos para realizar due diligence socioambiental completa de seus parceiros e fornecedores.
 
-### Nossa Solução
+### Solução
 
 A EcoTransparência oferece uma **plataforma centralizada e gratuita** que resolve esses problemas através de:
 
