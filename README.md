@@ -102,8 +102,7 @@ A plataforma integra dados das seguintes fontes oficiais:
 #### Ambiental IBAMA
 - **Embargos**: Áreas embargadas por desmatamento ilegal ou outras infrações ambientais
 - **Autos de Infração**: Multas e autuações por descumprimento da legislação ambiental
-- **Dados incluem**: Localização (município/UF), bioma afetado, área embargada, número do auto, valor da multa
-
+- **Dados incluem**: Localização (município/UF), bioma afetado, área embargada
 #### Ambiental ICMBio
 - **Processos Administrativos**: Infrações em unidades de conservação
 - **Autos de Infração**: Autuações relacionadas à fauna, flora e áreas protegidas
