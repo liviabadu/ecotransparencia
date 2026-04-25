@@ -70,8 +70,6 @@ Transformamos dados brutos em um **score de risco de 0 a 100 pontos**, classific
 | 51-75 | **Alto** | Múltiplas ocorrências ativas ou de maior gravidade |
 | 76-100 | **Crítico** | Histórico grave com múltiplas infrações ativas |
 
-#### Transparência Total
-Todas as ocorrências são apresentadas com detalhes completos, incluindo data, descrição, status, localização geográfica, bioma afetado, área embargada e link para a fonte original.
 
 #### Atualização Contínua
 Os dados são sincronizados periodicamente com as bases governamentais, garantindo informações atualizadas.
