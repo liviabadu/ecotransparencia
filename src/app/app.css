@@ -194,7 +194,8 @@
   transition: background 0.12s ease-out;
 }
 
-.app-sidebar-drawer.app-sidebar-drawer--unified:not(.is-expanded) .hamburger.app-rail-toggle-btn {
+/* Pós-login: mesma altura de linha com barra recolhida ou expandida (evita “pulo” do eco vs. nav). */
+.app-sidebar-drawer.app-sidebar-drawer--unified .hamburger.app-rail-toggle-btn {
   flex-direction: row;
   justify-content: flex-start;
   align-items: center;
@@ -1244,17 +1245,8 @@ button.app-rail-nav-link {
 }
 
 .app-sidebar-drawer.app-sidebar-drawer--unified.is-expanded .hamburger.app-rail-toggle-btn {
-  /* Igual à recolhida: flex-start na coluna de ícones; chevron à direita só com margin-left: auto (não space-between) */
-  justify-content: flex-start;
-  align-items: center;
-  width: 100%;
-  height: var(--app-rail-row-height);
-  min-height: var(--app-rail-row-height);
-  max-height: var(--app-rail-row-height);
-  gap: var(--app-rail-expanded-icon-text-gap, 3px);
+  /* Altura/padding já vêm de .app-sidebar-drawer--unified .hamburger.app-rail-toggle-btn */
   cursor: default;
-  padding: 0 var(--app-rail-row-pad-end) 0 var(--app-rail-row-pad-start);
-  box-sizing: border-box;
 }
 
 .app-sidebar-drawer.app-sidebar-drawer--unified.is-expanded .hamburger.app-rail-toggle-btn:hover {
@@ -1364,7 +1356,16 @@ button.app-rail-nav-link {
   max-width: 0;
   flex: 0 1 0;
   min-width: 0;
-  transition: opacity 0.22s var(--app-sidebar-ease);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  align-self: stretch;
+  min-height: 0;
+  max-height: var(--app-rail-row-height);
+  transition:
+    opacity 0.22s var(--app-sidebar-ease),
+    max-width 0.26s var(--app-sidebar-ease) 0.04s;
 }
 
 .app-sidebar-drawer.app-sidebar-drawer--unified:not(.is-expanded) .app-sidebar-user-card--rail .app-sidebar-user-meta {
@@ -1378,10 +1379,14 @@ button.app-rail-nav-link {
 .app-sidebar-drawer.app-sidebar-drawer--unified.is-expanded .app-sidebar-user-card--rail .app-sidebar-user-meta {
   opacity: 1;
   max-width: min(200px, 40vw);
-  flex: 1;
+  flex: 1 1 0;
   min-width: 0;
+  margin-left: 2px;
   visibility: visible;
   pointer-events: auto;
+  transition:
+    opacity 0.26s var(--app-sidebar-ease) 0.06s,
+    max-width 0.26s var(--app-sidebar-ease) 0.06s;
 }
 
 .app-sidebar-drawer.app-sidebar-drawer--unified.is-expanded .app-rail-footer > .app-rail-hover-wrap {
@@ -1457,6 +1462,16 @@ button.app-rail-nav-link {
   .app-sidebar-drawer.app-sidebar-drawer--unified:not(.is-expanded) button.app-sidebar-user-card--rail {
     height: 48px;
     min-height: 48px;
+    max-height: 48px;
+  }
+
+  .app-sidebar-drawer.app-sidebar-drawer--unified.is-expanded button.app-sidebar-user-card--rail {
+    height: 48px;
+    min-height: 48px;
+    max-height: 48px;
+  }
+
+  .app-sidebar-drawer.app-sidebar-drawer--unified .app-sidebar-user-card--rail .app-sidebar-user-meta {
     max-height: 48px;
   }
 }
@@ -1884,7 +1899,10 @@ button.app-sidebar-user-card {
   outline-offset: 2px;
 }
 
-/* Mesmo alinhamento que .app-rail-nav-link; fundo do hover via ::before (estende à esquerda sem mover o conteúdo). */
+/*
+ * Mesmo alinhamento que .app-rail-nav-link: altura fixa na coluna de ícones (recolhida = expandida),
+ * sem “subir/descer” ao abrir a barra — só a meta (nome/plano) aparece como o texto dos outros itens.
+ */
 .app-sidebar-drawer.app-sidebar-drawer--unified.is-expanded button.app-sidebar-user-card--rail {
   position: relative;
   z-index: 0;
@@ -1898,18 +1916,18 @@ button.app-sidebar-user-card {
   min-width: 0;
   width: 100%;
   max-width: 100%;
-  min-height: calc(var(--app-rail-row-height) + 8px);
-  height: auto;
-  max-height: none;
-  /* Alinhado à coluna dos links (pad-start 0); conteúdo um pouco mais à esquerda que com padding extra. */
-  padding: 4px calc(var(--app-rail-row-pad-end) + 2px) 4px var(--app-rail-row-pad-start);
+  height: var(--app-rail-row-height);
+  min-height: var(--app-rail-row-height);
+  max-height: var(--app-rail-row-height);
+  padding: 0 var(--app-rail-row-pad-end) 0 var(--app-rail-row-pad-start);
+  /* Mais espaço que nos links de nav: nome/plano não colados ao avatar (ícone mantém-se à esquerda). */
   gap: 10px;
   box-sizing: border-box;
   background-color: transparent;
   /* Herdado de button.app-sidebar-user-card; na expandida não queremos a linha por cima do botão. */
   border-top-width: 0;
   border-top-color: transparent;
-  border-radius: 10px;
+  border-radius: 8px;
 }
 
 .app-sidebar-drawer.app-sidebar-drawer--unified.is-expanded button.app-sidebar-user-card--rail::before {
@@ -1940,15 +1958,27 @@ button.app-sidebar-user-card {
   outline-offset: 2px;
 }
 
-/* Nome do utilizador: mesma tipografia que o texto dos links da rail (Assinaturas / Metodologia). */
+/*
+ * Nome + plano na mesma altura de linha que os links (36px); fonte um pouco maior + respiro ao avatar (gap no botão).
+ */
 .app-sidebar-drawer.app-sidebar-drawer--unified.is-expanded
   button.app-sidebar-user-card--rail
   .app-sidebar-user-name {
-  font-size: 0.9rem;
+  font-size: 0.875rem;
   font-weight: 600;
-  line-height: 1.3;
+  line-height: 1.2;
   letter-spacing: normal;
   color: rgba(255, 255, 255, 0.92);
+}
+
+.app-sidebar-drawer.app-sidebar-drawer--unified.is-expanded
+  button.app-sidebar-user-card--rail
+  .app-sidebar-user-plan {
+  margin-top: 1px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1.15;
+  color: rgba(255, 255, 255, 0.55);
 }
 
 /* Sem transição de layout no perfil ao abrir/fechar (só estados visuais locais, como os links de nav) */

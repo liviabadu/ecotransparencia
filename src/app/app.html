@@ -335,11 +335,12 @@
               </span>
               <span class="app-rail-nav-link-text">Histórico de pesquisas</span>
             </button>
-            <hr class="app-rail-nav-divider" />
+            <hr class="app-rail-nav-divider" aria-hidden="true" />
           </nav>
         </div>
 
         <div class="app-rail-footer" (click)="$event.stopPropagation()">
+          <hr class="app-rail-nav-divider" aria-hidden="true" />
           <div
             class="app-rail-hover-wrap"
             [attr.data-tooltip]="!sidebar.expanded() ? 'Perfil' : null"

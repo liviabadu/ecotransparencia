@@ -1,14 +1,4 @@
-import {
-  AfterViewInit,
-  Component,
-  ElementRef,
-  HostListener,
-  NgZone,
-  OnDestroy,
-  ViewChild,
-  inject,
-  signal,
-} from '@angular/core';
+import { AfterViewInit, Component, ElementRef, NgZone, OnDestroy, ViewChild, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Search } from '../../../components/search/search';
 import { CounterDirective } from '../../../directives/counter.directive';
@@ -33,8 +23,6 @@ export class HomePublic implements AfterViewInit, OnDestroy {
     instagram: 'https://www.instagram.com/',
     github: 'https://github.com/',
   } as const;
-
-  isHelpMenuOpen = signal(false);
 
   @ViewChild('storyHost', { read: ElementRef }) private storyHost?: ElementRef<HTMLElement>;
 
@@ -70,21 +58,5 @@ export class HomePublic implements AfterViewInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.scrollStory?.destroy();
-  }
-
-  toggleHelpMenu(): void {
-    this.isHelpMenuOpen.update((value) => !value);
-  }
-
-  @HostListener('document:keydown', ['$event'])
-  onEscapeCloseHelp(event: KeyboardEvent): void {
-    if (event.key !== 'Escape' || !this.isHelpMenuOpen()) return;
-    this.isHelpMenuOpen.set(false);
-    event.preventDefault();
-  }
-
-  @HostListener('document:click')
-  closeHelpMenu(): void {
-    this.isHelpMenuOpen.set(false);
   }
 }

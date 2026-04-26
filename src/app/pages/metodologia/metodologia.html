@@ -1,26 +1,33 @@
 <!-- Skip Link para Acessibilidade -->
 <a href="#main-content" class="skip-link">Pular para o conteúdo</a>
 
-<!-- ========== HEADER ========== -->
-<header class="header">
-  <div class="header-inner">
-    <!-- Logo -->
-    <div class="logo-container">
-      <a routerLink="/" class="logo-link" aria-label="Voltar para a página inicial">
-        <div class="logo-box">
-          <span class="logo-text">eco</span>
-          <span class="logo-sub">TRANSPARÊNCIA</span>
-        </div>
-      </a>
+<!-- Controles fixos: sem barra — logo à esquerda, voltar à direita -->
+<header class="page-top-controls" role="banner">
+  <a routerLink="/" class="logo-link" aria-label="Voltar para a página inicial">
+    <div class="logo-box">
+      <span class="logo-text">eco</span>
+      <span class="logo-sub">TRANSPARÊNCIA</span>
     </div>
-
-    <!-- Navegação -->
-    <nav class="nav-menu" aria-label="Menu principal">
-      <a routerLink="/" class="nav-btn">
-        ← Voltar para Home
-      </a>
-    </nav>
-  </div>
+  </a>
+  <nav class="top-nav-back" aria-label="Navegação da página">
+    <a routerLink="/" class="nav-btn" title="Retornar à página inicial">
+      <svg
+        class="nav-btn-icon"
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.85"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <path d="M19 12H5M12 19l-7-7 7-7" />
+      </svg>
+      <span class="nav-btn-label">Voltar para Home</span>
+    </a>
+  </nav>
 </header>
 
 <!-- ========== MAIN CONTENT ========== -->
@@ -29,7 +36,9 @@
     <div class="container">
       <!-- Título Principal -->
       <header class="article-header">
-        <h1 class="article-title">Metodologia de Cálculo de Score</h1>
+        <h1 class="article-title">
+          Metodologia de <span class="article-title-highlight">Cálculo de Score</span>
+        </h1>
         <p class="article-intro">
           Este documento descreve a metodologia utilizada pela plataforma EcoTransparência para calcular
           o score de risco socioambiental das entidades consultadas.
@@ -292,7 +301,7 @@
     </div>
 
     <div class="footer-copy">
-      <p>&copy; 2025 EcoTransparência. Todos os direitos reservados.</p>
+      <p>&copy; 2026 EcoTransparência. Todos os direitos reservados.</p>
       <p class="footer-version">Versão 1.0.0</p>
     </div>
   </div>

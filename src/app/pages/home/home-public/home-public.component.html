@@ -300,6 +300,12 @@
             <li>
               <a href="#" class="footer-col-link" (click)="preventFooterPlaceholder($event)">Acessibilidade</a>
             </li>
+            <li>
+              <a href="#" class="footer-col-link" (click)="preventFooterPlaceholder($event)">Central de ajuda</a>
+            </li>
+            <li>
+              <a href="#" class="footer-col-link" (click)="preventFooterPlaceholder($event)">Notas de versão</a>
+            </li>
           </ul>
         </nav>
 
@@ -366,24 +372,4 @@
   </footer>
   <!-- Fim da “jornada” da home: IntersectionObserver encerra efeitos (sem listener de scroll) -->
   <div class="home-story-end-sentinel" aria-hidden="true"></div>
-</div>
-
-<!-- Ajuda fixa: canto inferior direito (somente nesta página) -->
-<div class="help-menu" (click)="$event.stopPropagation()">
-  <button
-    type="button"
-    class="help-toggle"
-    aria-label="Abrir menu de ajuda"
-    [attr.aria-expanded]="isHelpMenuOpen()"
-    (click)="toggleHelpMenu()"
-  >
-    ?
-  </button>
-
-  @if (isHelpMenuOpen()) {
-    <div class="help-dropdown" role="menu" aria-label="Menu de ajuda">
-      <button type="button" class="help-item" role="menuitem">Central de ajuda</button>
-      <button type="button" class="help-item" role="menuitem">Notas de versão</button>
-    </div>
-  }
 </div>

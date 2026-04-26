@@ -11,7 +11,7 @@ const STORAGE_KEY = 'ecotransparencia-appearance';
 export class ThemeService {
   private readonly document = inject(DOCUMENT);
 
-  /** Preferência salva: Sistema segue o SO, Claro/Escuro forçam. */
+  /** Preferência salva; sem valor gravado o padrão é escuro (evita seguir SO em claro). */
   readonly mode = signal<AppThemeMode>(this.readStored());
 
   private mql?: MediaQueryList;
@@ -51,7 +51,7 @@ export class ThemeService {
     } catch {
       /* ignore */
     }
-    return 'system';
+    return 'dark';
   }
 
   private applyToDom(): void {
