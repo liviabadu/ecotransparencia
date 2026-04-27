@@ -22,13 +22,11 @@ O quinto objetivo é **possibilitar a comparação entre entidades e regiões**.
 
 As regras de negócio definem as restrições e políticas que o sistema deve seguir durante sua operação.
 
-### RN01 - Validação de Consulta por Nome
 
-Quando o usuário realizar uma pesquisa por nome, o sistema deve validar se o campo de busca contém pelo menos 3 caracteres antes de executar a consulta. Consultas com menos de 3 caracteres devem retornar uma mensagem orientando o usuário a fornecer mais informações.
 
-### RN02 - Validação de CPF/CNPJ
+### RN02 - Validação de CNPJ
 
-O sistema deve validar o formato e os dígitos verificadores de CPF e CNPJ antes de processar a consulta. Para CPF, o formato esperado é XXX.XXX.XXX-XX (11 dígitos). Para CNPJ, o formato esperado é XX.XXX.XXX/XXXX-XX (14 dígitos). Documentos com formato inválido devem gerar mensagem de erro orientativa.
+O sistema deve validar o formato e os dígitos verificadores do CNPJ antes de processar a consulta. Para CNPJ, o formato esperado é XX.XXX.XXX/XXXX-XX (14 dígitos). Documentos com formato inválido devem gerar mensagem de erro orientativa.
 
 ### RN03 - Cálculo do Score de Risco
 
@@ -54,23 +52,8 @@ Cada etapa requer navegação em interfaces diferentes, com formatos de dados di
 
 ### Processo Proposto (TO-BE)
 
-O fluxo proposto com a EcoTransparência simplifica drasticamente esse processo. O usuário acessa a plataforma e realiza uma única consulta, informando nome ou CPF/CNPJ da entidade. O sistema automaticamente consulta todas as bases de dados integradas, consolida as informações encontradas, calcula o score de risco, e apresenta os resultados de forma organizada. O usuário pode então analisar os dados, gerar relatórios ou compartilhar os resultados conforme necessário.
+O fluxo proposto com a EcoTransparência simplifica drasticamente esse processo. O usuário acessa a plataforma e realiza uma única consulta, do CNPJ da entidade. O sistema automaticamente consulta todas as bases de dados integradas, consolida as informações encontradas, calcula o score de risco, e apresenta os resultados de forma organizada. O usuário pode então analisar os dados, gerar relatórios ou compartilhar os resultados conforme necessário.
 
-## Usuários do Sistema
-
-O sistema atende três perfis principais de usuários, cada um com necessidades e permissões específicas.
-
-### Perfil Gerente
-
-O gerente possui acesso completo a todas as funcionalidades do sistema. Pode realizar consultas, gerar relatórios, configurar parâmetros do sistema, gerenciar usuários e acessar estatísticas de uso. Este perfil é destinado a administradores da plataforma ou gestores de equipes que utilizam a ferramenta.
-
-### Perfil Funcionário
-
-O funcionário possui acesso às funcionalidades operacionais do sistema. Pode realizar consultas por nome ou CPF/CNPJ, visualizar resultados, gerar relatórios e exportar dados. Não possui acesso a configurações administrativas ou gestão de usuários.
-
-### Perfil Cliente
-
-O cliente representa usuários externos que acessam a plataforma para consultas pontuais. Possui acesso às funcionalidades básicas de consulta e visualização de resultados. Pode gerar relatórios simples, mas possui limitações em funcionalidades avançadas como comparação em lote ou dashboards personalizados.
 
 ## Fontes de Dados Integradas
 
