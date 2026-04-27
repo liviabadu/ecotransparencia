@@ -40,7 +40,7 @@ Por exemplo, para obter dados sobre embargos ambientais do IBAMA, o usuário pre
 
 ## Proposta de Valor
 
-A EcoTransparência transforma esse cenário fragmentado oferecendo uma única interface que consolida dados de múltiplas fontes governamentais. O usuário realiza uma única consulta por nome ou CPF/CNPJ e recebe um relatório completo com todas as informações relevantes, além de um score de risco calculado algoritmicamente.
+A EcoTransparência transforma esse cenário fragmentado oferecendo uma única interface que consolida dados de múltiplas fontes governamentais. O usuário realiza uma única consulta por CNPJ e recebe um relatório completo com todas as informações relevantes, além de um score de risco calculado algoritmicamente.
 
 Nossa plataforma não apenas agrega dados, mas os transforma em insights acionáveis, permitindo que usuários compreendam melhor os fatores de risco e proponham ações corretivas a seus clientes. A interface intuitiva garante que mesmo usuários sem conhecimento técnico possam navegar e utilizar as informações de forma eficaz.
 
@@ -52,8 +52,9 @@ A EcoTransparência é desenvolvida em conformidade com a Lei Geral de Proteçã
 
 O projeto é desenvolvido por uma equipe multidisciplinar de estudantes do curso de Análise e Desenvolvimento de Sistemas do Campus Taguatinga:
 
-- **Livia Maria Badu de Oliveira** - livia.oliveira@sempreceub.com
-- **Marlon Valadão** - valadao@sempreceub.com - Responsável pelo projeto
-- **Matheus Henrique Viana da Silva** - matheus.vsilva@sempreceub.com
-- **Maria Eduarda Sousa Sales** - eduardasales@sempreceub.com
-- **Carolina Mairinque**
+- **Livia Maria Badu de Oliveira** 
+- **Kaua Haddad**
+- **Nicole Teixeira**
+- **Rafael Henrique Lopes Aguiar**
+- **Matheus Henrique Viana da Silva** 
+-
