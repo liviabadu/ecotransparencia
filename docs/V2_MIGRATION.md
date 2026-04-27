@@ -1,6 +1,6 @@
 # Migração para API V2 - EcoTransparência
 
-## Data: 2025-12-08
+
 
 ## Resumo
 
