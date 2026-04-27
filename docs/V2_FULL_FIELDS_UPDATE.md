@@ -1,6 +1,6 @@
 # Atualização V2 - Campos Completos
 
-## Data: 2025-12-08
+
 
 ## Resumo
 
