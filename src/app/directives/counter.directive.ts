@@ -52,7 +52,9 @@ export class CounterDirective implements AfterViewInit, OnDestroy {
     this.durationMs = Number.parseInt(el.dataset['duration'] ?? '2000', 10) || 2000;
     this.delayMs = Number.parseInt(el.dataset['delay'] ?? '0', 10) || 0;
 
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const reduced =
+      typeof window.matchMedia === 'function' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (reduced) {
       requestAnimationFrame(() => {
         this.cacheDigitPx();

@@ -195,39 +195,41 @@
           <p class="cnpj-entity-header__doc">CNPJ {{ searchResult()?.entity?.document }}</p>
         </header>
 
-        <!-- CA07 - Score + barra 0–100 -->
-        <article
-          [ngClass]="['result-surface', 'result-surface--score', 'risk-tone--' + riskBandKey()]"
-          aria-labelledby="cnpj-score-heading"
-        >
-          <div class="result-score-grid">
-            <div class="result-score-main">
-              <p id="cnpj-score-heading" class="visually-hidden">
-                Score de risco {{ searchResult()?.scoreResult?.score }} de 100, nível {{ riskBandLabel() }}
-              </p>
-              <span class="result-score-value" aria-hidden="true">{{ searchResult()?.scoreResult?.score }}</span>
-              <span class="result-score-caption">Score de risco</span>
-              <div class="risk-meter" aria-hidden="true">
-                <div class="risk-meter__labels">
-                  <span>0</span>
-                  <span>100</span>
-                </div>
-                <div class="risk-meter__track">
-                  <div
-                    class="risk-meter__fill"
-                    [style.width.%]="clampScorePercent(searchResult()?.scoreResult?.score)"
-                  ></div>
+        <!-- CA07 - Score + barra 0–100 (oculto quando o back não retornou score, ex.: CNPJ apenas em listas raiz V2) -->
+        @if (searchResult()?.scoreResult) {
+          <article
+            [ngClass]="['result-surface', 'result-surface--score', 'risk-tone--' + riskBandKey()]"
+            aria-labelledby="cnpj-score-heading"
+          >
+            <div class="result-score-grid">
+              <div class="result-score-main">
+                <p id="cnpj-score-heading" class="visually-hidden">
+                  Score de risco {{ searchResult()?.scoreResult?.score }} de 100, nível {{ riskBandLabel() }}
+                </p>
+                <span class="result-score-value" aria-hidden="true">{{ searchResult()?.scoreResult?.score }}</span>
+                <span class="result-score-caption">Score de risco</span>
+                <div class="risk-meter" aria-hidden="true">
+                  <div class="risk-meter__labels">
+                    <span>0</span>
+                    <span>100</span>
+                  </div>
+                  <div class="risk-meter__track">
+                    <div
+                      class="risk-meter__fill"
+                      [style.width.%]="clampScorePercent(searchResult()?.scoreResult?.score)"
+                    ></div>
+                  </div>
                 </div>
               </div>
+              <div class="result-score-aside">
+                <span [ngClass]="['risk-pill', 'risk-pill--' + riskBandKey()]">
+                  {{ riskBandLabel() }}
+                </span>
+                <span class="result-score-scale">Escala 0–100</span>
+              </div>
             </div>
-            <div class="result-score-aside">
-              <span [ngClass]="['risk-pill', 'risk-pill--' + riskBandKey()]">
-                {{ riskBandLabel() }}
-              </span>
-              <span class="result-score-scale">Escala 0–100</span>
-            </div>
-          </div>
-        </article>
+          </article>
+        }
 
         <!-- ASG Score Breakdown (V2 API) -->
         @if (searchResult()?.entity?.asgScore) {
@@ -286,7 +288,7 @@
             </span>
             <div class="result-summary-text">
               <span class="result-summary-label">Resumo</span>
-              <p class="result-summary-strong">{{ occurrencesSummaryLabel(searchResult()?.entity?.asgScore?.totalOcorrencias ?? searchResult()?.scoreResult?.totalOccurrences) }}</p>
+              <p class="result-summary-strong">{{ occurrencesSummaryLabel(totalOccurrencesCount()) }}</p>
             </div>
           </div>
         </div>

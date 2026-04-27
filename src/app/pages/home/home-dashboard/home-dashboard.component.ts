@@ -339,7 +339,7 @@ export class HomeDashboard implements AfterViewInit, OnDestroy {
   private processSearchForScoreAlerts(cnpj: string, result: SearchResult): void {
     if (result.found && result.entity) {
       const e = result.entity;
-      const curr = { score: e.score, risk: this.normalizeRiskKey(e.riskLevel) };
+      const curr = { score: e.score ?? 0, risk: this.normalizeRiskKey(e.riskLevel) };
       const prev = this.scoreSnapshots()[cnpj];
       if (prev && (prev.score !== curr.score || prev.risk !== curr.risk)) {
         const msg = this.buildScoreChangeMessage(e.name, prev, curr);

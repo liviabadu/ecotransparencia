@@ -378,7 +378,7 @@ export class MockDataService {
 
     if (entity) {
       const scoreResult = this.scoreService.calculateScoreResult(
-        entity.score,
+        entity.score ?? 0,
         entity.occurrences
       );
       return {
@@ -405,7 +405,7 @@ export class MockDataService {
 
     if (entity) {
       const scoreResult = this.scoreService.calculateScoreResult(
-        entity.score,
+        entity.score ?? 0,
         entity.occurrences
       );
       return {
@@ -431,7 +431,7 @@ export class MockDataService {
     for (const e of cnpjs) {
       const key = e.sectorLabel.trim();
       const list = bySector.get(key) ?? [];
-      list.push(e.score);
+      list.push(e.score ?? 0);
       bySector.set(key, list);
     }
     const aggregated = [...bySector.entries()].map(([sectorKey, scores]) => {

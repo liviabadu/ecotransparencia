@@ -51,7 +51,7 @@ export class HomeScrollStory {
   }
 
   init(): void {
-    if (this.reduced) {
+    if (this.reduced || typeof IntersectionObserver === 'undefined') {
       this.zone.runOutsideAngular(() => {
         this.applyReducedMotionDefaults();
         this.root.classList.add('home-story--settled');

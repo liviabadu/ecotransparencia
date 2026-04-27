@@ -718,6 +718,56 @@ describe('Search', () => {
       expect(groupTitles.some((t) => t?.includes('Administrativo'))).toBe(true);
     });
 
+    it('synthesizes entity when back returns found:true without entity but with V2 root lists', async () => {
+      component.searchTerm.set('17.344.993/0001-11');
+      const searchPromise = component.onSearch();
+      const req = httpMock.expectOne((request) =>
+        request.url.includes('/api/search/document')
+      );
+      req.flush({
+        found: true,
+        sancoesAdmPublica: [
+          {
+            cadastro: 'CEIS',
+            codigoSancao: '305206',
+            nomeSancionado: 'KM INDUSTRIA E COMERCIO DE MOVEIS',
+            categoriaSancao: 'Impedimento de contratar',
+            dataInicioSancao: '2024-04-26',
+            orgaoSancionador: 'Prefeitura Municipal de Buritis (MG)',
+            ufOrgao: 'MG',
+            esferaOrgao: 'MUNICIPAL',
+            fundamentacaoLegal: 'LEI 8666',
+          },
+        ],
+        impedimentosCepim: [],
+        trabalhoEscravo: [],
+        icmbioAutos: [],
+        icmbioEmbargos: [],
+      });
+      await searchPromise;
+      fixture.detectChanges();
+
+      const result = component.searchResult();
+      expect(result?.found).toBe(true);
+      expect(result?.entity).toBeDefined();
+      expect(result?.entity?.document).toBe('17344993000111');
+      expect(result?.entity?.name).toBe('KM INDUSTRIA E COMERCIO DE MOVEIS');
+      expect(result?.entity?.score).toBeUndefined();
+      expect(result?.entity?.sancoesAdmPublica?.length).toBe(1);
+      expect(component.hasAdministrativoContent()).toBe(true);
+      expect(component.hasAmbientalContent()).toBe(false);
+      expect(component.totalOccurrencesCount()).toBe(1);
+
+      const compiled = fixture.nativeElement as HTMLElement;
+      // Bloco CA07 (score numérico) não deve aparecer quando não há scoreResult
+      expect(compiled.querySelector('.result-surface--score')).toBeNull();
+      // Grupo Administrativo deve estar presente
+      const groupTitles = Array.from(
+        compiled.querySelectorAll('.result-group__title')
+      ).map((el) => el.textContent?.trim() ?? '');
+      expect(groupTitles.some((t) => t.includes('Administrativo'))).toBe(true);
+    });
+
     it('renders no group headers when no occurrences', async () => {
       component.searchTerm.set('99.999.999/0001-91');
       const searchPromise = component.onSearch();

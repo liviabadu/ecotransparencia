@@ -204,6 +204,46 @@ export interface ApiSearchResponse {
   icmbioEmbargos?: ApiIcmbioEmbargo[];
 }
 
+function hasV2RootListMatch(response: ApiSearchResponse): boolean {
+  return !!(
+    response.sancoesAdmPublica?.length ||
+    response.impedimentosCepim?.length ||
+    response.trabalhoEscravo?.length ||
+    response.icmbioAutos?.length ||
+    response.icmbioEmbargos?.length
+  );
+}
+
+function inferNameFromV2Lists(response: ApiSearchResponse): string {
+  return (
+    response.sancoesAdmPublica?.[0]?.nomeSancionado ||
+    response.trabalhoEscravo?.[0]?.empregador ||
+    response.impedimentosCepim?.[0]?.nomeEntidade ||
+    response.icmbioAutos?.[0]?.autuado ||
+    response.icmbioEmbargos?.[0]?.autuado ||
+    'Entidade não identificada'
+  );
+}
+
+function synthesizeEntityFromV2Lists(
+  response: ApiSearchResponse,
+  document: string,
+  documentType: 'cpf' | 'cnpj'
+): Entity {
+  return {
+    id: document,
+    name: inferNameFromV2Lists(response),
+    document,
+    documentType,
+    occurrences: [],
+    sancoesAdmPublica: response.sancoesAdmPublica as SancaoAdmPublica[] | undefined,
+    impedimentosCepim: response.impedimentosCepim as ImpedimentoCepim[] | undefined,
+    trabalhoEscravo: response.trabalhoEscravo as TrabalhoEscravo[] | undefined,
+    icmbioAutos: response.icmbioAutos as IcmbioAuto[] | undefined,
+    icmbioEmbargos: response.icmbioEmbargos as IcmbioEmbargo[] | undefined,
+  };
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -225,7 +265,7 @@ export class ApiService {
         params: { document: cleanDocument, type },
       })
       .pipe(
-        map((response) => this.mapApiResponseToSearchResult(response)),
+        map((response) => this.mapApiResponseToSearchResult(response, cleanDocument, type)),
         catchError((err) => this.fallbackDocumentSearchFromMockIfDev(document, type, err))
       );
   }
@@ -265,9 +305,15 @@ export class ApiService {
   }
 
   /**
-   * Maps API response to frontend SearchResult model
+   * Maps API response to frontend SearchResult model.
+   * `requestDocument` / `requestType` permitem sintetizar entity quando o back
+   * marca `found: true` mas só popula listas raiz V2 (CEIS/CNEP, CEPIM, MTE, ICMBio).
    */
-  private mapApiResponseToSearchResult(response: ApiSearchResponse): SearchResult {
+  private mapApiResponseToSearchResult(
+    response: ApiSearchResponse,
+    requestDocument?: string,
+    requestType?: 'cpf' | 'cnpj'
+  ): SearchResult {
     // Handle blocked by situacao cadastral case
     if (response.bloqueadoPorSituacaoCadastral) {
       return {
@@ -275,6 +321,11 @@ export class ApiService {
         bloqueadoPorSituacaoCadastral: true,
         situacaoCadastral: response.situacaoCadastral,
       };
+    }
+
+    if (response.found && !response.entity && hasV2RootListMatch(response) && requestDocument) {
+      const entity = synthesizeEntityFromV2Lists(response, requestDocument, requestType ?? 'cnpj');
+      return { found: true, entity };
     }
 
     if (!response.found || !response.entity) {
@@ -300,7 +351,7 @@ export class ApiService {
     };
 
     const scoreResult = this.scoreService.calculateScoreResult(
-      entity.score,
+      entity.score ?? 0,
       entity.occurrences
     );
 

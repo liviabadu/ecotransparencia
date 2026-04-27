@@ -176,8 +176,10 @@ export interface Entity {
   name: string;
   document: string;
   documentType: 'cpf' | 'cnpj';
-  score: number;
-  riskLevel: RiskLevel;
+  /** Ausente quando o back retornou ocorrências apenas via listas raiz V2 (sem IBAMA). */
+  score?: number;
+  /** Ausente quando o back retornou ocorrências apenas via listas raiz V2 (sem IBAMA). */
+  riskLevel?: RiskLevel;
   occurrences: Occurrence[];
   asgScore?: AsgScore;
   ocorrencias?: Ocorrencias;

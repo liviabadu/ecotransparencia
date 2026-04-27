@@ -55,6 +55,28 @@ export class Search implements OnDestroy {
   private favoriteToastClearTimer: ReturnType<typeof setTimeout> | null = null;
   private favoriteToastDismissFallback: ReturnType<typeof setTimeout> | null = null;
 
+  /**
+   * Conta total de ocorrências cobrindo as 7 fontes V2.
+   * Usa `asgScore.totalOcorrencias` quando o back o retornou; senão soma o que chegou
+   * (necessário para entidades sintetizadas a partir de listas raiz V2 sem score).
+   */
+  readonly totalOccurrencesCount = computed(() => {
+    const e = this.searchResult()?.entity;
+    if (!e) return 0;
+    if (typeof e.asgScore?.totalOcorrencias === 'number') {
+      return e.asgScore.totalOcorrencias;
+    }
+    return (
+      (e.ocorrencias?.embargos?.length ?? 0) +
+      (e.ocorrencias?.autosInfracao?.length ?? 0) +
+      (e.sancoesAdmPublica?.length ?? 0) +
+      (e.impedimentosCepim?.length ?? 0) +
+      (e.trabalhoEscravo?.length ?? 0) +
+      (e.icmbioAutos?.length ?? 0) +
+      (e.icmbioEmbargos?.length ?? 0)
+    );
+  });
+
   /** Há ao menos uma ocorrência ambiental (IBAMA ou ICMBio) para renderizar o grupo. */
   readonly hasAmbientalContent = computed(() => {
     const e = this.searchResult()?.entity;
