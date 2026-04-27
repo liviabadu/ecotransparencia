@@ -7,11 +7,11 @@
 ---
 **O projeto é desenvolvido pela turma do 4º semestre de Análise e Desenvolvimento de Sistemas do Campus Taguatinga?**
 
--Livia Maria Badu de Oliveira-
--Kaua Nascimento-
--Nicole Teixeira- 
--Rafael Lopes-
--Matheus Henrique Viana da Silva-
+- Livia Maria Badu de Oliveira
+- Kaua Nascimento
+- Nicole Teixeira
+- Rafael Lopes
+- Matheus Henrique Viana da Silva
 
 ## Índice
 
