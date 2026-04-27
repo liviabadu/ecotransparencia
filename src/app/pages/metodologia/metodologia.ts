@@ -8,4 +8,9 @@ import { RouterLink } from '@angular/router';
   templateUrl: './metodologia.html',
   styleUrl: './metodologia.css',
 })
-export class Metodologia {}
+export class Metodologia {
+  /** Rodapé com href="#" (placeholders): evita saltar ao topo */
+  preventFooterPlaceholder(event: Event): void {
+    event.preventDefault();
+  }
+}

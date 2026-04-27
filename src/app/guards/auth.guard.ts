@@ -6,13 +6,6 @@ export const authGuard: CanActivateFn = () => {
   const authService = inject(AuthService);
   const router = inject(Router);
 
-  // Wait for auth state to be determined
-  if (authService.isLoading()) {
-    // If still loading, we could return a Promise or redirect
-    // For simplicity, we'll allow and let the component handle it
-    return true;
-  }
-
   if (authService.isAuthenticated()) {
     return true;
   }

@@ -1,1 +1,505 @@
-/* You can add global styles to this file, and also import other style files */
+/* ============================================================================
+   ECOTRANSPARÊNCIA - GLOBAL THEME (Tech / Vivo / Inovador)
+   ============================================================================ */
+
+:root {
+  --bg-0: #070b12;
+  --bg-1: #0b1220;
+  --surface-0: rgba(255, 255, 255, 0.06);
+  --surface-1: rgba(255, 255, 255, 0.09);
+  --border-0: rgba(255, 255, 255, 0.12);
+  --border-1: rgba(255, 255, 255, 0.18);
+
+  --text-0: rgba(255, 255, 255, 0.92);
+  --text-1: rgba(255, 255, 255, 0.78);
+  --text-2: rgba(255, 255, 255, 0.6);
+
+  /* Verde como identidade (com acento tech) */
+  --brand-0: #22c55e; /* green neon */
+  --brand-1: #34d399; /* emerald */
+  --brand-2: #2dd4bf; /* teal (acento tecnológico) */
+  --danger: #ef4444;
+  --warn: #f59e0b;
+
+  --shadow-1: 0 8px 24px rgba(0, 0, 0, 0.22);
+  --shadow-2: 0 14px 40px rgba(0, 0, 0, 0.28);
+
+  --radius-md: 14px;
+  --radius-lg: 20px;
+
+  --ring: 0 0 0 3px rgba(45, 212, 191, 0.35);
+  /*
+   * Fontes: @fontsource-variable no bundle (angular.json). Cada @font-face usa font-display: swap.
+   * Fallbacks próximos de Inter/Space Grotesk em largura reduzem salto (FOUT) no primeiro paint.
+   */
+  --font-sans: "Inter Variable", Inter, "Segoe UI", system-ui, -apple-system, Roboto, Helvetica,
+    Arial, sans-serif;
+  --font-display: "Space Grotesk Variable", "Space Grotesk", "Segoe UI", system-ui, -apple-system,
+    Roboto, Helvetica, Arial, sans-serif;
+
+  /* Scrim compartilhado: configurações + véu login/cadastro */
+  --app-modal-scrim-bg: rgba(0, 0, 0, 0.62);
+  --app-modal-scrim-duration: 0.22s;
+  --app-modal-scrim-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --app-modal-scrim-duration-leave: 0.18s;
+
+  /*
+   * Barra lateral estreita (.app-sidebar-rail) — mesma base da caixa da marca em todo o site.
+   */
+  --app-sidebar-surface-top: #0d1528;
+  --app-sidebar-surface: #0b1220;
+  --app-sidebar-surface-bottom: #090f1a;
+  --app-sidebar-edge: rgba(52, 125, 102, 0.38);
+  --app-sidebar-edge-accent: rgba(42, 98, 80, 0.22);
+  --logo-mark-rail-bg: linear-gradient(
+    180deg,
+    var(--app-sidebar-surface-top) 0%,
+    var(--app-sidebar-surface) 45%,
+    var(--app-sidebar-surface-bottom) 100%
+  );
+  /* Caixa da marca: rail + véu verde/teal da identidade (menos “bloco chapado”) */
+  --logo-mark-brand-bg:
+    radial-gradient(ellipse 130% 90% at 50% -25%, rgba(52, 211, 153, 0.2), transparent 55%),
+    linear-gradient(
+      155deg,
+      rgba(34, 197, 94, 0.12) 0%,
+      transparent 45%,
+      rgba(45, 212, 191, 0.1) 100%
+    ),
+    var(--logo-mark-rail-bg);
+
+  /* Logo: “eco” / “TRANSPARÊNCIA” sobre fundo rail (caixa escura) */
+  --logo-eco-text-dark: #d2ede3;
+  --logo-eco-glow-dark: rgba(52, 211, 153, 0.14);
+
+  --leading-body: 1.65;
+  --leading-tight: 1.1;
+  --measure: 68ch;
+
+  /* Barra vertical à esquerda (espessura) + recuo interno dos ícones */
+  --app-left-rail-width: 56px;
+  --app-left-rail-pad-inline: 10px;
+  --app-left-rail-pad-block: 12px;
+  --app-left-rail-hit: calc(var(--app-left-rail-width) - 2 * var(--app-left-rail-pad-inline));
+
+  /* Barra de rolagem (Firefox herda de html; WebKit abaixo) */
+  --scrollbar-size: 10px;
+  --scrollbar-track: rgba(255, 255, 255, 0.05);
+  --scrollbar-thumb: rgba(52, 211, 153, 0.38);
+  --scrollbar-thumb-hover: rgba(52, 211, 153, 0.62);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* instantâneo no documento: evita scroll “arrastado” ao trocar de rota (páginas longas) */
+html {
+  scroll-behavior: auto;
+  /* Evita zoom/reflow de texto no mobile que parece “pulo” de tamanho */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  color: var(--text-0);
+  /* Menos camadas que o hero já repete — repintura do body mais barata ao rolar */
+  background:
+    radial-gradient(1000px 620px at 20% 8%, rgba(34, 197, 94, 0.16), transparent 58%),
+    radial-gradient(900px 560px at 88% 88%, rgba(45, 212, 191, 0.1), transparent 55%),
+    linear-gradient(180deg, var(--bg-0), var(--bg-1));
+  overflow-x: hidden;
+  /* optimizeLegibility pode custar mais durante repaint ao rolar */
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Chrome / Edge / Safari: trilha fina, polegar arredondado com tom da marca */
+*::-webkit-scrollbar {
+  width: var(--scrollbar-size);
+  height: var(--scrollbar-size);
+}
+
+*::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+  border-radius: 999px;
+  margin-block: 4px;
+}
+
+*::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  background-image: linear-gradient(
+    180deg,
+    rgba(52, 211, 153, 0.55),
+    rgba(34, 197, 94, 0.42)
+  );
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background-image: linear-gradient(
+    180deg,
+    rgba(52, 211, 153, 0.78),
+    rgba(34, 197, 94, 0.58)
+  );
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.18);
+}
+
+*::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* Mesmo fundo do body até o Angular pintar o outlet (evita faixa “vazia” no F5) */
+app-root {
+  display: block;
+  min-height: 100%;
+  background: inherit;
+}
+
+a {
+  color: inherit;
+}
+
+a.btn,
+a.btn:hover,
+a.btn:focus,
+a.btn:active {
+  text-decoration: none;
+}
+
+p {
+  margin: 0;
+  line-height: var(--leading-body);
+  color: var(--text-1);
+}
+
+:where(h1, h2, h3) {
+  margin: 0;
+  letter-spacing: -0.02em;
+  color: var(--text-0);
+  font-family: var(--font-display);
+  line-height: var(--leading-tight);
+}
+
+h1 {
+  letter-spacing: -0.03em;
+}
+
+small {
+  color: var(--text-2);
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.stack > * + * {
+  margin-top: 12px;
+}
+
+.prose {
+  max-width: var(--measure);
+}
+
+::selection {
+  background: rgba(45, 212, 191, 0.25);
+}
+
+:where(a, button, input, textarea, select):focus-visible {
+  outline: none;
+  box-shadow: var(--ring);
+  border-radius: 10px;
+}
+
+.glass {
+  background: rgba(255, 255, 255, 0.09);
+  border: 1px solid var(--border-0);
+  box-shadow: var(--shadow-1);
+}
+
+.btn {
+  border: 1px solid var(--border-0);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.10), rgba(255, 255, 255, 0.05));
+  color: var(--text-0);
+  text-decoration: none;
+  border-radius: 12px;
+  padding: 10px 16px;
+  font-weight: 650;
+  cursor: pointer;
+  transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  border-color: var(--border-1);
+  box-shadow: var(--shadow-1);
+}
+
+.btn-primary {
+  border-color: rgba(45, 212, 191, 0.35);
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.22), rgba(45, 212, 191, 0.18));
+}
+
+.card {
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-0);
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: var(--shadow-1);
+}
+
+/* ============================================================================
+   .counter — odômetro (diretiva CounterDirective)
+   ============================================================================ */
+.counter.counter--odometer {
+  display: inline-flex;
+  align-items: flex-end;
+  justify-content: center;
+  flex-wrap: nowrap;
+  gap: 0.04em;
+  line-height: 1;
+  vertical-align: bottom;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+/* Só o texto dos números — sem caixa, borda nem sombra no odômetro */
+.counter,
+.counter * {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  filter: none;
+}
+
+.odometer-digit {
+  display: inline-block;
+  position: relative;
+  overflow: hidden;
+  vertical-align: bottom;
+  height: 1em;
+  min-width: 0.52em;
+  text-align: center;
+}
+
+.odometer-digit__strip {
+  display: flex;
+  flex-direction: column;
+}
+
+.odometer-cell {
+  display: block;
+  height: 1em;
+  line-height: 1em;
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.counter-static,
+.counter-suffix {
+  display: inline-block;
+  align-self: flex-end;
+  line-height: 1;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.stat-number .odometer-cell {
+  color: #a7f3d0;
+}
+
+/* Cor sólida (sem background/clip no texto) para +, M+, / */
+.stat-number .counter-suffix,
+.stat-number .counter-static {
+  -webkit-background-clip: unset;
+  background-clip: unset;
+  color: #a7f3d0;
+}
+
+/* ========== Aparência: modo claro (e Sistema quando o SO está claro) ========== */
+
+html[data-app-theme="light"] {
+  --bg-0: #f1f5f9;
+  --bg-1: #e2e8f0;
+  --surface-0: rgba(15, 23, 42, 0.06);
+  --surface-1: rgba(15, 23, 42, 0.09);
+  --border-0: rgba(15, 23, 42, 0.12);
+  --border-1: rgba(15, 23, 42, 0.2);
+  --text-0: rgba(15, 23, 42, 0.92);
+  --text-1: rgba(15, 23, 42, 0.72);
+  --text-2: rgba(15, 23, 42, 0.52);
+  --shadow-1: 0 8px 24px rgba(15, 23, 42, 0.08);
+  --shadow-2: 0 14px 40px rgba(15, 23, 42, 0.1);
+  --ring: 0 0 0 3px rgba(34, 197, 94, 0.35);
+  --scrollbar-track: rgba(15, 23, 42, 0.07);
+  --scrollbar-thumb: rgba(34, 197, 94, 0.48);
+  --scrollbar-thumb-hover: rgba(22, 163, 74, 0.65);
+}
+
+html[data-app-theme="light"] body {
+  background:
+    radial-gradient(1000px 620px at 20% 8%, rgba(34, 197, 94, 0.14), transparent 58%),
+    radial-gradient(900px 560px at 88% 88%, rgba(45, 212, 191, 0.1), transparent 55%),
+    linear-gradient(180deg, var(--bg-0), var(--bg-1));
+}
+
+html[data-app-theme="light"] ::selection {
+  background: rgba(34, 197, 94, 0.22);
+}
+
+html[data-app-theme="light"] *::-webkit-scrollbar-thumb {
+  background-image: linear-gradient(
+    180deg,
+    rgba(34, 197, 94, 0.72),
+    rgba(22, 163, 74, 0.55)
+  );
+  box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.1);
+}
+
+html[data-app-theme="light"] *::-webkit-scrollbar-thumb:hover {
+  background-image: linear-gradient(
+    180deg,
+    rgba(34, 197, 94, 0.88),
+    rgba(22, 163, 74, 0.7)
+  );
+  box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.12);
+}
+
+@media (prefers-color-scheme: light) {
+  html[data-app-theme="system"] {
+    --bg-0: #f1f5f9;
+    --bg-1: #e2e8f0;
+    --surface-0: rgba(15, 23, 42, 0.06);
+    --surface-1: rgba(15, 23, 42, 0.09);
+    --border-0: rgba(15, 23, 42, 0.12);
+    --border-1: rgba(15, 23, 42, 0.2);
+    --text-0: rgba(15, 23, 42, 0.92);
+    --text-1: rgba(15, 23, 42, 0.72);
+    --text-2: rgba(15, 23, 42, 0.52);
+    --shadow-1: 0 8px 24px rgba(15, 23, 42, 0.08);
+    --shadow-2: 0 14px 40px rgba(15, 23, 42, 0.1);
+    --ring: 0 0 0 3px rgba(34, 197, 94, 0.35);
+    --scrollbar-track: rgba(15, 23, 42, 0.07);
+    --scrollbar-thumb: rgba(34, 197, 94, 0.48);
+    --scrollbar-thumb-hover: rgba(22, 163, 74, 0.65);
+  }
+
+  html[data-app-theme="system"] body {
+    background:
+      radial-gradient(1000px 620px at 20% 8%, rgba(34, 197, 94, 0.14), transparent 58%),
+      radial-gradient(900px 560px at 88% 88%, rgba(45, 212, 191, 0.1), transparent 55%),
+      linear-gradient(180deg, var(--bg-0), var(--bg-1));
+  }
+
+  html[data-app-theme="system"] ::selection {
+    background: rgba(34, 197, 94, 0.22);
+  }
+
+  html[data-app-theme="system"] *::-webkit-scrollbar-thumb {
+    background-image: linear-gradient(
+      180deg,
+      rgba(34, 197, 94, 0.72),
+      rgba(22, 163, 74, 0.55)
+    );
+    box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.1);
+  }
+
+  html[data-app-theme="system"] *::-webkit-scrollbar-thumb:hover {
+    background-image: linear-gradient(
+      180deg,
+      rgba(34, 197, 94, 0.88),
+      rgba(22, 163, 74, 0.7)
+    );
+    box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.12);
+  }
+}
+
+/* ============================================================================
+   Scrim / backdrop (mesmo token do modal de configurações + login/cadastro)
+   ============================================================================ */
+
+/* Overlay fixo: modal de configurações (z-index alinhado ao shell) */
+.app-modal-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 1080;
+  background: var(--app-modal-scrim-bg);
+  opacity: 0;
+  transition: opacity var(--app-modal-scrim-duration) var(--app-modal-scrim-ease);
+}
+
+.app-modal-scrim.is-mounted {
+  opacity: 1;
+}
+
+.app-modal-scrim.is-leaving {
+  opacity: 0;
+  transition: opacity var(--app-modal-scrim-duration-leave) ease-in;
+}
+
+.app-settings-overlay.app-modal-scrim {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right))
+    max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+}
+
+/* Véu atrás do formulário em /login e /cadastro (AuthBehindHome): mesma cor e transição */
+.auth-behind-dim {
+  background: var(--app-modal-scrim-bg);
+  opacity: 0;
+  transition: opacity var(--app-modal-scrim-duration) var(--app-modal-scrim-ease);
+}
+
+.auth-behind-dim.is-mounted {
+  opacity: 1;
+}
+
+.auth-behind-root.is-leaving .auth-behind-dim {
+  opacity: 0;
+  transition: opacity var(--app-modal-scrim-duration-leave) ease-in;
+}
+
+/* Login/cadastro: scrim só sobre a rail — mesmos tempos do véu .auth-behind-dim (sincronizado no App). */
+.app-auth-rail-scrim {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: var(--app-left-rail-width, 56px);
+  z-index: 1041;
+  background: var(--app-modal-scrim-bg);
+  pointer-events: none;
+  box-sizing: border-box;
+  opacity: 0;
+  /* Saída: mesmo ritmo do véu .auth-behind-root.is-leaving .auth-behind-dim */
+  transition: opacity var(--app-modal-scrim-duration-leave) ease-in;
+}
+
+.app-auth-rail-scrim.is-mounted {
+  opacity: 1;
+  transition: opacity var(--app-modal-scrim-duration) var(--app-modal-scrim-ease);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-auth-rail-scrim {
+    transition-duration: 0.01ms;
+  }
+}
+

@@ -64,7 +64,7 @@ describe('Login', () => {
     const fixture = TestBed.createComponent(Login);
     await fixture.whenStable();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Área Administrativa');
+    expect(compiled.querySelector('h1')?.textContent).toContain('Entrar');
   });
 
   it('should have back link to home page', async () => {

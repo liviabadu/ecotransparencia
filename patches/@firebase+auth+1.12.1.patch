@@ -1,0 +1,44 @@
+diff --git a/node_modules/@firebase/auth/dist/browser-cjs/index-ac6fb6b2.js b/node_modules/@firebase/auth/dist/browser-cjs/index-ac6fb6b2.js
+index f5ec195..d21148c 100644
+--- a/node_modules/@firebase/auth/dist/browser-cjs/index-ac6fb6b2.js
++++ b/node_modules/@firebase/auth/dist/browser-cjs/index-ac6fb6b2.js
+@@ -9447,7 +9447,7 @@ class AbstractPopupRedirectOperation {
+  * See the License for the specific language governing permissions and
+  * limitations under the License.
+  */
+-const _POLL_WINDOW_CLOSE_TIMEOUT = new Delay(2000, 10000);
++const _POLL_WINDOW_CLOSE_TIMEOUT = new Delay(300, 10000);
+ /**
+  * Authenticates a Firebase client using a popup-based OAuth authentication flow.
+  *
+@@ -9632,7 +9632,7 @@ class PopupOperation extends AbstractPopupRedirectOperation {
+                 this.pollId = window.setTimeout(() => {
+                     this.pollId = null;
+                     this.reject(_createError(this.auth, "popup-closed-by-user" /* AuthErrorCode.POPUP_CLOSED_BY_USER */));
+-                }, 8000 /* _Timeout.AUTH_EVENT */);
++                }, 500 /* _Timeout.AUTH_EVENT */);
+                 return;
+             }
+             this.pollId = window.setTimeout(poll, _POLL_WINDOW_CLOSE_TIMEOUT.get());
+diff --git a/node_modules/@firebase/auth/dist/esm/index-3398f4bb.js b/node_modules/@firebase/auth/dist/esm/index-3398f4bb.js
+index 1cf5cc2..2dee4dd 100644
+--- a/node_modules/@firebase/auth/dist/esm/index-3398f4bb.js
++++ b/node_modules/@firebase/auth/dist/esm/index-3398f4bb.js
+@@ -9445,7 +9445,7 @@ class AbstractPopupRedirectOperation {
+  * See the License for the specific language governing permissions and
+  * limitations under the License.
+  */
+-const _POLL_WINDOW_CLOSE_TIMEOUT = new Delay(2000, 10000);
++const _POLL_WINDOW_CLOSE_TIMEOUT = new Delay(300, 10000);
+ /**
+  * Authenticates a Firebase client using a popup-based OAuth authentication flow.
+  *
+@@ -9630,7 +9630,7 @@ class PopupOperation extends AbstractPopupRedirectOperation {
+                 this.pollId = window.setTimeout(() => {
+                     this.pollId = null;
+                     this.reject(_createError(this.auth, "popup-closed-by-user" /* AuthErrorCode.POPUP_CLOSED_BY_USER */));
+-                }, 8000 /* _Timeout.AUTH_EVENT */);
++                }, 500 /* _Timeout.AUTH_EVENT */);
+                 return;
+             }
+             this.pollId = window.setTimeout(poll, _POLL_WINDOW_CLOSE_TIMEOUT.get());

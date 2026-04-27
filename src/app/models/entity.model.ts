@@ -112,6 +112,8 @@ export interface Entity {
   occurrences: Occurrence[];
   asgScore?: AsgScore;
   ocorrencias?: Ocorrencias;
+  /** Setor econômico resumido (ex.: CNAE agregado) — opcional; mock / API. */
+  sectorLabel?: string;
 }
 
 export interface SituacaoCadastral {
