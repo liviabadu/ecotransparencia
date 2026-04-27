@@ -1,0 +1,201 @@
+CENTRO UNIVERSITÁRIO DE BRASÍLIA 
+FACULDADE DE TECNOLOGIA E CIÊNCIAS SOCIAIS 
+APLICADAS 
+RESUMO EXECUTIVO 
+EcoTransparência 
+Membros do Projeto 
+22510210 - Nicole Teixeira Lima 
+22409512 - Livia Maria Badu de 
+Oliveira  
+22403158 - Kauã Haddad Eccard 
+Nascimento 
+22403343 - Rafael Henrique Lopes 
+de Aguiar 
+22408667 - Matheus Henrique Viana 
+da Silva 
+Orientador 
+Prof. MSc.Tiago  
+BRASÍLIA, Abril de 2026 
+AGRADECIMENTOS 
+Registramos nosso agradecimento a todos que contribuíram para a realização deste projeto. 
+Aos docentes, pelo direcionamento e apoio, aos colegas, pela parceria ao longo do 
+desenvolvimento; e aos familiares, pelo suporte e motivação constantes. O envolvimento de 
+cada um foi importante para a conclusão deste trabalho. 
+RESUMO 
+A EcoTransparência é uma plataforma digital inovadora que democratiza o acesso a 
+informações sobre responsabilidade socioambiental das empresas brasileiras. Consolidamos 
+dados públicos de diversas fontes governamentais, calculamos pontuações de risco ASG 
+(Ambiental, Social e Governança), e oferecemos uma visão clara e atualizada do perfil de 
+risco de cada organização. 
+Palavras-chave: pesquisa, transparência, dados e informação. 
+ 
+ 
+ 
+ 
+SUMÁRIO 
+1. PROBLEMA/OPORTUNIDADE 3 
+2. BENEFÍCIOS DA SOLUÇÃO 4 
+3. PÚBLICO-ALVO 4 
+4. PROTÓTIPO VISUAL 4 
+5. CONSIDERAÇÕES FINAIS 4 
+REFERÊNCIAS 4 
+ 
+ 
+ 
+ 
+ 
+
+
+1. PROBLEMA/OPORTUNIDADE 
+O Brasil enfrenta um desafio crítico na gestão de informações socioambientais corporativas: 
+
+1. Fragmentação de Dados 
+Informações críticas sobre sustentabilidade estão espalhadas em vários portais 
+governamentais (IBAMA, ICMBio, Ministério do Trabalho, Portal de Dados Abertos), cada um 
+com formatos e interfaces distintas. 
+
+2. Dificuldade de Acesso 
+Para avaliar o risco socioambiental de uma empresa, é necessário consultar manualmente 
+diversas bases de dados, interpretar formatos diferentes e consolidar informações de forma 
+manual. 
+
+3. Tomada de Decisão Prejudicada 
+Instituições financeiras, investidores e parceiros comerciais frequentemente tomam decisões 
+com base em informações incompletas ou desatualizadas, aumentando a exposição a riscos 
+reputacionais, legais e financeiros. 
+
+4. Falta de Padronização 
+
+Não existe um score padronizado que permita comparar o perfil de risco socioambiental entre 
+diferentes empresas de forma objetiva. 
+5. Barreiras para Pequenos Atores 
+Pequenas empresas e organizações não possuem recursos para realizar due diligence 
+socioambiental completa de seus parceiros e fornecedores. 
+
+A SOLUÇÃO – ECOTRANSPARÊNCIA 
+
+A EcoTransparência oferece uma plataforma centralizada e gratuita que resolve esses 
+problemas através de: 
+
+Consolidação Automatizada 
+Agregamos dados de diversas fontes oficiais em uma única interface, eliminando a 
+necessidade de consultas manuais em diversos portais. 
+
+Pontuação ASG Calculada 
+Transformamos dados brutos em uma pontuação de risco de 0 a 100 pontos, classificados em 
+quatro níveis: 
+Não. Nível Significado 
+0–25 Baixo Pouco ou nenhum registro de ocorrências 
+26–5
+0 
+Médio Algumas ocorrências de menor gravidade 
+51–7
+5 
+Alto Múltiplas ocorrências ativas ou de maior 
+gravidade 
+ 
+76–1
+00 
+Crítico Túmulo histórico com múltiplas infrações 
+ativas 
+Atualização Contínua 
+Os dados são sincronizados periodicamente com as bases governamentais, garantindo 
+informações atualizadas. 
+ 
+2. BENEFÍCIOS DA SOLUÇÃO 
+ 
+ 1. Gratuidade 
+Acesso livre a informações que são públicas por natureza. 
+2. Simplicidade 
+Interface intuitiva com busca por CNPJ. 
+3. Confiabilidade 
+Dados provenientes exclusivamente de fontes governamentais oficiais. 
+4. Transparência 
+Metodologia de cálculo do score pública e auditável. 
+5. Conclusão 
+Consolidação de múltiplas categorias de ocorrências. 
+ 
+ 
+3. PÚBLICO-ALVO 
+Segmento Necessidade Benefícios 
+Instituições 
+Financeiras 
+Avaliar riscos na concessão de 
+crédito 
+Redução de exposição a clientes 
+com passivos ambientais 
+Empresas Conhecer a situação de 
+parceiros e fornecedores 
+Due diligence automatizada na 
+cadeia de suprimentos 
+Órgãos 
+Reguladores 
+Monitorar conformidade 
+setorial 
+Visão consolidada para fiscalização 
+Investidores Avaliar sustentabilidade de 
+investimentos 
+Apoio a decisões ESG informadas 
+ONGs e 
+Pesquisadores 
+Acompanhar questões 
+socioambientais 
+Acesso facilitado a dados públicos 
+Cidadãos Conhecer práticas de 
+empresas 
+Empoderamento para consumo 
+consciente 
+ 
+ 
+4. PROTÓTIPO VISUAL 
+https://ecotransparencia-d786e.web.app/ 
+
+5. CONSIDERAÇÕES FINAIS 
+O desenvolvimento da aplicação Eco Transparência atingiu com êxito os objetivos 
+propostos, oferecendo uma ferramenta eficiente para consulta de informações relacionadas a 
+embargos e autuações ambientais por meio da pesquisa de CNPJ. A solução demonstrou-se 
+funcional, acessível e alinhada às demandas por maior transparência e responsabilidade 
+socioambiental, permitindo que usuários tenham acesso facilitado a dados relevantes para a 
+tomada de decisão. Além disso, a aplicação contribui para a conscientização sobre práticas 
+ambientais, incentivando a adoção de condutas mais sustentáveis por parte das organizações. 
+Com uma interface intuitiva e foco na usabilidade, o sistema promove agilidade na obtenção 
+das informações e melhora a confiabilidade das análises realizadas pelos usuários. 
+
+6. REFERÊNCIAS 
+Bases de dados governamentais 
+IBAMA – Embargos e Autuações Ambientais 
+BRASIL. Instituto Brasileiro do Meio Ambiente e dos Recursos Naturais Renováveis (IBAMA). Consulta 
+pública de áreas embargadas e autuações ambientais. Disponível em: 
+<https://servicos.ibama.gov.br/ctf/publico/areasembargadas/>. Acesso em: 27 abr. 2026. 
+[servicos.i...ama.gov.br] 
+ICMBio – Áreas Embargadas 
+BRASIL. Instituto Chico Mendes de Conservação da Biodiversidade (ICMBio). Áreas embargadas – dados 
+geoespaciais. Disponível em: 
+<https://www.gov.br/icmbio/pt-br/assuntos/dados_geoespaciais/mapa-tematico-e-dados-geoestatisticos-d
+as-unidades-de-conservacao-federais>. Acesso em: 27 abr. 2026. 
+(Arquivo: Áreas Embargadas ICMBio – XLSX). [gov.br] 
+ICMBio – Autos de Infração 
+BRASIL. Instituto Chico Mendes de Conservação da Biodiversidade (ICMBio). Autos de infração ambiental – 
+dados abertos. Disponível em: 
+<https://www.gov.br/icmbio/pt-br/acesso-a-informacao/autuacoes-ambientais/infracoes-ambientais>. 
+Acesso em: 27 abr. 2026. 
+(Arquivo: Autos de Infração ICMBio – XLSX). [gov.br] 
+Trabalho Análogo à Escravidão 
+BRASIL. Ministério do Trabalho e Emprego. Combate ao trabalho escravo e ao trabalho análogo ao de 
+escravo. Disponível em: 
+<https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/inspecao-do-trabalho/areas-de-atuacao/combate-ao-trabalho-escravo-e-analogo-ao-de-escravo>. Acesso em: 27 abr. 2026. [gov.br] 
+Lista Suja e Sanções da Administração Pública 
+BRASIL. Controladoria-Geral da União (CGU). Portal da Transparência – Sanções administrativas (dados 
+abertos). Disponível em: <https://portaldatransparencia.gov.br/download-de-dados>. Acesso em: 27 abr. 
+2026. 
+(Seção: Sanções, exceto Acordos de Leniência). [portaldatr...cia.gov.br] 
+Referências – Tecnologia (Angular, Firebase e Banco de Dados) 
+Angular 
+ALVES, William Pereira. Desenvolvimento de aplicações web com Angular. 1. ed. Rio de Janeiro: Alta Books, 
+2019. [books.google.com] 
+Angular + Firebase 
+MACHADO, Kheronn Khennedy. Angular e Firebase: construindo uma aplicação integrada com a 
+plataforma do Google. São Paulo: Casa do Código, 2021. [casadocodigo.com.br] 
+Banco de Dados (Fundamentos) 
+GUIMARÃES, Célio Cardoso. Fundamentos de bancos de dados: modelagem, projeto e linguagem SQL. 
+Campinas: Editora da Unicamp, 2003. [loja.edito...amp.com.br]
