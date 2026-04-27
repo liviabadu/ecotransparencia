@@ -208,12 +208,32 @@
           <div class="app-settings-divider" role="separator"></div>
 
           @if (auth.isAuthenticated()) {
-            <div class="app-settings-advanced">
-              <p class="app-settings-advanced-lead">
-                {{ copy.loggedInLead }}
-              </p>
+            <div class="app-settings-advanced-wip" role="status">
+              <div class="app-settings-advanced-wip__hero" aria-hidden="true">
+                <div class="app-settings-advanced-wip__glow"></div>
+                <svg
+                  class="app-settings-advanced-wip__icon"
+                  width="40"
+                  height="40"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.65"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <circle cx="12" cy="12" r="9" />
+                  <path d="M12 16h.01" />
+                  <path d="M12 12V8" />
+                </svg>
+              </div>
+              <h3 class="app-settings-advanced-wip__title">{{ copy.advancedWipTitle }}</h3>
+              <p class="app-settings-advanced-wip__body">{{ copy.advancedWipBody }}</p>
               @if (auth.getUserEmail(); as email) {
-                <p class="app-settings-advanced-email">{{ email }}</p>
+                <div class="app-settings-advanced-wip__account">
+                  <span class="app-settings-advanced-wip__account-label">{{ copy.advancedAccountHint }}</span>
+                  <p class="app-settings-advanced-wip__email">{{ email }}</p>
+                </div>
               }
             </div>
           } @else {
