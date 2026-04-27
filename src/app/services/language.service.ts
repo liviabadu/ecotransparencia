@@ -32,7 +32,10 @@ export interface SettingsModalCopy {
   langEnDesc: string;
   dataTitle: string;
   dataSubtitle: string;
-  loggedInLead: string;
+  /** Aviso na área “Configurações avançadas” (utilizador autenticado). */
+  advancedWipTitle: string;
+  advancedWipBody: string;
+  advancedAccountHint: string;
   advancedGuestTagline: string;
   signIn: string;
   signUp: string;
@@ -63,7 +66,10 @@ const MODAL_COPY: Record<ModalLocale, SettingsModalCopy> = {
     langEnDesc: 'English (US)',
     dataTitle: 'Configurações avançadas',
     dataSubtitle: 'Conta e sessão neste dispositivo',
-    loggedInLead: 'Você está conectado. Sua sessão está ativa neste dispositivo.',
+    advancedWipTitle: 'Esta área ainda será ampliada',
+    advancedWipBody:
+      'Em breve esta secção incluirá mais opções de configuração da conta e da aplicação. Por agora, use “Geral” para tema e idioma.',
+    advancedAccountHint: 'Conta conectada',
     advancedGuestTagline: 'Entre com sua conta para salvar consultas e usar recursos extras.',
     signIn: 'Entrar',
     signUp: 'Criar conta',
@@ -92,7 +98,10 @@ const MODAL_COPY: Record<ModalLocale, SettingsModalCopy> = {
     langEnDesc: 'English (US)',
     dataTitle: 'Advanced settings',
     dataSubtitle: 'Account and session on this device',
-    loggedInLead: 'You’re signed in. Your session is active on this device.',
+    advancedWipTitle: 'This area will be expanded',
+    advancedWipBody:
+      'Soon this section will include more account and app settings. For now, use “General” for theme and language.',
+    advancedAccountHint: 'Signed-in account',
     advancedGuestTagline: 'Sign in to save searches and use extra features with your account.',
     signIn: 'Sign in',
     signUp: 'Create account',

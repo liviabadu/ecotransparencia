@@ -30,12 +30,14 @@
   </nav>
 </header>
 
+<!-- Raiz dos efeitos scroll (home-scroll-story.ts); display:contents não altera o layout -->
+<div class="home-story-root" #storyHost>
 <!-- ========== MAIN CONTENT ========== -->
 <main id="main-content" class="main-content">
   <article class="methodology-article">
     <div class="container">
       <!-- Título Principal -->
-      <header class="article-header">
+      <header class="article-header fade-in">
         <h1 class="article-title">
           Metodologia de <span class="article-title-highlight">Cálculo de Score</span>
         </h1>
@@ -46,7 +48,7 @@
       </header>
 
       <!-- Escala de Score -->
-      <section class="section">
+      <section class="section fade-in fade-in--delay-1">
         <h2 class="section-title">Escala de Score</h2>
         <p class="section-text">
           O score de risco é apresentado em uma escala de <strong>0 a 100 pontos</strong>,
@@ -89,7 +91,7 @@
       </section>
 
       <!-- Fontes de Dados -->
-      <section class="section">
+      <section class="section fade-in fade-in--delay-2">
         <h2 class="section-title">Fontes de Dados e Categorias</h2>
         <p class="section-text">
           O score é calculado a partir de dados consolidados de múltiplas fontes governamentais oficiais:
@@ -97,7 +99,7 @@
 
         <div class="sources-grid">
           <div class="source-card">
-            <div class="source-icon">🌿</div>
+            <div class="source-icon reveal-scale">🌿</div>
             <h3 class="source-title">Ambiental IBAMA</h3>
             <p class="source-desc">
               Dados do Instituto Brasileiro do Meio Ambiente: embargos e autos de infração
@@ -106,7 +108,7 @@
           </div>
 
           <div class="source-card">
-            <div class="source-icon">🦜</div>
+            <div class="source-icon reveal-scale">🦜</div>
             <h3 class="source-title">Ambiental ICMBio</h3>
             <p class="source-desc">
               Dados do Instituto Chico Mendes: processos administrativos e autos de infração
@@ -115,7 +117,7 @@
           </div>
 
           <div class="source-card">
-            <div class="source-icon">👷</div>
+            <div class="source-icon reveal-scale">👷</div>
             <h3 class="source-title">Trabalhista</h3>
             <p class="source-desc">
               Dados do Ministério do Trabalho: inclusão na Lista Suja do Trabalho Escravo
@@ -124,7 +126,7 @@
           </div>
 
           <div class="source-card">
-            <div class="source-icon">📋</div>
+            <div class="source-icon reveal-scale">📋</div>
             <h3 class="source-title">Administrativo</h3>
             <p class="source-desc">
               Dados do Portal de Dados Abertos: cadastro de empresas impedidas de contratar
@@ -135,7 +137,7 @@
       </section>
 
       <!-- Metodologia de Cálculo -->
-      <section class="section">
+      <section class="section fade-in fade-in--delay-3">
         <h2 class="section-title">Metodologia de Cálculo</h2>
 
         <div class="methodology-box">
@@ -175,7 +177,7 @@
       </section>
 
       <!-- Exemplo de Cálculo -->
-      <section class="section">
+      <section class="section fade-in fade-in--delay-1">
         <h2 class="section-title">Exemplo de Cálculo</h2>
         <p class="section-text">Considere uma empresa com as seguintes ocorrências:</p>
 
@@ -238,12 +240,12 @@
       </section>
 
       <!-- Limitações -->
-      <section class="section">
+      <section class="section fade-in fade-in--delay-2">
         <h2 class="section-title">Limitações e Considerações</h2>
 
         <div class="limitations-grid">
           <div class="limitation-card">
-            <h3 class="limitation-title">📂 Dados Públicos</h3>
+            <h3 class="limitation-title">Dados Públicos <span class="limitation-emoji" aria-hidden="true">📂</span></h3>
             <p class="limitation-text">
               O score é calculado exclusivamente com base em dados públicos disponíveis em portais governamentais.
               Informações não publicadas ou em sigilo não são consideradas.
@@ -251,7 +253,7 @@
           </div>
 
           <div class="limitation-card">
-            <h3 class="limitation-title">🔄 Atualização</h3>
+            <h3 class="limitation-title">Atualização <span class="limitation-emoji" aria-hidden="true">🔄</span></h3>
             <p class="limitation-text">
               Os dados são atualizados periodicamente conforme a disponibilidade das fontes oficiais.
               A data da consulta deve ser considerada ao interpretar os resultados.
@@ -259,7 +261,7 @@
           </div>
 
           <div class="limitation-card">
-            <h3 class="limitation-title">📋 Uso Recomendado</h3>
+            <h3 class="limitation-title">Uso Recomendado <span class="limitation-emoji" aria-hidden="true">📋</span></h3>
             <p class="limitation-text">
               O score deve ser utilizado como ferramenta de apoio à decisão, não como único critério.
               Recomenda-se verificar os detalhes das ocorrências individualmente.
@@ -269,7 +271,7 @@
       </section>
 
       <!-- Call to Action -->
-      <section class="cta-section">
+      <section class="cta-section fade-in fade-in--delay-3">
         <h2 class="cta-title">Pronto para consultar?</h2>
         <p class="cta-text">
           Utilize nossa ferramenta de busca para consultar o score de risco de empresas brasileiras.
@@ -283,26 +285,129 @@
 </main>
 
 <!-- ========== FOOTER ========== -->
-<footer class="footer">
-  <div class="footer-inner">
-    <div class="footer-brand">
-      <div class="footer-logo">
-        <span class="logo-text-small">eco</span>
-        <span class="logo-sub-small">TRANSPARÊNCIA</span>
+<footer class="footer fade-in fade-in--delay-1" role="contentinfo">
+  <div class="footer-shell">
+    <div class="footer-grid">
+      <div class="footer-col footer-col--brand">
+        <a
+          routerLink="/"
+          class="footer-brand-lockup"
+          (click)="scrollToTop()"
+          aria-label="Eco Transparência — início"
+        >
+          <div class="footer-logo-mark" aria-hidden="true">
+            <span class="footer-logo-mark__eco">eco</span>
+            <span class="footer-logo-mark__sub">TRANSPARÊNCIA</span>
+          </div>
+          <span class="footer-brand-name">Eco Transparência</span>
+        </a>
+        <p class="footer-tagline">Transparência socioambiental ao seu alcance</p>
+        <p class="footer-blurb">
+          Dados públicos e scores de risco socioambiental reunidos para apoiar decisões mais conscientes.
+        </p>
       </div>
-      <p class="footer-tagline">Transparência socioambiental ao seu alcance</p>
+
+      <nav class="footer-col" aria-labelledby="footer-heading-nav">
+        <h2 id="footer-heading-nav" class="footer-heading">Navegação</h2>
+        <ul class="footer-list">
+          <li>
+            <a routerLink="/" class="footer-col-link" (click)="scrollToTop()">Home</a>
+          </li>
+          <li>
+            <a routerLink="/" fragment="about" class="footer-col-link">Sobre</a>
+          </li>
+          <li>
+            <a routerLink="/metodologia" class="footer-col-link">Plataforma</a>
+          </li>
+          <li>
+            <a [href]="footerMailto" class="footer-col-link">Contato</a>
+          </li>
+        </ul>
+      </nav>
+
+      <nav class="footer-col" aria-labelledby="footer-heading-legal">
+        <h2 id="footer-heading-legal" class="footer-heading">Legal</h2>
+        <ul class="footer-list">
+          <li>
+            <a href="#" class="footer-col-link" (click)="preventFooterPlaceholder($event)">Termos de Uso</a>
+          </li>
+          <li>
+            <a href="#" class="footer-col-link" (click)="preventFooterPlaceholder($event)">Política de Privacidade</a>
+          </li>
+          <li>
+            <a href="#" class="footer-col-link" (click)="preventFooterPlaceholder($event)">Acessibilidade</a>
+          </li>
+          <li>
+            <a href="#" class="footer-col-link" (click)="preventFooterPlaceholder($event)">Central de ajuda</a>
+          </li>
+          <li>
+            <a href="#" class="footer-col-link" (click)="preventFooterPlaceholder($event)">Notas de versão</a>
+          </li>
+        </ul>
+      </nav>
+
+      <div class="footer-col footer-col--contact" aria-labelledby="footer-heading-contact">
+        <h2 id="footer-heading-contact" class="footer-heading">Contato &amp; redes</h2>
+        <p class="footer-contact-line">
+          <a [href]="footerMailto" class="footer-email-link">{{ footerContactEmail }}</a>
+        </p>
+        <ul class="footer-social" aria-label="Redes sociais">
+          <li>
+            <a
+              [href]="footerSocial.linkedin"
+              class="footer-social-link"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Eco Transparência no LinkedIn"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
+                <rect x="2" y="9" width="4" height="12" rx="1" />
+                <circle cx="4" cy="4" r="2" />
+              </svg>
+            </a>
+          </li>
+          <li>
+            <a
+              [href]="footerSocial.instagram"
+              class="footer-social-link"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Eco Transparência no Instagram"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+                <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+              </svg>
+            </a>
+          </li>
+          <li>
+            <a
+              [href]="footerSocial.github"
+              class="footer-social-link"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Eco Transparência no GitHub"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path
+                  d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"
+                />
+              </svg>
+            </a>
+          </li>
+        </ul>
+      </div>
     </div>
 
-    <div class="footer-links">
-      <a href="#" class="footer-link" (click)="preventFooterPlaceholder($event)">Termos de Uso</a>
-      <a href="#" class="footer-link" (click)="preventFooterPlaceholder($event)">Política de Privacidade</a>
-      <a href="#" class="footer-link" (click)="preventFooterPlaceholder($event)">Contato</a>
-      <a href="#" class="footer-link" (click)="preventFooterPlaceholder($event)">Acessibilidade</a>
-    </div>
-
-    <div class="footer-copy">
-      <p>&copy; 2026 EcoTransparência. Todos os direitos reservados.</p>
-      <p class="footer-version">Versão 1.0.0</p>
+    <div class="footer-bottom">
+      <p class="footer-bottom__copy">&copy; 2026 EcoTransparência. Todos os direitos reservados.</p>
+      <p class="footer-bottom__version">Versão 1.0.0</p>
     </div>
   </div>
 </footer>
+
+  <!-- Fim da página: IO encerra efeitos (igual à home pré-login) -->
+  <div class="home-story-end-sentinel" aria-hidden="true"></div>
+</div>
