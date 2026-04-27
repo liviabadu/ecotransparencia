@@ -286,220 +286,532 @@
             </span>
             <div class="result-summary-text">
               <span class="result-summary-label">Resumo</span>
-              <p class="result-summary-strong">{{ occurrencesSummaryLabel(searchResult()?.scoreResult?.totalOccurrences) }}</p>
+              <p class="result-summary-strong">{{ occurrencesSummaryLabel(searchResult()?.entity?.asgScore?.totalOcorrencias ?? searchResult()?.scoreResult?.totalOccurrences) }}</p>
             </div>
           </div>
         </div>
 
-        <!-- Embargos (V2) -->
-        @if (searchResult()?.entity?.ocorrencias?.embargos?.length) {
-          <section class="result-section" aria-labelledby="cnpj-embargos-title">
-            <h3 id="cnpj-embargos-title" class="result-section__title">
-              Embargos
-              <span class="result-section__count">{{ searchResult()?.entity?.ocorrencias?.embargos?.length }}</span>
-            </h3>
-            <div class="result-stack">
-              @for (embargo of searchResult()?.entity?.ocorrencias?.embargos; track embargo.id) {
-                <article class="result-surface result-surface--occurrence result-surface--embargo">
-                  <div class="occurrence-card-head">
-                    <div class="occurrence-card-head__left">
-                      @if (embargo.date) {
-                        <time class="occurrence-date">{{ formatDate(embargo.date) }}</time>
-                      }
-                      @if (embargo.category) {
-                        <span class="occurrence-category-chip">{{ embargo.category }}</span>
-                      }
-                    </div>
-                    <div class="occurrence-card-head__badges">
-                      @if (embargo.status) {
-                        <span
-                          class="status-chip"
-                          [class.status-chip--ativo]="embargo.status === 'Ativo'"
-                          [class.status-chip--baixado]="embargo.status === 'Baixado'"
-                        >
-                          {{ embargo.status }}
-                        </span>
-                      }
-                      @if (embargo.desmatamento) {
-                        <span class="meta-chip meta-chip--alert">Desmatamento</span>
-                      }
-                      @if (embargo.biome) {
-                        <span class="meta-chip meta-chip--biome" [style.--biome]="getBiomeColor(embargo.biome)">
-                          {{ embargo.biome }}
-                        </span>
-                      }
-                    </div>
-                  </div>
-                  @if (embargo.description) {
-                    <p class="occurrence-body-text">{{ embargo.description }}</p>
-                  }
-                  <div class="occurrence-details">
-                    @if (embargo.location) {
-                      <div class="occurrence-detail-row">
-                        <span class="occurrence-detail-icon" aria-hidden="true">📍</span>
-                        <span>{{ formatLocation(embargo.location) }}</span>
-                      </div>
-                    }
-                    @if (embargo.areaEmbargada) {
-                      <div class="occurrence-detail-row">
-                        <span class="occurrence-detail-icon" aria-hidden="true">📊</span>
-                        <span>Área embargada: {{ formatArea(embargo.areaEmbargada) }}</span>
-                      </div>
-                    }
-                    @if (embargo.autoInfracao) {
-                      <div class="occurrence-detail-row">
-                        <span class="occurrence-detail-icon" aria-hidden="true">📄</span>
-                        <span>Auto de infração: {{ embargo.autoInfracao }}</span>
-                      </div>
-                    }
-                  </div>
-                  <footer class="occurrence-card-foot">
-                    <span class="occurrence-source">Fonte: {{ embargo.source }}</span>
-                    @if (embargo.sourceUrl) {
-                      <a [href]="embargo.sourceUrl" target="_blank" rel="noopener noreferrer" class="result-link">
-                        Ver fonte original
-                      </a>
-                    }
-                  </footer>
-                </article>
-              }
-            </div>
-          </section>
-        }
+        <!-- Grupo: Ambiental (IBAMA + ICMBio) -->
+        @if (hasAmbientalContent()) {
+          <div class="result-group result-group--ambiental">
+            <h3 class="result-group__title">Ambiental</h3>
 
-        <!-- Autos de infração (V2) -->
-        @if (searchResult()?.entity?.ocorrencias?.autosInfracao?.length) {
-          <section class="result-section" aria-labelledby="cnpj-autos-title">
-            <h3 id="cnpj-autos-title" class="result-section__title">
-              Autos de infração
-              <span class="result-section__count">{{ searchResult()?.entity?.ocorrencias?.autosInfracao?.length }}</span>
-            </h3>
-            <div class="result-stack">
-              @for (auto of searchResult()?.entity?.ocorrencias?.autosInfracao; track auto.id) {
-                <article class="result-surface result-surface--occurrence result-surface--auto">
-                  <div class="occurrence-card-head">
-                    <div class="occurrence-card-head__left">
-                      @if (auto.data) {
-                        <time class="occurrence-date">{{ formatDate(auto.data) }}</time>
-                      }
-                      @if (auto.numeroAuto) {
-                        <span class="occurrence-category-chip">Nº {{ auto.numeroAuto }}</span>
-                      }
-                    </div>
-                    <div class="occurrence-card-head__badges">
-                      @if (auto.status) {
-                        <span class="status-chip status-chip--neutral">{{ auto.status }}</span>
-                      }
-                      @if (auto.gravidade) {
-                        <span class="meta-chip meta-chip--gravity" [style.--grav]="getGravityColor(auto.gravidade)">
-                          {{ auto.gravidade }}
-                        </span>
-                      }
-                    </div>
-                  </div>
-                  @if (auto.descricao) {
-                    <p class="occurrence-body-text">{{ auto.descricao }}</p>
-                  }
-                  <div class="occurrence-details occurrence-details--grid">
-                    @if (auto.location) {
-                      <div class="occurrence-detail-row">
-                        <span class="occurrence-detail-icon" aria-hidden="true">📍</span>
-                        <span>{{ formatLocation(auto.location) }}</span>
-                      </div>
-                    }
-                    @if (auto.biomasAtingidos) {
-                      <div class="occurrence-detail-row">
-                        <span class="occurrence-detail-icon" aria-hidden="true">🌳</span>
-                        <span>Bioma: {{ auto.biomasAtingidos }}</span>
-                      </div>
-                    }
-                    @if (auto.tipoInfracao) {
-                      <div class="occurrence-detail-row">
-                        <span class="occurrence-detail-icon" aria-hidden="true">🌿</span>
-                        <span>Tipo: {{ auto.tipoInfracao }}</span>
-                      </div>
-                    }
-                    @if (auto.efeitoMeioAmbiente) {
-                      <div class="occurrence-detail-row">
-                        <span class="occurrence-detail-icon" aria-hidden="true">⚠️</span>
-                        <span>Efeito: {{ auto.efeitoMeioAmbiente }}</span>
-                      </div>
-                    }
-                    @if (auto.valorMulta !== undefined) {
-                      <div class="occurrence-detail-row">
-                        <span class="occurrence-detail-icon" aria-hidden="true">💰</span>
-                        <span>Multa: {{ formatCurrency(auto.valorMulta) }}</span>
-                      </div>
-                    }
-                    @if (auto.motivacaoConduta) {
-                      <div class="occurrence-detail-row">
-                        <span class="occurrence-detail-icon" aria-hidden="true">🎯</span>
-                        <span>Motivação: {{ auto.motivacaoConduta }}</span>
-                      </div>
-                    }
-                  </div>
-                  @if (auto.enquadramentoLegal) {
-                    <div class="occurrence-legal">
-                      <span class="occurrence-detail-icon" aria-hidden="true">📜</span>
-                      <span>{{ auto.enquadramentoLegal }}</span>
-                    </div>
-                  }
-                  <footer class="occurrence-card-foot">
-                    <span class="occurrence-source">Fonte: {{ auto.source }}</span>
-                  </footer>
-                </article>
-              }
-            </div>
-          </section>
-        }
-
-        <!-- CA08 - Por categoria -->
-        @if (searchResult()?.scoreResult?.categorySummaries?.length) {
-          <section class="result-section" aria-labelledby="cnpj-cat-title">
-            <h3 id="cnpj-cat-title" class="result-section__title">Detalhamento por categoria</h3>
-            <div class="result-stack result-stack--categories">
-              @for (category of searchResult()?.scoreResult?.categorySummaries; track category.category) {
-                <article class="result-surface result-surface--category">
-                  <header class="category-card-head">
-                    <h4 class="category-card-head__name">{{ category.category }}</h4>
-                    <span class="category-card-head__count">{{ category.count }} ocorrência(s)</span>
-                  </header>
-                  <div class="category-card-body">
-                    @for (occurrence of category.occurrences; track occurrence.id) {
-                      <div class="result-surface result-surface--occurrence result-surface--nested">
-                        <div class="occurrence-card-head">
-                          <div class="occurrence-card-head__left">
-                            <time class="occurrence-date">{{ formatDate(occurrence.date) }}</time>
-                          </div>
-                          @if (occurrence.status) {
-                            <div class="occurrence-card-head__badges">
-                              <span
-                                class="status-chip"
-                                [class.status-chip--ativo]="occurrence.status === 'Ativo'"
-                                [class.status-chip--baixado]="occurrence.status === 'Baixado'"
-                                [class.status-chip--lavrado]="occurrence.status === 'Lavrado'"
-                              >
-                                {{ occurrence.status }}
-                              </span>
-                            </div>
+            <!-- Embargos IBAMA -->
+            @if (searchResult()?.entity?.ocorrencias?.embargos?.length) {
+              <section class="result-section" aria-labelledby="cnpj-embargos-title">
+                <h4 id="cnpj-embargos-title" class="result-section__title">
+                  Embargos IBAMA
+                  <span class="result-section__count">{{ searchResult()?.entity?.ocorrencias?.embargos?.length }}</span>
+                </h4>
+                <div class="result-stack">
+                  @for (embargo of searchResult()?.entity?.ocorrencias?.embargos; track embargo.id) {
+                    <article class="result-surface result-surface--occurrence result-surface--embargo">
+                      <div class="occurrence-card-head">
+                        <div class="occurrence-card-head__left">
+                          @if (embargo.date) {
+                            <time class="occurrence-date">{{ formatDate(embargo.date) }}</time>
+                          }
+                          @if (embargo.category) {
+                            <span class="occurrence-category-chip">{{ embargo.category }}</span>
                           }
                         </div>
-                        <p class="occurrence-body-text">{{ occurrence.description }}</p>
-                        <footer class="occurrence-card-foot occurrence-card-foot--split">
-                          <span class="occurrence-source">Fonte: {{ occurrence.source }}</span>
-                          @if (occurrence.sourceUrl) {
-                            <a [href]="occurrence.sourceUrl" target="_blank" rel="noopener noreferrer" class="result-link">
-                              Ver fonte original
-                            </a>
+                        <div class="occurrence-card-head__badges">
+                          @if (embargo.status) {
+                            <span
+                              class="status-chip"
+                              [class.status-chip--ativo]="embargo.status === 'Ativo'"
+                              [class.status-chip--baixado]="embargo.status === 'Baixado'"
+                            >
+                              {{ embargo.status }}
+                            </span>
                           }
-                        </footer>
+                          @if (embargo.desmatamento) {
+                            <span class="meta-chip meta-chip--alert">Desmatamento</span>
+                          }
+                          @if (embargo.biome) {
+                            <span class="meta-chip meta-chip--biome" [style.--biome]="getBiomeColor(embargo.biome)">
+                              {{ embargo.biome }}
+                            </span>
+                          }
+                        </div>
                       </div>
-                    }
-                  </div>
-                </article>
-              }
-            </div>
-          </section>
+                      @if (embargo.description) {
+                        <p class="occurrence-body-text">{{ embargo.description }}</p>
+                      }
+                      <div class="occurrence-details">
+                        @if (embargo.location) {
+                          <div class="occurrence-detail-row">
+                            <span class="occurrence-detail-icon" aria-hidden="true">📍</span>
+                            <span>{{ formatLocation(embargo.location) }}</span>
+                          </div>
+                        }
+                        @if (embargo.areaEmbargada) {
+                          <div class="occurrence-detail-row">
+                            <span class="occurrence-detail-icon" aria-hidden="true">📊</span>
+                            <span>Área embargada: {{ formatArea(embargo.areaEmbargada) }}</span>
+                          </div>
+                        }
+                        @if (embargo.autoInfracao) {
+                          <div class="occurrence-detail-row">
+                            <span class="occurrence-detail-icon" aria-hidden="true">📄</span>
+                            <span>Auto de infração: {{ embargo.autoInfracao }}</span>
+                          </div>
+                        }
+                      </div>
+                      <footer class="occurrence-card-foot">
+                        <span class="occurrence-source">Fonte: {{ embargo.source }}</span>
+                        @if (embargo.sourceUrl) {
+                          <a [href]="embargo.sourceUrl" target="_blank" rel="noopener noreferrer" class="result-link">
+                            Ver fonte original
+                          </a>
+                        }
+                      </footer>
+                    </article>
+                  }
+                </div>
+              </section>
+            }
+
+            <!-- Autos de infração IBAMA -->
+            @if (searchResult()?.entity?.ocorrencias?.autosInfracao?.length) {
+              <section class="result-section" aria-labelledby="cnpj-autos-title">
+                <h4 id="cnpj-autos-title" class="result-section__title">
+                  Autos de infração IBAMA
+                  <span class="result-section__count">{{ searchResult()?.entity?.ocorrencias?.autosInfracao?.length }}</span>
+                </h4>
+                <div class="result-stack">
+                  @for (auto of searchResult()?.entity?.ocorrencias?.autosInfracao; track auto.id) {
+                    <article class="result-surface result-surface--occurrence result-surface--auto">
+                      <div class="occurrence-card-head">
+                        <div class="occurrence-card-head__left">
+                          @if (auto.data) {
+                            <time class="occurrence-date">{{ formatDate(auto.data) }}</time>
+                          }
+                          @if (auto.numeroAuto) {
+                            <span class="occurrence-category-chip">Nº {{ auto.numeroAuto }}</span>
+                          }
+                        </div>
+                        <div class="occurrence-card-head__badges">
+                          @if (auto.status) {
+                            <span class="status-chip status-chip--neutral">{{ auto.status }}</span>
+                          }
+                          @if (auto.gravidade) {
+                            <span class="meta-chip meta-chip--gravity" [style.--grav]="getGravityColor(auto.gravidade)">
+                              {{ auto.gravidade }}
+                            </span>
+                          }
+                        </div>
+                      </div>
+                      @if (auto.descricao) {
+                        <p class="occurrence-body-text">{{ auto.descricao }}</p>
+                      }
+                      <div class="occurrence-details occurrence-details--grid">
+                        @if (auto.location) {
+                          <div class="occurrence-detail-row">
+                            <span class="occurrence-detail-icon" aria-hidden="true">📍</span>
+                            <span>{{ formatLocation(auto.location) }}</span>
+                          </div>
+                        }
+                        @if (auto.biomasAtingidos) {
+                          <div class="occurrence-detail-row">
+                            <span class="occurrence-detail-icon" aria-hidden="true">🌳</span>
+                            <span>Bioma: {{ auto.biomasAtingidos }}</span>
+                          </div>
+                        }
+                        @if (auto.tipoInfracao) {
+                          <div class="occurrence-detail-row">
+                            <span class="occurrence-detail-icon" aria-hidden="true">🌿</span>
+                            <span>Tipo: {{ auto.tipoInfracao }}</span>
+                          </div>
+                        }
+                        @if (auto.efeitoMeioAmbiente) {
+                          <div class="occurrence-detail-row">
+                            <span class="occurrence-detail-icon" aria-hidden="true">⚠️</span>
+                            <span>Efeito: {{ auto.efeitoMeioAmbiente }}</span>
+                          </div>
+                        }
+                        @if (auto.valorMulta !== undefined) {
+                          <div class="occurrence-detail-row">
+                            <span class="occurrence-detail-icon" aria-hidden="true">💰</span>
+                            <span>Multa: {{ formatCurrency(auto.valorMulta) }}</span>
+                          </div>
+                        }
+                        @if (auto.motivacaoConduta) {
+                          <div class="occurrence-detail-row">
+                            <span class="occurrence-detail-icon" aria-hidden="true">🎯</span>
+                            <span>Motivação: {{ auto.motivacaoConduta }}</span>
+                          </div>
+                        }
+                      </div>
+                      @if (auto.enquadramentoLegal) {
+                        <div class="occurrence-legal">
+                          <span class="occurrence-detail-icon" aria-hidden="true">📜</span>
+                          <span>{{ auto.enquadramentoLegal }}</span>
+                        </div>
+                      }
+                      <footer class="occurrence-card-foot">
+                        <span class="occurrence-source">Fonte: {{ auto.source }}</span>
+                      </footer>
+                    </article>
+                  }
+                </div>
+              </section>
+            }
+
+            <!-- Autos ICMBio -->
+            @if (searchResult()?.entity?.icmbioAutos?.length) {
+              <section class="result-section" aria-labelledby="cnpj-icmbio-autos-title">
+                <h4 id="cnpj-icmbio-autos-title" class="result-section__title">
+                  Autos de infração ICMBio
+                  <span class="result-section__count">{{ searchResult()?.entity?.icmbioAutos?.length }}</span>
+                </h4>
+                <div class="result-stack">
+                  @for (auto of searchResult()?.entity?.icmbioAutos; track auto.numeroAi) {
+                    <article class="result-surface result-surface--occurrence result-surface--auto">
+                      <div class="occurrence-card-head">
+                        <div class="occurrence-card-head__left">
+                          @if (auto.data) {
+                            <time class="occurrence-date">{{ formatDate(auto.data) }}</time>
+                          }
+                          @if (auto.numeroAi) {
+                            <span class="occurrence-category-chip">AI {{ auto.numeroAi }}</span>
+                          }
+                        </div>
+                        <div class="occurrence-card-head__badges">
+                          @if (auto.tipo) {
+                            <span class="status-chip status-chip--neutral">{{ auto.tipo }}</span>
+                          }
+                        </div>
+                      </div>
+                      @if (auto.descAi) {
+                        <p class="occurrence-body-text">{{ auto.descAi }}</p>
+                      }
+                      <div class="occurrence-details occurrence-details--grid">
+                        @if (auto.nomeUc) {
+                          <div class="occurrence-detail-row">
+                            <span class="occurrence-detail-icon" aria-hidden="true">🌳</span>
+                            <span>UC: {{ auto.nomeUc }}</span>
+                          </div>
+                        }
+                        @if (auto.municipio || auto.uf) {
+                          <div class="occurrence-detail-row">
+                            <span class="occurrence-detail-icon" aria-hidden="true">📍</span>
+                            <span>{{ auto.municipio }}{{ auto.municipio && auto.uf ? '/' : '' }}{{ auto.uf }}</span>
+                          </div>
+                        }
+                        @if (auto.tipoInfra) {
+                          <div class="occurrence-detail-row">
+                            <span class="occurrence-detail-icon" aria-hidden="true">🌿</span>
+                            <span>Tipo: {{ auto.tipoInfra }}</span>
+                          </div>
+                        }
+                        @if (auto.valorMulta !== undefined && auto.valorMulta !== null) {
+                          <div class="occurrence-detail-row">
+                            <span class="occurrence-detail-icon" aria-hidden="true">💰</span>
+                            <span>Multa: {{ formatCurrency(auto.valorMulta) }}</span>
+                          </div>
+                        }
+                        @if (auto.processo) {
+                          <div class="occurrence-detail-row">
+                            <span class="occurrence-detail-icon" aria-hidden="true">📄</span>
+                            <span>Processo: {{ auto.processo }}</span>
+                          </div>
+                        }
+                        @if (auto.julgamento) {
+                          <div class="occurrence-detail-row">
+                            <span class="occurrence-detail-icon" aria-hidden="true">⚖️</span>
+                            <span>Julgamento: {{ auto.julgamento }}</span>
+                          </div>
+                        }
+                      </div>
+                      <footer class="occurrence-card-foot">
+                        <span class="occurrence-source">Fonte: ICMBio</span>
+                      </footer>
+                    </article>
+                  }
+                </div>
+              </section>
+            }
+
+            <!-- Embargos ICMBio -->
+            @if (searchResult()?.entity?.icmbioEmbargos?.length) {
+              <section class="result-section" aria-labelledby="cnpj-icmbio-emb-title">
+                <h4 id="cnpj-icmbio-emb-title" class="result-section__title">
+                  Embargos ICMBio
+                  <span class="result-section__count">{{ searchResult()?.entity?.icmbioEmbargos?.length }}</span>
+                </h4>
+                <div class="result-stack">
+                  @for (emb of searchResult()?.entity?.icmbioEmbargos; track emb.numeroEmb) {
+                    <article class="result-surface result-surface--occurrence result-surface--embargo">
+                      <div class="occurrence-card-head">
+                        <div class="occurrence-card-head__left">
+                          @if (emb.data) {
+                            <time class="occurrence-date">{{ formatDate(emb.data) }}</time>
+                          }
+                          @if (emb.numeroEmb) {
+                            <span class="occurrence-category-chip">Embargo {{ emb.numeroEmb }}</span>
+                          }
+                        </div>
+                        <div class="occurrence-card-head__badges">
+                          @if (emb.tipoInfra) {
+                            <span class="status-chip status-chip--neutral">{{ emb.tipoInfra }}</span>
+                          }
+                        </div>
+                      </div>
+                      @if (emb.descInfra) {
+                        <p class="occurrence-body-text">{{ emb.descInfra }}</p>
+                      }
+                      <div class="occurrence-details occurrence-details--grid">
+                        @if (emb.nomeUc) {
+                          <div class="occurrence-detail-row">
+                            <span class="occurrence-detail-icon" aria-hidden="true">🌳</span>
+                            <span>UC: {{ emb.nomeUc }}</span>
+                          </div>
+                        }
+                        @if (emb.municipio || emb.uf) {
+                          <div class="occurrence-detail-row">
+                            <span class="occurrence-detail-icon" aria-hidden="true">📍</span>
+                            <span>{{ emb.municipio }}{{ emb.municipio && emb.uf ? '/' : '' }}{{ emb.uf }}</span>
+                          </div>
+                        }
+                        @if (emb.area !== undefined && emb.area !== null) {
+                          <div class="occurrence-detail-row">
+                            <span class="occurrence-detail-icon" aria-hidden="true">📊</span>
+                            <span>Área: {{ formatArea(emb.area) }}</span>
+                          </div>
+                        }
+                        @if (emb.numeroAi) {
+                          <div class="occurrence-detail-row">
+                            <span class="occurrence-detail-icon" aria-hidden="true">📄</span>
+                            <span>AI relacionado: {{ emb.numeroAi }}</span>
+                          </div>
+                        }
+                        @if (emb.processo) {
+                          <div class="occurrence-detail-row">
+                            <span class="occurrence-detail-icon" aria-hidden="true">📄</span>
+                            <span>Processo: {{ emb.processo }}</span>
+                          </div>
+                        }
+                        @if (emb.julgamento) {
+                          <div class="occurrence-detail-row">
+                            <span class="occurrence-detail-icon" aria-hidden="true">⚖️</span>
+                            <span>Julgamento: {{ emb.julgamento }}</span>
+                          </div>
+                        }
+                      </div>
+                      @if (emb.descSanc) {
+                        <div class="occurrence-legal">
+                          <span class="occurrence-detail-icon" aria-hidden="true">📜</span>
+                          <span>Sanção: {{ emb.descSanc }}</span>
+                        </div>
+                      }
+                      <footer class="occurrence-card-foot">
+                        <span class="occurrence-source">Fonte: ICMBio</span>
+                      </footer>
+                    </article>
+                  }
+                </div>
+              </section>
+            }
+          </div>
+        }
+
+        <!-- Grupo: Administrativo & Social -->
+        @if (hasAdministrativoContent()) {
+          <div class="result-group result-group--administrativo">
+            <h3 class="result-group__title">Administrativo &amp; Social</h3>
+
+            <!-- Sanções administrativas (CEIS/CNEP) -->
+            @if (searchResult()?.entity?.sancoesAdmPublica?.length) {
+              <section class="result-section" aria-labelledby="cnpj-sancoes-title">
+                <h4 id="cnpj-sancoes-title" class="result-section__title">
+                  Sanções administrativas
+                  <span class="result-section__count">{{ searchResult()?.entity?.sancoesAdmPublica?.length }}</span>
+                </h4>
+                <div class="result-stack">
+                  @for (sancao of searchResult()?.entity?.sancoesAdmPublica; track $index) {
+                    <article class="result-surface result-surface--occurrence">
+                      <div class="occurrence-card-head">
+                        <div class="occurrence-card-head__left">
+                          @if (sancao.dataInicioSancao) {
+                            <time class="occurrence-date">{{ formatDate(sancao.dataInicioSancao) }}</time>
+                          }
+                          <span class="occurrence-category-chip cadastro-chip" [class.cadastro-chip--ceis]="sancao.cadastro === 'CEIS'" [class.cadastro-chip--cnep]="sancao.cadastro === 'CNEP'">
+                            {{ sancao.cadastro }}
+                          </span>
+                          @if (sancao.codigoSancao) {
+                            <span class="occurrence-category-chip">Cód. {{ sancao.codigoSancao }}</span>
+                          }
+                        </div>
+                        <div class="occurrence-card-head__badges">
+                          @if (sancao.esferaOrgao) {
+                            <span class="status-chip status-chip--neutral">{{ sancao.esferaOrgao }}</span>
+                          }
+                        </div>
+                      </div>
+                      @if (sancao.categoriaSancao) {
+                        <p class="occurrence-body-text">{{ sancao.categoriaSancao }}</p>
+                      }
+                      <div class="occurrence-details occurrence-details--grid">
+                        @if (sancao.nomeSancionado) {
+                          <div class="occurrence-detail-row">
+                            <span class="occurrence-detail-icon" aria-hidden="true">🏢</span>
+                            <span>{{ sancao.nomeSancionado }}</span>
+                          </div>
+                        }
+                        @if (sancao.orgaoSancionador) {
+                          <div class="occurrence-detail-row">
+                            <span class="occurrence-detail-icon" aria-hidden="true">🏛️</span>
+                            <span>{{ sancao.orgaoSancionador }}{{ sancao.ufOrgao ? ' — ' + sancao.ufOrgao : '' }}</span>
+                          </div>
+                        }
+                        @if (sancao.dataFimSancao) {
+                          <div class="occurrence-detail-row">
+                            <span class="occurrence-detail-icon" aria-hidden="true">📅</span>
+                            <span>Fim: {{ formatDate(sancao.dataFimSancao) }}</span>
+                          </div>
+                        }
+                        @if (sancao.valorMulta !== undefined && sancao.valorMulta !== null) {
+                          <div class="occurrence-detail-row">
+                            <span class="occurrence-detail-icon" aria-hidden="true">💰</span>
+                            <span>Multa: {{ formatCurrency(sancao.valorMulta) }}</span>
+                          </div>
+                        }
+                      </div>
+                      @if (sancao.fundamentacaoLegal) {
+                        <div class="occurrence-legal">
+                          <span class="occurrence-detail-icon" aria-hidden="true">📜</span>
+                          <span>{{ sancao.fundamentacaoLegal }}</span>
+                        </div>
+                      }
+                      <footer class="occurrence-card-foot">
+                        <span class="occurrence-source">Fonte: Portal da Transparência ({{ sancao.cadastro }})</span>
+                      </footer>
+                    </article>
+                  }
+                </div>
+              </section>
+            }
+
+            <!-- Impedimentos CEPIM -->
+            @if (searchResult()?.entity?.impedimentosCepim?.length) {
+              <section class="result-section" aria-labelledby="cnpj-cepim-title">
+                <h4 id="cnpj-cepim-title" class="result-section__title">
+                  Impedimentos CEPIM
+                  <span class="result-section__count">{{ searchResult()?.entity?.impedimentosCepim?.length }}</span>
+                </h4>
+                <div class="result-stack">
+                  @for (imp of searchResult()?.entity?.impedimentosCepim; track $index) {
+                    <article class="result-surface result-surface--occurrence">
+                      <div class="occurrence-card-head">
+                        <div class="occurrence-card-head__left">
+                          <span class="occurrence-category-chip cadastro-chip cadastro-chip--cepim">CEPIM</span>
+                          @if (imp.numeroConvenio) {
+                            <span class="occurrence-category-chip">Convênio {{ imp.numeroConvenio }}</span>
+                          }
+                        </div>
+                      </div>
+                      @if (imp.motivoImpedimento) {
+                        <p class="occurrence-body-text">{{ imp.motivoImpedimento }}</p>
+                      }
+                      <div class="occurrence-details occurrence-details--grid">
+                        @if (imp.nomeEntidade) {
+                          <div class="occurrence-detail-row">
+                            <span class="occurrence-detail-icon" aria-hidden="true">🏢</span>
+                            <span>{{ imp.nomeEntidade }}</span>
+                          </div>
+                        }
+                        @if (imp.cnpjEntidade) {
+                          <div class="occurrence-detail-row">
+                            <span class="occurrence-detail-icon" aria-hidden="true">🔢</span>
+                            <span>CNPJ: {{ imp.cnpjEntidade }}</span>
+                          </div>
+                        }
+                        @if (imp.orgaoConcedente) {
+                          <div class="occurrence-detail-row">
+                            <span class="occurrence-detail-icon" aria-hidden="true">🏛️</span>
+                            <span>Concedente: {{ imp.orgaoConcedente }}</span>
+                          </div>
+                        }
+                      </div>
+                      <footer class="occurrence-card-foot">
+                        <span class="occurrence-source">Fonte: Portal da Transparência (CEPIM)</span>
+                      </footer>
+                    </article>
+                  }
+                </div>
+              </section>
+            }
+
+            <!-- Trabalho escravo (MTE) -->
+            @if (searchResult()?.entity?.trabalhoEscravo?.length) {
+              <section class="result-section" aria-labelledby="cnpj-mte-title">
+                <h4 id="cnpj-mte-title" class="result-section__title">
+                  Trabalho escravo (MTE)
+                  <span class="result-section__count">{{ searchResult()?.entity?.trabalhoEscravo?.length }}</span>
+                </h4>
+                <div class="result-stack">
+                  @for (mte of searchResult()?.entity?.trabalhoEscravo; track $index) {
+                    <article class="result-surface result-surface--occurrence">
+                      <div class="occurrence-card-head">
+                        <div class="occurrence-card-head__left">
+                          @if (mte.decisaoAdmProcedencia) {
+                            <time class="occurrence-date">{{ formatDate(mte.decisaoAdmProcedencia) }}</time>
+                          }
+                          <span class="occurrence-category-chip cadastro-chip cadastro-chip--mte">MTE</span>
+                          @if (mte.anoAcaoFiscal) {
+                            <span class="occurrence-category-chip">Ação fiscal {{ mte.anoAcaoFiscal }}</span>
+                          }
+                        </div>
+                        <div class="occurrence-card-head__badges">
+                          @if (mte.trabalhadoresEnvolvidos !== undefined && mte.trabalhadoresEnvolvidos !== null) {
+                            <span class="meta-chip meta-chip--alert">{{ mte.trabalhadoresEnvolvidos }} trabalhador(es)</span>
+                          }
+                        </div>
+                      </div>
+                      @if (mte.empregador) {
+                        <p class="occurrence-body-text">{{ mte.empregador }}</p>
+                      }
+                      <div class="occurrence-details occurrence-details--grid">
+                        @if (mte.estabelecimento) {
+                          <div class="occurrence-detail-row">
+                            <span class="occurrence-detail-icon" aria-hidden="true">📍</span>
+                            <span>{{ mte.estabelecimento }}{{ mte.uf ? ' — ' + mte.uf : '' }}</span>
+                          </div>
+                        } @else if (mte.uf) {
+                          <div class="occurrence-detail-row">
+                            <span class="occurrence-detail-icon" aria-hidden="true">📍</span>
+                            <span>UF: {{ mte.uf }}</span>
+                          </div>
+                        }
+                        @if (mte.cpfCnpjFormatado) {
+                          <div class="occurrence-detail-row">
+                            <span class="occurrence-detail-icon" aria-hidden="true">🔢</span>
+                            <span>{{ mte.cpfCnpjFormatado }}</span>
+                          </div>
+                        }
+                        @if (mte.cnae) {
+                          <div class="occurrence-detail-row">
+                            <span class="occurrence-detail-icon" aria-hidden="true">🏭</span>
+                            <span>CNAE: {{ mte.cnae }}</span>
+                          </div>
+                        }
+                        @if (mte.inclusaoCadastroEmpregadores) {
+                          <div class="occurrence-detail-row">
+                            <span class="occurrence-detail-icon" aria-hidden="true">📅</span>
+                            <span>Inclusão: {{ formatDate(mte.inclusaoCadastroEmpregadores) }}</span>
+                          </div>
+                        }
+                      </div>
+                      <footer class="occurrence-card-foot">
+                        <span class="occurrence-source">Fonte: MTE — Cadastro de Empregadores</span>
+                      </footer>
+                    </article>
+                  }
+                </div>
+              </section>
+            }
+          </div>
         }
       </div>
     </div>

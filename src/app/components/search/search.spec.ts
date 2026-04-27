@@ -141,6 +141,114 @@ const mockNameSearch: Record<string, any> = {
   'Empresa Verde': mockEntities['11222333000181'],
 };
 
+const mockEntityWithAllSources = {
+  found: true,
+  entity: {
+    id: '99',
+    name: 'Empresa Multifonte S.A.',
+    document: '55666777000181',
+    documentType: 'cnpj',
+    score: 75,
+    riskLevel: 'Alto',
+    occurrences: [],
+    ocorrencias: {
+      embargos: [
+        {
+          id: 'emb-99',
+          source: 'IBAMA',
+          date: '2024-04-01T00:00:00.000Z',
+          description: 'Embargo IBAMA',
+          status: 'Ativo',
+          category: 'Ambiental IBAMA',
+        },
+      ],
+      autosInfracao: [
+        {
+          id: 'auto-99',
+          source: 'IBAMA',
+          data: '2024-03-01T00:00:00.000Z',
+          descricao: 'Auto IBAMA',
+        },
+      ],
+    },
+    asgScore: {
+      score: 75,
+      riskLevel: 'Alto',
+      totalOcorrencias: 7,
+      breakdown: [],
+    },
+  },
+  sancoesAdmPublica: [
+    {
+      cadastro: 'CEIS',
+      codigoSancao: 'X1',
+      nomeSancionado: 'Empresa Multifonte S.A.',
+      categoriaSancao: 'Inidoneidade',
+      dataInicioSancao: '2023-09-01',
+      orgaoSancionador: 'CGU',
+      ufOrgao: 'DF',
+      esferaOrgao: 'FEDERAL',
+      fundamentacaoLegal: 'Lei 8.666/93',
+    },
+  ],
+  impedimentosCepim: [
+    {
+      cnpjEntidade: '55666777000181',
+      nomeEntidade: 'Empresa Multifonte S.A.',
+      numeroConvenio: '700123/2022',
+      orgaoConcedente: 'MMA',
+      motivoImpedimento: 'Convênio com pendências',
+    },
+  ],
+  trabalhoEscravo: [
+    {
+      anoAcaoFiscal: 2023,
+      uf: 'PA',
+      empregador: 'Empresa Multifonte S.A.',
+      cpfCnpjFormatado: '55.666.777/0001-81',
+      estabelecimento: 'Fazenda X',
+      trabalhadoresEnvolvidos: 12,
+      cnae: '0111-3/02',
+      decisaoAdmProcedencia: '2023-11-10',
+      inclusaoCadastroEmpregadores: '2024-01-15',
+    },
+  ],
+  icmbioAutos: [
+    {
+      numeroAi: 'AI-001',
+      tipo: 'Flora',
+      autuado: 'Empresa Multifonte S.A.',
+      descAi: 'Supressão em UC',
+      data: '2024-02-10',
+      ano: 2024,
+      tipoInfra: 'Supressão',
+      nomeUc: 'Parque Nacional X',
+      municipio: 'Altamira',
+      uf: 'PA',
+      processo: '02001.001/2024',
+      julgamento: 'Em análise',
+    },
+  ],
+  icmbioEmbargos: [
+    {
+      numeroEmb: 'EMB-001',
+      numeroAi: 'AI-001',
+      autuado: 'Empresa Multifonte S.A.',
+      descInfra: 'Supressão de vegetação',
+      descSanc: 'Embargo de área',
+      tipoInfra: 'Supressão',
+      nomeUc: 'Parque Nacional X',
+      municipio: 'Altamira',
+      uf: 'PA',
+      data: '2024-02-15',
+      ano: 2024,
+      area: 12.5,
+      processo: '02001.002/2024',
+      julgamento: 'Em análise',
+    },
+  ],
+};
+
 describe('Search', () => {
   let component: Search;
   let fixture: any;
@@ -538,6 +646,90 @@ describe('Search', () => {
 
         expect(component.errorMessage()).toBe('CNPJ inválido. Verifique os dígitos informados.');
       });
+    });
+  });
+
+  // V2 schema (Fases B + C): 5 novas listas no nível raiz da SearchResponse
+  describe('V2 schema mapping — root-level lists', () => {
+    async function searchMultifonte() {
+      component.searchTerm.set('55.666.777/0001-81');
+      const searchPromise = component.onSearch();
+      const req = httpMock.expectOne((request) =>
+        request.url.includes('/api/search/document')
+      );
+      req.flush(mockEntityWithAllSources);
+      await searchPromise;
+      fixture.detectChanges();
+    }
+
+    it('promotes the 5 new root-level lists into entity', async () => {
+      await searchMultifonte();
+      const entity = component.searchResult()?.entity;
+
+      expect(entity?.sancoesAdmPublica?.length).toBe(1);
+      expect(entity?.impedimentosCepim?.length).toBe(1);
+      expect(entity?.trabalhoEscravo?.length).toBe(1);
+      expect(entity?.icmbioAutos?.length).toBe(1);
+      expect(entity?.icmbioEmbargos?.length).toBe(1);
+    });
+
+    it('keeps the new fields undefined when API omits them', async () => {
+      component.searchTerm.set('11.222.333/0001-81');
+      const searchPromise = component.onSearch();
+      const req = httpMock.expectOne((request) =>
+        request.url.includes('/api/search/document')
+      );
+      req.flush(mockEntities['11222333000181']);
+      await searchPromise;
+      fixture.detectChanges();
+
+      const entity = component.searchResult()?.entity;
+      expect(entity?.sancoesAdmPublica).toBeUndefined();
+      expect(entity?.icmbioAutos).toBeUndefined();
+      expect(entity?.trabalhoEscravo).toBeUndefined();
+    });
+
+    it('hasAmbientalContent and hasAdministrativoContent are true when lists are populated', async () => {
+      await searchMultifonte();
+      expect(component.hasAmbientalContent()).toBe(true);
+      expect(component.hasAdministrativoContent()).toBe(true);
+    });
+
+    it('hasAdministrativoContent is false when only ambiental lists exist', async () => {
+      component.searchTerm.set('11.222.333/0001-81');
+      const searchPromise = component.onSearch();
+      const req = httpMock.expectOne((request) =>
+        request.url.includes('/api/search/document')
+      );
+      req.flush(mockEntities['11222333000181']);
+      await searchPromise;
+      fixture.detectChanges();
+
+      expect(component.hasAdministrativoContent()).toBe(false);
+    });
+
+    it('renders both group headers when all lists populated', async () => {
+      await searchMultifonte();
+      const compiled = fixture.nativeElement as HTMLElement;
+      const groupTitles = Array.from(
+        compiled.querySelectorAll('.result-group__title')
+      ).map((el) => el.textContent?.trim());
+      expect(groupTitles.some((t) => t?.includes('Ambiental'))).toBe(true);
+      expect(groupTitles.some((t) => t?.includes('Administrativo'))).toBe(true);
+    });
+
+    it('renders no group headers when no occurrences', async () => {
+      component.searchTerm.set('99.999.999/0001-91');
+      const searchPromise = component.onSearch();
+      const req = httpMock.expectOne((request) =>
+        request.url.includes('/api/search/document')
+      );
+      req.flush({ found: false });
+      await searchPromise;
+      fixture.detectChanges();
+
+      const compiled = fixture.nativeElement as HTMLElement;
+      expect(compiled.querySelectorAll('.result-group__title').length).toBe(0);
     });
   });
 });

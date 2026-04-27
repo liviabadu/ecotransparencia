@@ -55,6 +55,29 @@ export class Search implements OnDestroy {
   private favoriteToastClearTimer: ReturnType<typeof setTimeout> | null = null;
   private favoriteToastDismissFallback: ReturnType<typeof setTimeout> | null = null;
 
+  /** Há ao menos uma ocorrência ambiental (IBAMA ou ICMBio) para renderizar o grupo. */
+  readonly hasAmbientalContent = computed(() => {
+    const e = this.searchResult()?.entity;
+    if (!e) return false;
+    return (
+      !!e.ocorrencias?.embargos?.length ||
+      !!e.ocorrencias?.autosInfracao?.length ||
+      !!e.icmbioAutos?.length ||
+      !!e.icmbioEmbargos?.length
+    );
+  });
+
+  /** Há ao menos uma ocorrência administrativa/social (CEIS/CNEP, CEPIM, MTE). */
+  readonly hasAdministrativoContent = computed(() => {
+    const e = this.searchResult()?.entity;
+    if (!e) return false;
+    return (
+      !!e.sancoesAdmPublica?.length ||
+      !!e.impedimentosCepim?.length ||
+      !!e.trabalhoEscravo?.length
+    );
+  });
+
   /** Resultado CNPJ atual está nos favoritos do painel. */
   readonly isCurrentEntityFavorite = computed(() => {
     const keys = this.favoriteCnpjKeys();

@@ -127,7 +127,7 @@ export class CounterDirective implements AfterViewInit, OnDestroy {
     this.resetStripsToZero();
     this.cacheDigitPx();
 
-    this.playTimeoutId = window.setTimeout(() => {
+    this.playTimeoutId = setTimeout(() => {
       this.playTimeoutId = null;
       this.runAnimation(this.durationMs);
     }, this.delayMs);

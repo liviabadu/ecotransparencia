@@ -1,7 +1,18 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, catchError, from, map, throwError } from 'rxjs';
-import { Entity, SearchResult, Occurrence, RiskLevel, SituacaoCadastral } from '../models/entity.model';
+import {
+  Entity,
+  SearchResult,
+  Occurrence,
+  RiskLevel,
+  SituacaoCadastral,
+  SancaoAdmPublica,
+  ImpedimentoCepim,
+  TrabalhoEscravo,
+  IcmbioAuto,
+  IcmbioEmbargo,
+} from '../models/entity.model';
 import { ScoreService } from './score.service';
 import { MockDataService } from './mock-data.service';
 import { environment } from '../../environments/environment';
@@ -114,11 +125,83 @@ export interface ApiSituacaoCadastral {
   erroConsulta?: boolean;
 }
 
+export interface ApiSancaoAdmPublica {
+  cadastro: 'CEIS' | 'CNEP';
+  codigoSancao?: string;
+  nomeSancionado?: string;
+  categoriaSancao?: string;
+  valorMulta?: number;
+  dataInicioSancao?: string;
+  dataFimSancao?: string;
+  orgaoSancionador?: string;
+  ufOrgao?: string;
+  esferaOrgao?: string;
+  fundamentacaoLegal?: string;
+}
+
+export interface ApiImpedimentoCepim {
+  cnpjEntidade?: string;
+  nomeEntidade?: string;
+  numeroConvenio?: string;
+  orgaoConcedente?: string;
+  motivoImpedimento?: string;
+}
+
+export interface ApiTrabalhoEscravo {
+  anoAcaoFiscal?: number;
+  uf?: string;
+  empregador?: string;
+  cpfCnpjFormatado?: string;
+  estabelecimento?: string;
+  trabalhadoresEnvolvidos?: number;
+  cnae?: string;
+  decisaoAdmProcedencia?: string;
+  inclusaoCadastroEmpregadores?: string;
+}
+
+export interface ApiIcmbioAuto {
+  numeroAi?: string;
+  tipo?: string;
+  valorMulta?: number;
+  autuado?: string;
+  descAi?: string;
+  data?: string;
+  ano?: number;
+  tipoInfra?: string;
+  nomeUc?: string;
+  municipio?: string;
+  uf?: string;
+  processo?: string;
+  julgamento?: string;
+}
+
+export interface ApiIcmbioEmbargo {
+  numeroEmb?: string;
+  numeroAi?: string;
+  autuado?: string;
+  descInfra?: string;
+  descSanc?: string;
+  tipoInfra?: string;
+  nomeUc?: string;
+  municipio?: string;
+  uf?: string;
+  data?: string;
+  ano?: number;
+  area?: number;
+  processo?: string;
+  julgamento?: string;
+}
+
 export interface ApiSearchResponse {
   found: boolean;
   entity?: ApiEntityResponse;
   bloqueadoPorSituacaoCadastral?: boolean;
   situacaoCadastral?: ApiSituacaoCadastral;
+  sancoesAdmPublica?: ApiSancaoAdmPublica[];
+  impedimentosCepim?: ApiImpedimentoCepim[];
+  trabalhoEscravo?: ApiTrabalhoEscravo[];
+  icmbioAutos?: ApiIcmbioAuto[];
+  icmbioEmbargos?: ApiIcmbioEmbargo[];
 }
 
 @Injectable({
@@ -209,6 +292,11 @@ export class ApiService {
         riskLevel: response.entity.asgScore.riskLevel as RiskLevel,
       } : undefined,
       ocorrencias: response.entity.ocorrencias,
+      sancoesAdmPublica: response.sancoesAdmPublica as SancaoAdmPublica[] | undefined,
+      impedimentosCepim: response.impedimentosCepim as ImpedimentoCepim[] | undefined,
+      trabalhoEscravo: response.trabalhoEscravo as TrabalhoEscravo[] | undefined,
+      icmbioAutos: response.icmbioAutos as IcmbioAuto[] | undefined,
+      icmbioEmbargos: response.icmbioEmbargos as IcmbioEmbargo[] | undefined,
     };
 
     const scoreResult = this.scoreService.calculateScoreResult(
