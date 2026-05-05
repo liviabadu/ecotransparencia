@@ -1,14 +1,14 @@
-<div class="search-container">
+<div class="search-container" [class.search-container--dashboard]="dashboardLayout()">
   <!-- CA01 - Search Form -->
   <form class="search-form" (submit)="onSubmit($event)">
     <div class="search-input-group">
       <input
         type="text"
         class="search-input"
-        placeholder="Digite o CNPJ da empresa"
+        [attr.placeholder]="searchPlaceholder()"
         [value]="searchTerm()"
         (input)="onInputChange($any($event.target).value)"
-        [attr.aria-label]="'Campo de busca por CNPJ'"
+        [attr.aria-label]="dashboardLayout() ? 'Buscar empresa por nome ou CNPJ' : 'Campo de busca por CNPJ'"
         [attr.aria-describedby]="errorMessage() ? 'error-message' : null"
         maxlength="18"
       />
@@ -34,338 +34,551 @@
         (click)="clearSearch()"
         aria-label="Limpar busca"
       >
-        Limpar
+        <svg class="clear-button__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="9.25" stroke-opacity="0.28" />
+          <path d="M15 9 9 15M9 9l6 6" />
+        </svg>
+        <span class="clear-button__label">Limpar</span>
       </button>
     }
   </form>
 
-  <!-- Error Message - CA02, CA05, CT17 -->
+  <!-- Validação / rede — mesmo padrão visual dos cartões de resultado (result-surface + resumo) -->
   @if (errorMessage()) {
-    <div class="error-message" id="error-message" role="alert">
-      {{ errorMessage() }}
-    </div>
-  }
-
-  <!-- CA13 - Loading Indicator -->
-  @if (isLoading()) {
-    <div class="loading-container" role="status" aria-live="polite">
-      <div class="loading-spinner-large"></div>
-      <p>Buscando informações...</p>
-    </div>
-  }
-
-  <!-- CA12 - No Results Message -->
-  @if (noResultsFound() && !isLoading()) {
-    <div class="no-results" role="status">
-      <p>Nenhum registro encontrado para a entidade pesquisada</p>
-    </div>
-  }
-
-  <!-- Bloqueado por Situação Cadastral (V2 API) -->
-  @if (bloqueadoPorSituacaoCadastral() && !isLoading()) {
-    <div class="situacao-cadastral-alert" role="alert">
-      <div class="situacao-cadastral-header">
-        @if (situacaoCadastral()?.erroConsulta) {
-          <span class="situacao-icon warning-icon">&#9888;</span>
-          <h3>Erro na Consulta</h3>
-        } @else {
-          <span class="situacao-icon info-icon">&#9432;</span>
-          <h3>CNPJ Inativo</h3>
-        }
-      </div>
-      <div class="situacao-cadastral-content">
-        <p class="situacao-mensagem">{{ situacaoCadastral()?.mensagem }}</p>
-        <div class="situacao-details">
-          <p><strong>Situação:</strong> {{ situacaoCadastral()?.situacao }}</p>
-          @if (situacaoCadastral()?.dataConsulta) {
-            <p><strong>Data da Consulta:</strong> {{ formatDate(situacaoCadastral()?.dataConsulta) }}</p>
-          }
-          @if (situacaoCadastral()?.codigoErro) {
-            <p><strong>Código do Erro:</strong> {{ situacaoCadastral()?.codigoErro }}</p>
-          }
-        </div>
-      </div>
-    </div>
-  }
-
-  <!-- Search Results - CA07, CA08, CA10 -->
-  @if (searchResult()?.found && !isLoading()) {
-    <div class="results-container">
-      <!-- Entity Info -->
-      <div class="entity-info">
-        <h2>{{ searchResult()?.entity?.name }}</h2>
-        <p class="document">
-          CNPJ: {{ searchResult()?.entity?.document }}
-        </p>
-      </div>
-
-      <!-- CA07 - Score Display with Risk Level -->
-      <div class="score-card" [class]="'risk-' + searchResult()?.scoreResult?.riskLevel?.toLowerCase()">
-        <div class="score-value">
-          <span class="score-number">{{ searchResult()?.scoreResult?.score }}</span>
-          <span class="score-label">Score de Risco</span>
-        </div>
-        <div class="risk-indicator">
-          <span
-            class="risk-badge"
-            [style.background-color]="scoreService.getRiskColor(searchResult()?.scoreResult?.riskLevel!)"
-          >
-            {{ searchResult()?.scoreResult?.riskLevel }}
+    <div class="search-outcome-shell" [class.search-outcome-shell--dashboard]="dashboardLayout()">
+      <article
+        class="result-surface result-surface--summary search-state-card"
+        [class.search-state-card--empty-field]="errorFeedbackKind() === 'empty'"
+        [class.search-state-card--bad-format]="errorFeedbackKind() === 'format'"
+        [class.search-state-card--bad-digits]="errorFeedbackKind() === 'invalid-digits'"
+        [class.search-state-card--network]="errorFeedbackKind() === 'network'"
+        id="error-message"
+        role="alert"
+        aria-live="polite"
+      >
+        <div class="result-summary-row search-state-card__row">
+          <span class="search-state-icon" aria-hidden="true">
+            @switch (errorFeedbackKind()) {
+              @case ('empty') {
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke-linejoin="round" />
+                  <path d="M14 2v6h6M8 13h8M8 17h5" stroke-linecap="round" />
+                </svg>
+              }
+              @case ('format') {
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+                  <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" stroke-linejoin="round" />
+                  <path d="M12 9v4M12 17h.01" stroke-linecap="round" />
+                </svg>
+              }
+              @case ('invalid-digits') {
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="m15 9-6 6M9 9l6 6" stroke-linecap="round" />
+                </svg>
+              }
+              @case ('network') {
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round">
+                  <path d="m2 2 20 20" />
+                  <path d="M5.782 14.957A9 9 0 0 1 12 19a9 9 0 0 0 9-9" />
+                  <path d="M8.5 7.998A4 4 0 0 1 17 11" />
+                  <path d="M12 18v.01M12 5V3" />
+                </svg>
+              }
+              @default {
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="M12 8v5M12 16h.01" stroke-linecap="round" />
+                </svg>
+              }
+            }
           </span>
-          <span class="risk-scale">Escala: 0-100</span>
+          <div class="result-summary-text">
+            <span class="result-summary-label">{{ errorFeedbackEyebrow() }}</span>
+            <p class="result-summary-strong">{{ errorMessage() }}</p>
+          </div>
+        </div>
+      </article>
+    </div>
+  }
+
+  @if (isLoading()) {
+    <div class="search-outcome-shell" [class.search-outcome-shell--dashboard]="dashboardLayout()">
+      <article class="result-surface result-surface--summary search-state-card search-state-card--loading" role="status" aria-live="polite">
+        <div class="result-summary-row search-state-card__row">
+          <span class="search-state-icon search-state-icon--loading" aria-hidden="true">
+            <span class="search-state-spinner"></span>
+          </span>
+          <div class="result-summary-text">
+            <span class="result-summary-label">Busca em andamento</span>
+            <p class="result-summary-strong">Consultando as fontes e preparando o score de risco…</p>
+          </div>
+        </div>
+      </article>
+    </div>
+  }
+
+  @if (noResultsFound() && !isLoading()) {
+    <div class="search-outcome-shell" [class.search-outcome-shell--dashboard]="dashboardLayout()">
+      <article class="result-surface result-surface--summary search-state-card search-state-card--no-records" role="status">
+        <div class="result-summary-row search-state-card__row">
+          <span class="search-state-icon" aria-hidden="true">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+              <circle cx="11" cy="11" r="8" />
+              <path d="m21 21-4.35-4.35M8 11h6" stroke-linecap="round" />
+            </svg>
+          </span>
+          <div class="result-summary-text">
+            <span class="result-summary-label">Sem registro na base</span>
+            <p class="result-summary-strong">Nenhum registro encontrado para a entidade pesquisada</p>
+          </div>
+        </div>
+      </article>
+    </div>
+  }
+
+  @if (bloqueadoPorSituacaoCadastral() && !isLoading()) {
+    <div class="search-outcome-shell" [class.search-outcome-shell--dashboard]="dashboardLayout()">
+      <div
+        class="situacao-cadastral-card situacao-cadastral-card--result-surface"
+        [class.situacao-cadastral-card--error]="situacaoCadastral()?.erroConsulta"
+        [class.situacao-cadastral-card--dashboard]="dashboardLayout()"
+        role="alert"
+      >
+      <div class="situacao-cadastral-card__inner">
+        <div class="situacao-cadastral-card__icon-wrap" aria-hidden="true">
+          @if (situacaoCadastral()?.erroConsulta) {
+            <svg class="situacao-cadastral-card__svg situacao-cadastral-card__svg--error" width="28" height="28" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.75" />
+              <path d="M12 8v5M12 16h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            </svg>
+          } @else {
+            <svg class="situacao-cadastral-card__svg situacao-cadastral-card__svg--warn" width="28" height="28" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"
+                stroke="currentColor"
+                stroke-width="1.75"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <path d="M12 9v4M12 17h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            </svg>
+          }
+        </div>
+        <div class="situacao-cadastral-card__main">
+          <h3 class="situacao-cadastral-card__title">
+            {{ situacaoCadastral()?.erroConsulta ? 'Erro na consulta' : 'CNPJ inativo' }}
+          </h3>
+          <p class="situacao-cadastral-card__message">{{ situacaoCadastral()?.mensagem }}</p>
+          <dl class="situacao-cadastral-card__facts">
+            @if (situacaoCadastral()?.situacao) {
+              <div class="situacao-cadastral-card__fact">
+                <dt>Situação</dt>
+                <dd>{{ situacaoCadastral()?.situacao }}</dd>
+              </div>
+            }
+            @if (formatDataConsultaCadastral(situacaoCadastral()?.dataConsulta); as dataConsultaFmt) {
+              <div class="situacao-cadastral-card__fact">
+                <dt>Data da consulta</dt>
+                <dd>{{ dataConsultaFmt }}</dd>
+              </div>
+            }
+            @if (situacaoCadastral()?.codigoErro) {
+              <div class="situacao-cadastral-card__fact">
+                <dt>Código do erro</dt>
+                <dd>{{ situacaoCadastral()?.codigoErro }}</dd>
+              </div>
+            }
+          </dl>
         </div>
       </div>
+    </div>
+    </div>
+  }
 
-      <!-- ASG Score Breakdown (V2 API) -->
-      @if (searchResult()?.entity?.asgScore) {
-        <div class="asg-score-card">
-          <h3>ASG Score Detalhado</h3>
-          <div class="asg-summary">
-            <p>
-              <strong>Score ASG:</strong> {{ searchResult()?.entity?.asgScore?.score }}
-              | <strong>Nível:</strong> {{ searchResult()?.entity?.asgScore?.riskLevel }}
-              | <strong>Total de Ocorrências:</strong> {{ searchResult()?.entity?.asgScore?.totalOcorrencias }}
-            </p>
-          </div>
-
-          @if (searchResult()?.entity?.asgScore?.breakdown?.length) {
-            <div class="breakdown-container">
-              <h4>Composição do Score</h4>
-              @for (item of searchResult()?.entity?.asgScore?.breakdown; track item.fonte) {
-                <div class="breakdown-item">
-                  <div class="breakdown-header">
-                    <span class="breakdown-fonte">{{ item.fonte }}</span>
-                    <span class="breakdown-score">Score: {{ item.score }}</span>
-                  </div>
-                  <div class="breakdown-details">
-                    <span>Ocorrências: {{ item.quantidadeOcorrencias }}</span>
-                    <span>Peso: {{ item.peso }}</span>
-                    @if (item.scorePonderado !== undefined) {
-                      <span>Score Ponderado: {{ item.scorePonderado }}</span>
-                      <span class="breakdown-percentage">
-                        {{ getBreakdownPercentage(item.scorePonderado, searchResult()?.entity?.asgScore?.score || 0) }}% do total
-                      </span>
-                    }
-                  </div>
+  @if (searchResult()?.found && !isLoading()) {
+    <div
+      class="results-container"
+      [class.results-container--dashboard]="dashboardLayout()"
+    >
+      <div class="cnpj-results">
+        <header
+          class="cnpj-entity-header"
+          [class.cnpj-entity-header--with-fav]="dashboardLayout() && searchResult()?.entity?.documentType === 'cnpj'"
+        >
+          @if (dashboardLayout() && searchResult()?.entity?.documentType === 'cnpj') {
+            <div class="cnpj-entity-header__toolbar">
+              <span class="cnpj-entity-header__tag">Empresa analisada</span>
+              <div class="cnpj-entity-header__fav-wrap">
+                <button
+                  type="button"
+                  class="cnpj-entity-header__fav-btn"
+                  [class.cnpj-entity-header__fav-btn--active]="isCurrentEntityFavorite()"
+                  [attr.aria-pressed]="isCurrentEntityFavorite()"
+                  [attr.aria-label]="
+                    isCurrentEntityFavorite()
+                      ? 'Remover empresa dos favoritos'
+                      : 'Favoritar empresa'
+                  "
+                  (click)="toggleEntityFavorite($event)"
+                >
+                  <svg
+                    class="cnpj-entity-header__fav-icon"
+                    width="22"
+                    height="22"
+                    viewBox="0 0 24 24"
+                    [attr.fill]="isCurrentEntityFavorite() ? 'currentColor' : 'none'"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    aria-hidden="true"
+                  >
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                  </svg>
+                </button>
+                <span class="cnpj-entity-header__fav-tooltip" aria-hidden="true">
+                  {{ isCurrentEntityFavorite() ? 'Remover dos favoritos' : 'Favoritar empresa' }}
+                </span>
+              </div>
+            </div>
+          } @else {
+            <span class="cnpj-entity-header__tag">Empresa analisada</span>
+          }
+          <div
+            class="cnpj-entity-header__fav-toast-slot"
+            [class.cnpj-entity-header__fav-toast-slot--expanded]="
+              !!favoriteToastMessage() && !favoriteToastLeaving()
+            "
+            (transitionend)="onFavoriteToastSlotTransitionEnd($event)"
+          >
+            @if (favoriteToastMessage(); as toastMsg) {
+              @for (_ of [favoriteToastRenderKey()]; track _) {
+                <div class="cnpj-entity-header__fav-toast-slot__inner">
+                  <p
+                    class="cnpj-entity-header__fav-toast"
+                    [class.cnpj-entity-header__fav-toast--removed]="favoriteToastKind() === 'removed'"
+                    [class.cnpj-entity-header__fav-toast--leaving]="favoriteToastLeaving()"
+                    role="status"
+                    aria-live="polite"
+                  >
+                    {{ toastMsg }}
+                  </p>
                 </div>
               }
+            }
+          </div>
+          <h2 class="cnpj-entity-header__title">{{ searchResult()?.entity?.name }}</h2>
+          <p class="cnpj-entity-header__doc">CNPJ {{ searchResult()?.entity?.document }}</p>
+        </header>
+
+        <!-- CA07 - Score + barra 0–100 -->
+        <article
+          [ngClass]="['result-surface', 'result-surface--score', 'risk-tone--' + riskBandKey()]"
+          aria-labelledby="cnpj-score-heading"
+        >
+          <div class="result-score-grid">
+            <div class="result-score-main">
+              <p id="cnpj-score-heading" class="visually-hidden">
+                Score de risco {{ searchResult()?.scoreResult?.score }} de 100, nível {{ riskBandLabel() }}
+              </p>
+              <span class="result-score-value" aria-hidden="true">{{ searchResult()?.scoreResult?.score }}</span>
+              <span class="result-score-caption">Score de risco</span>
+              <div class="risk-meter" aria-hidden="true">
+                <div class="risk-meter__labels">
+                  <span>0</span>
+                  <span>100</span>
+                </div>
+                <div class="risk-meter__track">
+                  <div
+                    class="risk-meter__fill"
+                    [style.width.%]="clampScorePercent(searchResult()?.scoreResult?.score)"
+                  ></div>
+                </div>
+              </div>
             </div>
-          }
-        </div>
-      }
+            <div class="result-score-aside">
+              <span [ngClass]="['risk-pill', 'risk-pill--' + riskBandKey()]">
+                {{ riskBandLabel() }}
+              </span>
+              <span class="result-score-scale">Escala 0–100</span>
+            </div>
+          </div>
+        </article>
 
-      <!-- CT18 - Score Components Summary -->
-      <div class="summary-card">
-        <h3>Resumo das Ocorrências</h3>
-        <p class="total-occurrences">
-          Total de ocorrências encontradas:
-          <strong>{{ searchResult()?.scoreResult?.totalOccurrences }}</strong>
-        </p>
-      </div>
-
-      <!-- Embargos Section (V2 API) -->
-      @if (searchResult()?.entity?.ocorrencias?.embargos?.length) {
-        <div class="embargos-container">
-          <h3>Embargos ({{ searchResult()?.entity?.ocorrencias?.embargos?.length }})</h3>
-          <div class="embargos-list">
-            @for (embargo of searchResult()?.entity?.ocorrencias?.embargos; track embargo.id) {
-              <div class="embargo-card">
-                <div class="embargo-header">
-                  @if (embargo.date) {
-                    <span class="embargo-date">{{ formatDate(embargo.date) }}</span>
-                  }
-                  <div class="embargo-badges">
-                    @if (embargo.status) {
-                      <span
-                        class="embargo-status"
-                        [class.status-ativo]="embargo.status === 'Ativo'"
-                        [class.status-baixado]="embargo.status === 'Baixado'"
-                      >
-                        {{ embargo.status }}
-                      </span>
-                    }
-                    @if (embargo.desmatamento) {
-                      <span class="badge badge-desmatamento">Desmatamento</span>
-                    }
-                    @if (embargo.biome) {
-                      <span class="badge badge-biome" [style.background-color]="getBiomeColor(embargo.biome)">
-                        {{ embargo.biome }}
-                      </span>
-                    }
-                  </div>
+        <!-- ASG Score Breakdown (V2 API) -->
+        @if (searchResult()?.entity?.asgScore) {
+          <section class="result-section" aria-labelledby="cnpj-asg-title">
+            <h3 id="cnpj-asg-title" class="result-section__title">ASG — detalhamento</h3>
+            <article class="result-surface result-surface--asg">
+              <div class="asg-metrics">
+                <div class="asg-metric">
+                  <span class="asg-metric__label">Score ASG</span>
+                  <span class="asg-metric__value">{{ searchResult()?.entity?.asgScore?.score }}</span>
                 </div>
-                @if (embargo.description) {
-                  <p class="embargo-description">{{ embargo.description }}</p>
-                }
-                <div class="embargo-details">
-                  @if (embargo.location) {
-                    <div class="detail-item">
-                      <span class="detail-icon">📍</span>
-                      <span class="detail-text">{{ formatLocation(embargo.location) }}</span>
-                    </div>
-                  }
-                  @if (embargo.areaEmbargada) {
-                    <div class="detail-item">
-                      <span class="detail-icon">📊</span>
-                      <span class="detail-text">Área embargada: {{ formatArea(embargo.areaEmbargada) }}</span>
-                    </div>
-                  }
-                  @if (embargo.autoInfracao) {
-                    <div class="detail-item">
-                      <span class="detail-icon">📄</span>
-                      <span class="detail-text">Auto de Infração: {{ embargo.autoInfracao }}</span>
-                    </div>
-                  }
+                <div class="asg-metric">
+                  <span class="asg-metric__label">Nível</span>
+                  <span class="asg-metric__value asg-metric__value--sm">{{ searchResult()?.entity?.asgScore?.riskLevel }}</span>
                 </div>
-                <div class="embargo-footer">
-                  <span class="embargo-source">Fonte: {{ embargo.source }}</span>
-                  @if (embargo.sourceUrl) {
-                    <a
-                      [href]="embargo.sourceUrl"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      class="source-link"
-                    >
-                      Ver fonte original
-                    </a>
-                  }
-                  @if (embargo.category) {
-                    <span class="embargo-category">{{ embargo.category }}</span>
-                  }
+                <div class="asg-metric">
+                  <span class="asg-metric__label">Total de ocorrências</span>
+                  <span class="asg-metric__value">{{ searchResult()?.entity?.asgScore?.totalOcorrencias }}</span>
                 </div>
               </div>
-            }
+
+              @if (searchResult()?.entity?.asgScore?.breakdown?.length) {
+                <h4 class="asg-breakdown-title">Composição do score</h4>
+                <ul class="asg-breakdown-list">
+                  @for (item of searchResult()?.entity?.asgScore?.breakdown; track item.fonte) {
+                    <li class="asg-breakdown-card">
+                      <div class="asg-breakdown-card__head">
+                        <span class="asg-breakdown-card__fonte">{{ item.fonte }}</span>
+                        <span class="asg-breakdown-card__score">Score {{ item.score }}</span>
+                      </div>
+                      <div class="asg-breakdown-card__meta">
+                        <span>Ocorrências: {{ item.quantidadeOcorrencias }}</span>
+                        <span>Peso: {{ item.peso }}</span>
+                        @if (item.scorePonderado !== undefined) {
+                          <span>Ponderado: {{ item.scorePonderado }}</span>
+                          <span class="asg-breakdown-card__pct">
+                            {{ getBreakdownPercentage(item.scorePonderado, searchResult()?.entity?.asgScore?.score || 0) }}% do total
+                          </span>
+                        }
+                      </div>
+                    </li>
+                  }
+                </ul>
+              }
+            </article>
+          </section>
+        }
+
+        <!-- CT18 - Resumo -->
+        <div class="result-surface result-surface--summary">
+          <div class="result-summary-row">
+            <span class="result-summary-icon" aria-hidden="true">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+                <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" stroke-linecap="round" />
+              </svg>
+            </span>
+            <div class="result-summary-text">
+              <span class="result-summary-label">Resumo</span>
+              <p class="result-summary-strong">{{ occurrencesSummaryLabel(searchResult()?.scoreResult?.totalOccurrences) }}</p>
+            </div>
           </div>
         </div>
-      }
 
-      <!-- Autos de Infração Section (V2 API) -->
-      @if (searchResult()?.entity?.ocorrencias?.autosInfracao?.length) {
-        <div class="autos-container">
-          <h3>Autos de Infração ({{ searchResult()?.entity?.ocorrencias?.autosInfracao?.length }})</h3>
-          <div class="autos-list">
-            @for (auto of searchResult()?.entity?.ocorrencias?.autosInfracao; track auto.id) {
-              <div class="auto-card">
-                <div class="auto-header">
-                  @if (auto.data) {
-                    <span class="auto-date">{{ formatDate(auto.data) }}</span>
+        <!-- Embargos (V2) -->
+        @if (searchResult()?.entity?.ocorrencias?.embargos?.length) {
+          <section class="result-section" aria-labelledby="cnpj-embargos-title">
+            <h3 id="cnpj-embargos-title" class="result-section__title">
+              Embargos
+              <span class="result-section__count">{{ searchResult()?.entity?.ocorrencias?.embargos?.length }}</span>
+            </h3>
+            <div class="result-stack">
+              @for (embargo of searchResult()?.entity?.ocorrencias?.embargos; track embargo.id) {
+                <article class="result-surface result-surface--occurrence result-surface--embargo">
+                  <div class="occurrence-card-head">
+                    <div class="occurrence-card-head__left">
+                      @if (embargo.date) {
+                        <time class="occurrence-date">{{ formatDate(embargo.date) }}</time>
+                      }
+                      @if (embargo.category) {
+                        <span class="occurrence-category-chip">{{ embargo.category }}</span>
+                      }
+                    </div>
+                    <div class="occurrence-card-head__badges">
+                      @if (embargo.status) {
+                        <span
+                          class="status-chip"
+                          [class.status-chip--ativo]="embargo.status === 'Ativo'"
+                          [class.status-chip--baixado]="embargo.status === 'Baixado'"
+                        >
+                          {{ embargo.status }}
+                        </span>
+                      }
+                      @if (embargo.desmatamento) {
+                        <span class="meta-chip meta-chip--alert">Desmatamento</span>
+                      }
+                      @if (embargo.biome) {
+                        <span class="meta-chip meta-chip--biome" [style.--biome]="getBiomeColor(embargo.biome)">
+                          {{ embargo.biome }}
+                        </span>
+                      }
+                    </div>
+                  </div>
+                  @if (embargo.description) {
+                    <p class="occurrence-body-text">{{ embargo.description }}</p>
                   }
-                  <div class="auto-badges">
-                    @if (auto.numeroAuto) {
-                      <span class="auto-numero">Nº {{ auto.numeroAuto }}</span>
+                  <div class="occurrence-details">
+                    @if (embargo.location) {
+                      <div class="occurrence-detail-row">
+                        <span class="occurrence-detail-icon" aria-hidden="true">📍</span>
+                        <span>{{ formatLocation(embargo.location) }}</span>
+                      </div>
                     }
-                    @if (auto.status) {
-                      <span class="badge badge-status">{{ auto.status }}</span>
+                    @if (embargo.areaEmbargada) {
+                      <div class="occurrence-detail-row">
+                        <span class="occurrence-detail-icon" aria-hidden="true">📊</span>
+                        <span>Área embargada: {{ formatArea(embargo.areaEmbargada) }}</span>
+                      </div>
                     }
-                    @if (auto.gravidade) {
-                      <span class="badge badge-gravidade" [style.background-color]="getGravityColor(auto.gravidade)">
-                        {{ auto.gravidade }}
-                      </span>
+                    @if (embargo.autoInfracao) {
+                      <div class="occurrence-detail-row">
+                        <span class="occurrence-detail-icon" aria-hidden="true">📄</span>
+                        <span>Auto de infração: {{ embargo.autoInfracao }}</span>
+                      </div>
                     }
                   </div>
-                </div>
-                @if (auto.descricao) {
-                  <p class="auto-description">{{ auto.descricao }}</p>
-                }
-                <div class="auto-details-grid">
-                  @if (auto.location) {
-                    <div class="detail-item">
-                      <span class="detail-icon">📍</span>
-                      <span class="detail-text">{{ formatLocation(auto.location) }}</span>
-                    </div>
-                  }
-                  @if (auto.biomasAtingidos) {
-                    <div class="detail-item">
-                      <span class="detail-icon">🌳</span>
-                      <span class="detail-text">Bioma: {{ auto.biomasAtingidos }}</span>
-                    </div>
-                  }
-                  @if (auto.tipoInfracao) {
-                    <div class="detail-item">
-                      <span class="detail-icon">🌿</span>
-                      <span class="detail-text">Tipo: {{ auto.tipoInfracao }}</span>
-                    </div>
-                  }
-                  @if (auto.efeitoMeioAmbiente) {
-                    <div class="detail-item">
-                      <span class="detail-icon">⚠️</span>
-                      <span class="detail-text">Efeito: {{ auto.efeitoMeioAmbiente }}</span>
-                    </div>
-                  }
-                  @if (auto.valorMulta !== undefined) {
-                    <div class="detail-item">
-                      <span class="detail-icon">💰</span>
-                      <span class="detail-text">Multa: {{ formatCurrency(auto.valorMulta) }}</span>
-                    </div>
-                  }
-                  @if (auto.motivacaoConduta) {
-                    <div class="detail-item">
-                      <span class="detail-icon">🎯</span>
-                      <span class="detail-text">Motivação: {{ auto.motivacaoConduta }}</span>
-                    </div>
-                  }
-                </div>
-                @if (auto.enquadramentoLegal) {
-                  <div class="auto-legal">
-                    <span class="detail-icon">📜</span>
-                    <span class="legal-text">{{ auto.enquadramentoLegal }}</span>
-                  </div>
-                }
-                <div class="auto-footer">
-                  <span class="auto-source">Fonte: {{ auto.source }}</span>
-                </div>
-              </div>
-            }
-          </div>
-        </div>
-      }
-
-      <!-- CA08 - Results by Category -->
-      @if (searchResult()?.scoreResult?.categorySummaries?.length) {
-        <div class="categories-container">
-          <h3>Detalhamento por Categoria</h3>
-
-          @for (category of searchResult()?.scoreResult?.categorySummaries; track category.category) {
-            <div class="category-section">
-              <div class="category-header">
-                <h4>{{ category.category }}</h4>
-                <span class="category-count">{{ category.count }} ocorrência(s)</span>
-              </div>
-
-              <!-- CA09, CA10 - Occurrences ordered chronologically -->
-              <div class="occurrences-list">
-                @for (occurrence of category.occurrences; track occurrence.id) {
-                  <div class="occurrence-card">
-                    <div class="occurrence-header">
-                      <span class="occurrence-date">{{ formatDate(occurrence.date) }}</span>
-                      <span
-                        class="occurrence-status"
-                        [class.status-ativo]="occurrence.status === 'Ativo'"
-                        [class.status-baixado]="occurrence.status === 'Baixado'"
-                      >
-                        {{ occurrence.status }}
-                      </span>
-                    </div>
-                    <p class="occurrence-description">{{ occurrence.description }}</p>
-                    <div class="occurrence-footer">
-                      <span class="occurrence-source">Fonte: {{ occurrence.source }}</span>
-                      <!-- CA11 - Link to original source -->
-                      <a
-                        [href]="occurrence.sourceUrl"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        class="source-link"
-                      >
+                  <footer class="occurrence-card-foot">
+                    <span class="occurrence-source">Fonte: {{ embargo.source }}</span>
+                    @if (embargo.sourceUrl) {
+                      <a [href]="embargo.sourceUrl" target="_blank" rel="noopener noreferrer" class="result-link">
                         Ver fonte original
                       </a>
+                    }
+                  </footer>
+                </article>
+              }
+            </div>
+          </section>
+        }
+
+        <!-- Autos de infração (V2) -->
+        @if (searchResult()?.entity?.ocorrencias?.autosInfracao?.length) {
+          <section class="result-section" aria-labelledby="cnpj-autos-title">
+            <h3 id="cnpj-autos-title" class="result-section__title">
+              Autos de infração
+              <span class="result-section__count">{{ searchResult()?.entity?.ocorrencias?.autosInfracao?.length }}</span>
+            </h3>
+            <div class="result-stack">
+              @for (auto of searchResult()?.entity?.ocorrencias?.autosInfracao; track auto.id) {
+                <article class="result-surface result-surface--occurrence result-surface--auto">
+                  <div class="occurrence-card-head">
+                    <div class="occurrence-card-head__left">
+                      @if (auto.data) {
+                        <time class="occurrence-date">{{ formatDate(auto.data) }}</time>
+                      }
+                      @if (auto.numeroAuto) {
+                        <span class="occurrence-category-chip">Nº {{ auto.numeroAuto }}</span>
+                      }
+                    </div>
+                    <div class="occurrence-card-head__badges">
+                      @if (auto.status) {
+                        <span class="status-chip status-chip--neutral">{{ auto.status }}</span>
+                      }
+                      @if (auto.gravidade) {
+                        <span class="meta-chip meta-chip--gravity" [style.--grav]="getGravityColor(auto.gravidade)">
+                          {{ auto.gravidade }}
+                        </span>
+                      }
                     </div>
                   </div>
-                }
-              </div>
+                  @if (auto.descricao) {
+                    <p class="occurrence-body-text">{{ auto.descricao }}</p>
+                  }
+                  <div class="occurrence-details occurrence-details--grid">
+                    @if (auto.location) {
+                      <div class="occurrence-detail-row">
+                        <span class="occurrence-detail-icon" aria-hidden="true">📍</span>
+                        <span>{{ formatLocation(auto.location) }}</span>
+                      </div>
+                    }
+                    @if (auto.biomasAtingidos) {
+                      <div class="occurrence-detail-row">
+                        <span class="occurrence-detail-icon" aria-hidden="true">🌳</span>
+                        <span>Bioma: {{ auto.biomasAtingidos }}</span>
+                      </div>
+                    }
+                    @if (auto.tipoInfracao) {
+                      <div class="occurrence-detail-row">
+                        <span class="occurrence-detail-icon" aria-hidden="true">🌿</span>
+                        <span>Tipo: {{ auto.tipoInfracao }}</span>
+                      </div>
+                    }
+                    @if (auto.efeitoMeioAmbiente) {
+                      <div class="occurrence-detail-row">
+                        <span class="occurrence-detail-icon" aria-hidden="true">⚠️</span>
+                        <span>Efeito: {{ auto.efeitoMeioAmbiente }}</span>
+                      </div>
+                    }
+                    @if (auto.valorMulta !== undefined) {
+                      <div class="occurrence-detail-row">
+                        <span class="occurrence-detail-icon" aria-hidden="true">💰</span>
+                        <span>Multa: {{ formatCurrency(auto.valorMulta) }}</span>
+                      </div>
+                    }
+                    @if (auto.motivacaoConduta) {
+                      <div class="occurrence-detail-row">
+                        <span class="occurrence-detail-icon" aria-hidden="true">🎯</span>
+                        <span>Motivação: {{ auto.motivacaoConduta }}</span>
+                      </div>
+                    }
+                  </div>
+                  @if (auto.enquadramentoLegal) {
+                    <div class="occurrence-legal">
+                      <span class="occurrence-detail-icon" aria-hidden="true">📜</span>
+                      <span>{{ auto.enquadramentoLegal }}</span>
+                    </div>
+                  }
+                  <footer class="occurrence-card-foot">
+                    <span class="occurrence-source">Fonte: {{ auto.source }}</span>
+                  </footer>
+                </article>
+              }
             </div>
-          }
-        </div>
-      }
+          </section>
+        }
+
+        <!-- CA08 - Por categoria -->
+        @if (searchResult()?.scoreResult?.categorySummaries?.length) {
+          <section class="result-section" aria-labelledby="cnpj-cat-title">
+            <h3 id="cnpj-cat-title" class="result-section__title">Detalhamento por categoria</h3>
+            <div class="result-stack result-stack--categories">
+              @for (category of searchResult()?.scoreResult?.categorySummaries; track category.category) {
+                <article class="result-surface result-surface--category">
+                  <header class="category-card-head">
+                    <h4 class="category-card-head__name">{{ category.category }}</h4>
+                    <span class="category-card-head__count">{{ category.count }} ocorrência(s)</span>
+                  </header>
+                  <div class="category-card-body">
+                    @for (occurrence of category.occurrences; track occurrence.id) {
+                      <div class="result-surface result-surface--occurrence result-surface--nested">
+                        <div class="occurrence-card-head">
+                          <div class="occurrence-card-head__left">
+                            <time class="occurrence-date">{{ formatDate(occurrence.date) }}</time>
+                          </div>
+                          @if (occurrence.status) {
+                            <div class="occurrence-card-head__badges">
+                              <span
+                                class="status-chip"
+                                [class.status-chip--ativo]="occurrence.status === 'Ativo'"
+                                [class.status-chip--baixado]="occurrence.status === 'Baixado'"
+                                [class.status-chip--lavrado]="occurrence.status === 'Lavrado'"
+                              >
+                                {{ occurrence.status }}
+                              </span>
+                            </div>
+                          }
+                        </div>
+                        <p class="occurrence-body-text">{{ occurrence.description }}</p>
+                        <footer class="occurrence-card-foot occurrence-card-foot--split">
+                          <span class="occurrence-source">Fonte: {{ occurrence.source }}</span>
+                          @if (occurrence.sourceUrl) {
+                            <a [href]="occurrence.sourceUrl" target="_blank" rel="noopener noreferrer" class="result-link">
+                              Ver fonte original
+                            </a>
+                          }
+                        </footer>
+                      </div>
+                    }
+                  </div>
+                </article>
+              }
+            </div>
+          </section>
+        }
+      </div>
     </div>
   }
 </div>

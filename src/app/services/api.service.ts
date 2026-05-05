@@ -1,8 +1,10 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, map } from 'rxjs';
+import { Observable, catchError, from, map, throwError } from 'rxjs';
 import { Entity, SearchResult, Occurrence, RiskLevel, SituacaoCadastral } from '../models/entity.model';
 import { ScoreService } from './score.service';
+import { MockDataService } from './mock-data.service';
+import { environment } from '../../environments/environment';
 
 /**
  * Interface representing the API response for entity search
@@ -18,6 +20,8 @@ export interface ApiEntityResponse {
   occurrences: ApiOccurrenceResponse[];
   asgScore?: ApiAsgScore;
   ocorrencias?: ApiOcorrencias;
+  /** Setor agregado para insights (opcional). */
+  sectorLabel?: string;
 }
 
 export interface ApiOccurrenceResponse {
@@ -123,6 +127,7 @@ export interface ApiSearchResponse {
 export class ApiService {
   private http = inject(HttpClient);
   private scoreService = inject(ScoreService);
+  private mockData = inject(MockDataService);
 
   private baseUrl = '/api';
 
@@ -136,7 +141,10 @@ export class ApiService {
       .get<ApiSearchResponse>(`${this.baseUrl}/search/document`, {
         params: { document: cleanDocument, type },
       })
-      .pipe(map((response) => this.mapApiResponseToSearchResult(response)));
+      .pipe(
+        map((response) => this.mapApiResponseToSearchResult(response)),
+        catchError((err) => this.fallbackDocumentSearchFromMockIfDev(document, type, err))
+      );
   }
 
   /**
@@ -147,7 +155,30 @@ export class ApiService {
       .get<ApiSearchResponse>(`${this.baseUrl}/search/name`, {
         params: { name },
       })
-      .pipe(map((response) => this.mapApiResponseToSearchResult(response)));
+      .pipe(
+        map((response) => this.mapApiResponseToSearchResult(response)),
+        catchError((err) => {
+          if (environment.production) {
+            return throwError(() => err);
+          }
+          return from(this.mockData.searchByName(name));
+        })
+      );
+  }
+
+  /**
+   * Em desenvolvimento, se a API em 127.0.0.1:3333 não estiver no ar (`npm start` sem `npm run api`),
+   * usa o mock em memória para os CNPJs de demonstração continuarem a funcionar.
+   */
+  private fallbackDocumentSearchFromMockIfDev(
+    document: string,
+    type: 'cpf' | 'cnpj',
+    err: unknown
+  ): Observable<SearchResult> {
+    if (environment.production) {
+      return throwError(() => err);
+    }
+    return from(this.mockData.searchByDocument(document, type));
   }
 
   /**

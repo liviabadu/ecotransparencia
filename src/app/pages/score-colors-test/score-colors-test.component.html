@@ -1,0 +1,374 @@
+<div class="score-colors-test-page">
+  <a routerLink="/" class="score-colors-test-back">← Voltar ao site</a>
+
+  <header class="score-colors-test-head">
+    <h1 class="score-colors-test-title">Teste — cores do score</h1>
+    <p class="score-colors-test-lead">
+      Use os CNPJs de demonstração na tabela (servidor local com mock em <code class="score-colors-test-code">server/mock-data.js</code>) para cada faixa de
+      score e tipos de pendência; depois consulte. Abaixo há ainda a paleta fixa de cores.
+    </p>
+  </header>
+
+  <div class="search-container">
+    <section class="score-colors-test-cnpj" aria-labelledby="cnpj-test-title">
+      <h2 id="cnpj-test-title" class="score-colors-test-section-title">Testar CNPJ</h2>
+
+      <div class="score-colors-test-fixtures" role="region" aria-label="CNPJs de demonstração">
+        <table class="score-colors-test-table">
+          <thead>
+            <tr>
+              <th scope="col">CNPJ (demo)</th>
+              <th scope="col">Faixa de score</th>
+              <th scope="col">Pendências</th>
+              <th scope="col">Ação</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of demoCnpjFixtures; track row.cnpjMasked) {
+              <tr>
+                <td>
+                  <code class="score-colors-test-code">{{ row.cnpjMasked }}</code>
+                </td>
+                <td>{{ row.faixa }}</td>
+                <td>{{ row.pendencias }}</td>
+                <td>
+                  <button type="button" class="score-colors-test-chip" (click)="fillDemoCnpj(row.cnpjMasked)">
+                    Preencher
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <form class="search-form" (submit)="onCnpjSubmit($event)">
+        <div class="search-input-group">
+          <input
+            type="text"
+            class="search-input"
+            placeholder="Digite o CNPJ"
+            [value]="cnpjTerm()"
+            (input)="onCnpjInput($any($event.target).value)"
+            aria-label="CNPJ para teste de pendências"
+            [attr.aria-describedby]="errorMessage() ? 'cnpj-test-error' : null"
+            maxlength="18"
+          />
+          <button type="submit" class="search-button" [disabled]="isLoading()" aria-label="Consultar CNPJ">
+            @if (isLoading()) {
+              <span class="loading-spinner"></span>
+              Buscando...
+            } @else {
+              Consultar
+            }
+          </button>
+        </div>
+        @if (cnpjTerm()) {
+          <button type="button" class="clear-button" (click)="clearCnpjSearch()">Limpar</button>
+        }
+      </form>
+
+      @if (errorMessage()) {
+        <div class="error-message" id="cnpj-test-error" role="alert">
+          {{ errorMessage() }}
+        </div>
+      }
+
+      @if (isLoading()) {
+        <div class="loading-container" role="status" aria-live="polite">
+          <div class="loading-spinner-large"></div>
+          <p>Buscando informações...</p>
+        </div>
+      }
+
+      @if (noResultsFound() && !isLoading()) {
+        <div class="no-results" role="status">
+          <p>Nenhum registro encontrado para este CNPJ.</p>
+        </div>
+      }
+
+      @if (bloqueadoPorSituacaoCadastral() && !isLoading()) {
+        <div
+          class="situacao-cadastral-card"
+          [class.situacao-cadastral-card--error]="situacaoCadastral()?.erroConsulta"
+          role="alert"
+        >
+          <div class="situacao-cadastral-card__inner">
+            <div class="situacao-cadastral-card__icon-wrap" aria-hidden="true">
+              @if (situacaoCadastral()?.erroConsulta) {
+                <svg class="situacao-cadastral-card__svg situacao-cadastral-card__svg--error" width="28" height="28" viewBox="0 0 24 24" fill="none">
+                  <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.75" />
+                  <path d="M12 8v5M12 16h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                </svg>
+              } @else {
+                <svg class="situacao-cadastral-card__svg situacao-cadastral-card__svg--warn" width="28" height="28" viewBox="0 0 24 24" fill="none">
+                  <path
+                    d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"
+                    stroke="currentColor"
+                    stroke-width="1.75"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                  <path d="M12 9v4M12 17h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                </svg>
+              }
+            </div>
+            <div class="situacao-cadastral-card__main">
+              <h3 class="situacao-cadastral-card__title">
+                {{ situacaoCadastral()?.erroConsulta ? 'Erro na consulta' : 'CNPJ inativo' }}
+              </h3>
+              <p class="situacao-cadastral-card__message">{{ situacaoCadastral()?.mensagem }}</p>
+              <dl class="situacao-cadastral-card__facts">
+                @if (situacaoCadastral()?.situacao) {
+                  <div class="situacao-cadastral-card__fact">
+                    <dt>Situação</dt>
+                    <dd>{{ situacaoCadastral()?.situacao }}</dd>
+                  </div>
+                }
+                @if (formatDataConsultaCadastral(situacaoCadastral()?.dataConsulta); as dataConsultaFmt) {
+                  <div class="situacao-cadastral-card__fact">
+                    <dt>Data da consulta</dt>
+                    <dd>{{ dataConsultaFmt }}</dd>
+                  </div>
+                }
+                @if (situacaoCadastral()?.codigoErro) {
+                  <div class="situacao-cadastral-card__fact">
+                    <dt>Código do erro</dt>
+                    <dd>{{ situacaoCadastral()?.codigoErro }}</dd>
+                  </div>
+                }
+              </dl>
+            </div>
+          </div>
+        </div>
+      }
+
+      @if (hasSearched() && !isLoading() && !errorMessage()) {
+        @if (bloqueadoPorSituacaoCadastral()) {
+          <div class="pendencia-verdict pendencia-verdict--alert" role="status">
+            <strong>Pendência cadastral</strong>
+            <p>
+              Este CNPJ apresenta situação que impede exibir o painel completo (veja os detalhes acima). Trate como
+              <strong>com pendência</strong> até regularização.
+            </p>
+          </div>
+        } @else if (noResultsFound()) {
+          <div class="pendencia-verdict pendencia-verdict--neutral" role="status">
+            <strong>Sem dados na base</strong>
+            <p>Não foi possível associar pendências ou score a este número: empresa não encontrada.</p>
+          </div>
+        } @else if (searchResult()?.found) {
+          <div
+            class="pendencia-verdict"
+            [class.pendencia-verdict--alert]="hasOccurrencePendency()"
+            [class.pendencia-verdict--ok]="!hasOccurrencePendency()"
+            role="status"
+          >
+            @if (hasOccurrencePendency()) {
+              <strong>Com pendências nas bases consultadas</strong>
+              <p>
+                Foram encontradas <strong>{{ occurrenceCount() }}</strong>
+                {{ occurrenceCount() === 1 ? 'ocorrência' : 'ocorrências' }} ligadas a esta empresa (ambiental,
+                trabalhista ou administrativo, conforme as fontes).
+              </p>
+            } @else {
+              <strong>Sem pendências registradas nas bases consultadas</strong>
+              <p>Nenhuma ocorrência foi encontrada nas fontes públicas que alimentam o score neste momento.</p>
+            }
+          </div>
+
+          <div class="cnpj-results score-colors-test-live-wrap">
+            <header class="cnpj-entity-header">
+              <span class="cnpj-entity-header__tag">Resultado da consulta</span>
+              <h2 class="cnpj-entity-header__title">{{ searchResult()?.entity?.name }}</h2>
+              <p class="cnpj-entity-header__doc">CNPJ {{ searchResult()?.entity?.document }}</p>
+            </header>
+
+            <article
+              [ngClass]="['result-surface', 'result-surface--score', 'risk-tone--' + riskBandKeyLive()]"
+              aria-labelledby="live-score-heading"
+            >
+              <div class="result-score-grid">
+                <div class="result-score-main">
+                  <p id="live-score-heading" class="visually-hidden">
+                    Score de risco {{ searchResult()?.scoreResult?.score }} de 100, nível {{ riskBandLabelLive() }}
+                  </p>
+                  <span class="result-score-value" aria-hidden="true">{{ searchResult()?.scoreResult?.score }}</span>
+                  <span class="result-score-caption">Score de risco</span>
+                  <div class="risk-meter" aria-hidden="true">
+                    <div class="risk-meter__labels">
+                      <span>0</span>
+                      <span>100</span>
+                    </div>
+                    <div class="risk-meter__track">
+                      <div
+                        class="risk-meter__fill"
+                        [style.width.%]="clampScorePercent(searchResult()?.scoreResult?.score)"
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="result-score-aside">
+                  <span [ngClass]="['risk-pill', 'risk-pill--' + riskBandKeyLive()]">
+                    {{ riskBandLabelLive() }}
+                  </span>
+                  <span class="result-score-scale">Escala 0–100</span>
+                </div>
+              </div>
+            </article>
+
+            <section
+              class="result-section score-colors-test-pendencias"
+              aria-labelledby="pendencias-exemplos-title"
+            >
+              <h3 id="pendencias-exemplos-title" class="result-section__title">Exemplos de pendências</h3>
+              <p class="score-colors-test-pend-lead">
+                Com score <strong>{{ liveScoreDisplay() }}</strong> de 100, a faixa visual é
+                <strong>{{ riskBandLabelLive() }}</strong> (escala {{ riskBandRangeLive() }}). Abaixo, os registros
+                públicos associados a esta empresa que entram no cálculo e explicam o nível de risco.
+              </p>
+
+              @if (hasCategoryPendencyList()) {
+                <div class="result-stack result-stack--categories">
+                  @for (category of searchResult()?.scoreResult?.categorySummaries; track category.category) {
+                    <article class="result-surface result-surface--category">
+                      <header class="category-card-head">
+                        <h4 class="category-card-head__name">{{ category.category }}</h4>
+                        <span class="category-card-head__count">{{ category.count }} ocorrência(s)</span>
+                      </header>
+                      <div class="category-card-body">
+                        @for (occurrence of category.occurrences; track occurrence.id) {
+                          <div class="result-surface result-surface--occurrence result-surface--nested">
+                            <div class="occurrence-card-head">
+                              <div class="occurrence-card-head__left">
+                                <time class="occurrence-date">{{ formatDate(occurrence.date) }}</time>
+                              </div>
+                              @if (occurrence.status) {
+                                <div class="occurrence-card-head__badges">
+                                  <span
+                                    class="status-chip"
+                                    [class.status-chip--ativo]="occurrence.status === 'Ativo'"
+                                    [class.status-chip--baixado]="occurrence.status === 'Baixado'"
+                                    [class.status-chip--lavrado]="occurrence.status === 'Lavrado'"
+                                  >
+                                    {{ occurrence.status }}
+                                  </span>
+                                </div>
+                              }
+                            </div>
+                            @if (occurrence.description) {
+                              <p class="occurrence-body-text">{{ occurrence.description }}</p>
+                            }
+                            <footer class="occurrence-card-foot occurrence-card-foot--split">
+                              <span class="occurrence-source">Fonte: {{ occurrence.source }}</span>
+                              @if (occurrence.sourceUrl) {
+                                <a
+                                  [href]="occurrence.sourceUrl"
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  class="result-link"
+                                >
+                                  Ver fonte original
+                                </a>
+                              }
+                            </footer>
+                          </div>
+                        }
+                      </div>
+                    </article>
+                  }
+                </div>
+              } @else if (flatOccurrencesForPendencyList().length) {
+                <div class="result-stack">
+                  @for (occurrence of flatOccurrencesForPendencyList(); track occurrence.id) {
+                    <article class="result-surface result-surface--occurrence">
+                      <div class="occurrence-card-head">
+                        <div class="occurrence-card-head__left">
+                          <time class="occurrence-date">{{ formatDate(occurrence.date) }}</time>
+                          @if (occurrence.category) {
+                            <span class="occurrence-category-chip">{{ occurrence.category }}</span>
+                          }
+                        </div>
+                        @if (occurrence.status) {
+                          <div class="occurrence-card-head__badges">
+                            <span
+                              class="status-chip"
+                              [class.status-chip--ativo]="occurrence.status === 'Ativo'"
+                              [class.status-chip--baixado]="occurrence.status === 'Baixado'"
+                            >
+                              {{ occurrence.status }}
+                            </span>
+                          </div>
+                        }
+                      </div>
+                      @if (occurrence.description) {
+                        <p class="occurrence-body-text">{{ occurrence.description }}</p>
+                      }
+                      <footer class="occurrence-card-foot occurrence-card-foot--split">
+                        <span class="occurrence-source">Fonte: {{ occurrence.source }}</span>
+                        @if (occurrence.sourceUrl) {
+                          <a
+                            [href]="occurrence.sourceUrl"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="result-link"
+                          >
+                            Ver fonte original
+                          </a>
+                        }
+                      </footer>
+                    </article>
+                  }
+                </div>
+              } @else {
+                <div class="result-surface score-colors-test-pend-empty" role="status">
+                  <p>
+                    <strong>Nenhuma pendência a listar.</strong>
+                    Nesta consulta não há ocorrências detalhadas nas fontes — o score
+                    {{ liveScoreDisplay() !== '—' ? '(' + liveScoreDisplay() + ')' : '' }} reflete essa ausência ou
+                    apenas metadados mínimos da empresa.
+                  </p>
+                </div>
+              }
+            </section>
+          </div>
+        }
+      }
+    </section>
+
+    <h2 class="score-colors-test-section-title score-colors-test-section-title--spaced">Paleta de exemplos (faixas)</h2>
+    <div class="cnpj-results">
+      @for (b of bands; track b.key) {
+        <article
+          [ngClass]="['result-surface', 'result-surface--score', 'risk-tone--' + b.key]"
+          [attr.aria-labelledby]="'score-test-heading-' + b.key"
+        >
+          <div class="result-score-grid">
+            <div class="result-score-main">
+              <p [id]="'score-test-heading-' + b.key" class="visually-hidden">
+                Exemplo de score {{ b.score }} de 100, nível {{ b.label }}, faixa {{ b.range }}
+              </p>
+              <span class="result-score-value" aria-hidden="true">{{ b.score }}</span>
+              <span class="result-score-caption">Score de risco (exemplo {{ b.range }})</span>
+              <div class="risk-meter" aria-hidden="true">
+                <div class="risk-meter__labels">
+                  <span>0</span>
+                  <span>100</span>
+                </div>
+                <div class="risk-meter__track">
+                  <div class="risk-meter__fill" [style.width.%]="clampScorePercent(b.score)"></div>
+                </div>
+              </div>
+            </div>
+            <div class="result-score-aside">
+              <span [ngClass]="['risk-pill', 'risk-pill--' + b.key]">
+                {{ b.label }}
+              </span>
+              <span class="result-score-scale">Escala 0–100</span>
+            </div>
+          </div>
+        </article>
+      }
+    </div>
+  </div>
+</div>

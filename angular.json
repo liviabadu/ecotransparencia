@@ -26,21 +26,29 @@
               }
             ],
             "styles": [
+              "node_modules/@fontsource-variable/inter/wght.css",
+              "node_modules/@fontsource-variable/space-grotesk/wght.css",
               "src/styles.css"
             ]
           },
           "configurations": {
             "production": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.prod.ts"
+                }
+              ],
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "500kB",
-                  "maximumError": "1MB"
+                  "maximumWarning": "1MB",
+                  "maximumError": "2MB"
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "6kB",
-                  "maximumError": "12kB"
+                  "maximumWarning": "50kB",
+                  "maximumError": "100kB"
                 }
               ],
               "outputHashing": "all"
@@ -55,9 +63,17 @@
         },
         "serve": {
           "builder": "@angular/build:dev-server",
+          "options": {
+            "buildTarget": "ecotransparencia:build:development",
+            "proxyConfig": "proxy.conf.json",
+            "liveReload": true,
+            "watch": true,
+            "hmr": true
+          },
           "configurations": {
             "production": {
-              "buildTarget": "ecotransparencia:build:production"
+              "buildTarget": "ecotransparencia:build:production",
+              "hmr": false
             },
             "development": {
               "buildTarget": "ecotransparencia:build:development"

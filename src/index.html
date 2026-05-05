@@ -1,13 +1,19 @@
 <!doctype html>
-<html lang="en">
+<html lang="pt-BR" data-app-theme="dark">
 <head>
   <meta charset="utf-8">
   <title>Ecotransparencia</title>
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <meta name="theme-color" content="#0b1220">
+  <meta name="color-scheme" content="dark light">
+  <link rel="icon" type="image/png" href="/logo-ecotransparencia.png">
+  <!--
+    CSS global + @font-face vêm do build (angular.json → styles).
+    Fontes: @fontsource-variable/inter e space-grotesk — font-display: swap em cada face (não usamos Google Fonts).
+  -->
 </head>
-<body>
+<body style="margin:0;background-color:#070b12;color:rgba(255,255,255,0.92);font-family:Segoe UI,system-ui,-apple-system,Roboto,sans-serif">
   <app-root></app-root>
 </body>
 </html>

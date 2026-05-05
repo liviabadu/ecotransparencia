@@ -1,0 +1,29 @@
+<div
+  class="clear-search-history-confirm-backdrop"
+  role="presentation"
+  (click)="onBackdropClick($event)"
+>
+  <div
+    class="clear-search-history-confirm-panel"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="clear-search-history-confirm-title"
+    (click)="$event.stopPropagation()"
+  >
+    <h2 id="clear-search-history-confirm-title" class="clear-search-history-confirm-title">
+      Limpar todo o histórico de pesquisas neste navegador?
+    </h2>
+    <p class="clear-search-history-confirm-lead">
+      Serão removidos: últimas pesquisas, o ranking de maior risco recente, os alertas de mudança de score e a referência
+      usada para comparar consultas.
+    </p>
+    <div class="clear-search-history-confirm-actions">
+      <button type="button" class="clear-search-history-confirm-btn clear-search-history-confirm-btn--primary" (click)="onConfirm()">
+        Limpar histórico
+      </button>
+      <button type="button" class="clear-search-history-confirm-btn clear-search-history-confirm-btn--secondary" (click)="onCancel()" autofocus>
+        Cancelar
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,8 @@
+/* Estilos específicos da página Cadastrar-se (layout base em auth-modal.shared.css) */
+
+:host {
+  display: block;
+  width: 100%;
+  min-height: 100%;
+  background: transparent;
+}
