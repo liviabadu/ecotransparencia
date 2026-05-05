@@ -806,12 +806,21 @@
 
 .dash-insight-card--data-indicator .dash-card__indicator-facts--panel {
   margin-top: 8px;
-  gap: 0;
+  gap: 0.55rem;
   flex: 1;
   min-height: 0;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
+}
+
+.dash-insight-card--data-indicator .dash-card__indicator-facts--panel .dash-card__glossary-block:first-child {
+  margin-top: -4px;
+  min-height: 4.3rem;
+}
+
+.dash-insight-card--data-indicator .dash-card__indicator-facts--panel .dash-card__glossary-block:nth-child(2) {
+  min-height: 4.3rem;
 }
 
 .dash-insight-card--data-indicator .dash-card__indicator-facts__tail {

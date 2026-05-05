@@ -1,7 +1,7 @@
 import { DOCUMENT } from '@angular/common';
 import { Injectable, effect, inject, signal } from '@angular/core';
 
-export type AppThemeMode = 'system' | 'light' | 'dark';
+export type AppThemeMode = 'dark';
 
 const STORAGE_KEY = 'ecotransparencia-appearance';
 
@@ -11,28 +11,15 @@ const STORAGE_KEY = 'ecotransparencia-appearance';
 export class ThemeService {
   private readonly document = inject(DOCUMENT);
 
-  /** Preferência salva; sem valor gravado o padrão é escuro (evita seguir SO em claro). */
-  readonly mode = signal<AppThemeMode>(this.readStored());
-
-  private mql?: MediaQueryList;
-  private readonly onSchemeChange = (): void => {
-    if (this.mode() === 'system') {
-      this.applyToDom();
-    }
-  };
+  /** Tema fixo da aplicação: escuro. */
+  readonly mode = signal<AppThemeMode>('dark');
 
   constructor() {
-    if (typeof globalThis.matchMedia === 'function') {
-      this.mql = globalThis.matchMedia('(prefers-color-scheme: dark)');
-      this.mql.addEventListener('change', this.onSchemeChange);
-    }
-
     this.applyToDom();
 
     effect(() => {
-      const m = this.mode();
       try {
-        localStorage.setItem(STORAGE_KEY, m);
+        localStorage.setItem(STORAGE_KEY, 'dark');
       } catch {
         /* modo privado / indisponível */
       }
@@ -44,26 +31,9 @@ export class ThemeService {
     this.mode.set(next);
   }
 
-  private readStored(): AppThemeMode {
-    try {
-      const v = localStorage.getItem(STORAGE_KEY);
-      if (v === 'light' || v === 'dark' || v === 'system') return v;
-    } catch {
-      /* ignore */
-    }
-    return 'dark';
-  }
-
   private applyToDom(): void {
     const html = this.document.documentElement;
-    const m = this.mode();
-    html.setAttribute('data-app-theme', m);
-
-    const resolvedDark =
-      m === 'system'
-        ? !!globalThis.matchMedia?.('(prefers-color-scheme: dark)').matches
-        : m === 'dark';
-
-    html.style.setProperty('color-scheme', resolvedDark ? 'dark' : 'light');
+    html.setAttribute('data-app-theme', 'dark');
+    html.style.setProperty('color-scheme', 'dark');
   }
 }
