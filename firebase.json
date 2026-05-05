@@ -24,8 +24,8 @@
       {
         "source": "/api/**",
         "run": {
-          "serviceId": "ecotransparencia-api",
-          "region": "us-central1"
+          "serviceId": "ecotransparencia-api-gateway",
+          "region": "southamerica-east1"
         }
       },
       {

@@ -235,7 +235,14 @@ export class AuthService {
   }
 
   getPhotoUrl(): string | null {
-    return this.currentUser()?.photoURL ?? null;
+    const u = this.currentUser();
+    if (!u) return null;
+    const direct = u.photoURL?.trim();
+    if (direct) {
+      return direct;
+    }
+    const providerPhoto = u.providerData?.map((p) => p?.photoURL?.trim() ?? '').find(Boolean);
+    return providerPhoto || null;
   }
 
   /**
