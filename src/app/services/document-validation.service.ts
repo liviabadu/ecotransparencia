@@ -6,6 +6,8 @@ export interface ValidationResult {
   isValid: boolean;
   type: DocumentType;
   errorMessage?: string;
+  /** Classificação para UI em `validateCnpjOnly`. */
+  cnpjFeedback?: 'empty' | 'format' | 'invalid-digits';
 }
 
 @Injectable({
@@ -199,6 +201,7 @@ export class DocumentValidationService {
         isValid: false,
         type: 'cnpj',
         errorMessage: 'Informe o CNPJ para realizar a busca',
+        cnpjFeedback: 'empty',
       };
     }
 
@@ -209,6 +212,7 @@ export class DocumentValidationService {
         isValid: false,
         type: 'cnpj',
         errorMessage: 'Informe um CNPJ válido (14 dígitos)',
+        cnpjFeedback: 'format',
       };
     }
 
@@ -221,6 +225,7 @@ export class DocumentValidationService {
       isValid: false,
       type: 'cnpj',
       errorMessage: 'CNPJ inválido. Verifique os dígitos informados.',
+      cnpjFeedback: 'invalid-digits',
     };
   }
 

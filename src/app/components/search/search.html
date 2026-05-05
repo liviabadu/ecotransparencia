@@ -34,41 +34,117 @@
         (click)="clearSearch()"
         aria-label="Limpar busca"
       >
-        Limpar
+        <svg class="clear-button__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="9.25" stroke-opacity="0.28" />
+          <path d="M15 9 9 15M9 9l6 6" />
+        </svg>
+        <span class="clear-button__label">Limpar</span>
       </button>
     }
   </form>
 
-  <!-- Error Message - CA02, CA05, CT17 -->
+  <!-- Validação / rede — mesmo padrão visual dos cartões de resultado (result-surface + resumo) -->
   @if (errorMessage()) {
-    <div class="error-message" id="error-message" role="alert">
-      {{ errorMessage() }}
+    <div class="search-outcome-shell" [class.search-outcome-shell--dashboard]="dashboardLayout()">
+      <article
+        class="result-surface result-surface--summary search-state-card"
+        [class.search-state-card--empty-field]="errorFeedbackKind() === 'empty'"
+        [class.search-state-card--bad-format]="errorFeedbackKind() === 'format'"
+        [class.search-state-card--bad-digits]="errorFeedbackKind() === 'invalid-digits'"
+        [class.search-state-card--network]="errorFeedbackKind() === 'network'"
+        id="error-message"
+        role="alert"
+        aria-live="polite"
+      >
+        <div class="result-summary-row search-state-card__row">
+          <span class="search-state-icon" aria-hidden="true">
+            @switch (errorFeedbackKind()) {
+              @case ('empty') {
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke-linejoin="round" />
+                  <path d="M14 2v6h6M8 13h8M8 17h5" stroke-linecap="round" />
+                </svg>
+              }
+              @case ('format') {
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+                  <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" stroke-linejoin="round" />
+                  <path d="M12 9v4M12 17h.01" stroke-linecap="round" />
+                </svg>
+              }
+              @case ('invalid-digits') {
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="m15 9-6 6M9 9l6 6" stroke-linecap="round" />
+                </svg>
+              }
+              @case ('network') {
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round">
+                  <path d="m2 2 20 20" />
+                  <path d="M5.782 14.957A9 9 0 0 1 12 19a9 9 0 0 0 9-9" />
+                  <path d="M8.5 7.998A4 4 0 0 1 17 11" />
+                  <path d="M12 18v.01M12 5V3" />
+                </svg>
+              }
+              @default {
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="M12 8v5M12 16h.01" stroke-linecap="round" />
+                </svg>
+              }
+            }
+          </span>
+          <div class="result-summary-text">
+            <span class="result-summary-label">{{ errorFeedbackEyebrow() }}</span>
+            <p class="result-summary-strong">{{ errorMessage() }}</p>
+          </div>
+        </div>
+      </article>
     </div>
   }
 
-  <!-- CA13 - Loading -->
   @if (isLoading()) {
-    <div class="loading-container" role="status" aria-live="polite">
-      <div class="loading-spinner-large"></div>
-      <p>Buscando informações...</p>
+    <div class="search-outcome-shell" [class.search-outcome-shell--dashboard]="dashboardLayout()">
+      <article class="result-surface result-surface--summary search-state-card search-state-card--loading" role="status" aria-live="polite">
+        <div class="result-summary-row search-state-card__row">
+          <span class="search-state-icon search-state-icon--loading" aria-hidden="true">
+            <span class="search-state-spinner"></span>
+          </span>
+          <div class="result-summary-text">
+            <span class="result-summary-label">Busca em andamento</span>
+            <p class="result-summary-strong">Consultando as fontes e preparando o score de risco…</p>
+          </div>
+        </div>
+      </article>
     </div>
   }
 
-  <!-- CA12 - No Results Message -->
   @if (noResultsFound() && !isLoading()) {
-    <div class="no-results" role="status">
-      <p>Nenhum registro encontrado para a entidade pesquisada</p>
+    <div class="search-outcome-shell" [class.search-outcome-shell--dashboard]="dashboardLayout()">
+      <article class="result-surface result-surface--summary search-state-card search-state-card--no-records" role="status">
+        <div class="result-summary-row search-state-card__row">
+          <span class="search-state-icon" aria-hidden="true">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+              <circle cx="11" cy="11" r="8" />
+              <path d="m21 21-4.35-4.35M8 11h6" stroke-linecap="round" />
+            </svg>
+          </span>
+          <div class="result-summary-text">
+            <span class="result-summary-label">Sem registro na base</span>
+            <p class="result-summary-strong">Nenhum registro encontrado para a entidade pesquisada</p>
+          </div>
+        </div>
+      </article>
     </div>
   }
 
-  <!-- Bloqueado por situação cadastral (V2 API) — cartão alinhado ao tema escuro do painel -->
   @if (bloqueadoPorSituacaoCadastral() && !isLoading()) {
-    <div
-      class="situacao-cadastral-card"
-      [class.situacao-cadastral-card--error]="situacaoCadastral()?.erroConsulta"
-      [class.situacao-cadastral-card--dashboard]="dashboardLayout()"
-      role="alert"
-    >
+    <div class="search-outcome-shell" [class.search-outcome-shell--dashboard]="dashboardLayout()">
+      <div
+        class="situacao-cadastral-card situacao-cadastral-card--result-surface"
+        [class.situacao-cadastral-card--error]="situacaoCadastral()?.erroConsulta"
+        [class.situacao-cadastral-card--dashboard]="dashboardLayout()"
+        role="alert"
+      >
       <div class="situacao-cadastral-card__inner">
         <div class="situacao-cadastral-card__icon-wrap" aria-hidden="true">
           @if (situacaoCadastral()?.erroConsulta) {
@@ -116,6 +192,7 @@
           </dl>
         </div>
       </div>
+    </div>
     </div>
   }
 
