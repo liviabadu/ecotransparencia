@@ -23,9 +23,12 @@
   font-size: 1.1rem;
 }
 
-/* Search Form */
+/* Search Form — grid alinha “Limpar” na linha de baixo */
 .search-form {
   margin-bottom: 1.5rem;
+  display: grid;
+  grid-template-columns: 1fr;
+  justify-items: stretch;
 }
 
 .search-input-group {
@@ -83,20 +86,58 @@
   cursor: not-allowed;
 }
 
+/* Ação secundária — leve (sob a linha campo+botão, à esquerda) */
 .clear-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
   margin-top: 0.5rem;
-  padding: 0.5rem 1rem;
-  font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.7);
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: 10px;
+  justify-self: start;
+  padding: 0.35rem 0.55rem 0.35rem 0.4rem;
+  border: none;
+  border-radius: 999px;
   cursor: pointer;
-  justify-self: end;
+  font-family: inherit;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  color: rgba(148, 163, 184, 0.95);
+  background: transparent;
+  transition:
+    color 0.18s ease,
+    background 0.18s ease;
+}
+
+.clear-button__icon {
+  flex-shrink: 0;
+  width: 1rem;
+  height: 1rem;
+  color: rgba(148, 163, 184, 0.88);
+  transition: color 0.18s ease;
+}
+
+.clear-button__label {
+  padding-right: 0.1rem;
 }
 
 .clear-button:hover {
+  color: rgba(248, 250, 252, 0.98);
   background: rgba(255, 255, 255, 0.07);
+}
+
+.clear-button:hover .clear-button__icon {
+  color: rgba(248, 113, 113, 0.92);
+}
+
+.clear-button:active {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.clear-button:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.45);
+  background: rgba(255, 255, 255, 0.06);
 }
 
 /* Loading Spinner */
@@ -109,19 +150,23 @@
   animation: spin 0.8s linear infinite;
 }
 
-.loading-container {
-  text-align: center;
-  padding: 3rem;
-}
-
-.loading-spinner-large {
-  width: 48px;
-  height: 48px;
-  border: 4px solid rgba(255, 255, 255, 0.2);
-  border-top-color: rgba(34, 197, 94, 0.9);
+/* Spinner compacto dentro do cartão de “busca em andamento” */
+.search-state-spinner {
+  width: 26px;
+  height: 26px;
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  border-top-color: rgba(34, 197, 94, 0.95);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
-  margin: 0 auto 1rem;
+  flex-shrink: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .search-state-spinner {
+    animation: none;
+    border-top-color: rgba(52, 211, 153, 0.75);
+    opacity: 0.92;
+  }
 }
 
 @keyframes spin {
@@ -130,24 +175,158 @@
   }
 }
 
-/* Error Message */
-.error-message {
-  padding: 1rem;
-  background: rgba(239, 68, 68, 0.12);
-  border: 1px solid rgba(239, 68, 68, 0.35);
-  border-radius: 12px;
-  color: rgba(255, 255, 255, 0.9);
-  margin-bottom: 1rem;
+/* Cartões intermediários — centrados e mais estreitos que a barra de busca */
+.search-outcome-shell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: clamp(1.25rem, 4vw, 2.25rem);
+  width: 100%;
+  margin-inline: auto;
 }
 
-/* No Results */
-.no-results {
+.search-outcome-shell--dashboard {
+  margin-top: clamp(0.3rem, 1vw, 0.6rem);
+}
+
+.search-outcome-shell > .result-surface,
+.search-outcome-shell > .situacao-cadastral-card {
+  width: 100%;
+  max-width: min(28rem, calc(100% - 2rem));
+  margin-inline: auto;
+}
+
+.search-outcome-shell .search-state-card .search-state-card__row {
+  flex-direction: column;
+  align-items: center;
   text-align: center;
-  padding: 3rem;
-  background: rgba(255, 255, 255, 0.05);
+  gap: 0.75rem;
+}
+
+.search-outcome-shell .search-state-card .result-summary-text {
+  text-align: center;
+  max-width: 22rem;
+}
+
+.search-outcome-shell .situacao-cadastral-card__inner {
+  grid-template-columns: 1fr;
+  justify-items: center;
+  text-align: center;
+}
+
+.search-outcome-shell .situacao-cadastral-card__facts {
+  width: 100%;
+}
+
+.search-state-card__row {
+  align-items: flex-start;
+}
+
+.search-state-icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
   border-radius: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.10);
-  color: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(226, 232, 240, 0.95);
+}
+
+.search-state-icon svg {
+  display: block;
+}
+
+.search-state-icon--loading {
+  border-color: rgba(52, 211, 153, 0.35);
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.18), rgba(45, 212, 191, 0.1));
+  color: rgba(52, 211, 153, 0.92);
+}
+
+/* Acentos em vermelho (validação / alerta) */
+.search-state-card--empty-field .search-state-icon {
+  border-color: rgba(248, 113, 113, 0.42);
+  background: rgba(239, 68, 68, 0.14);
+  color: rgba(254, 202, 202, 0.96);
+}
+
+.search-state-card--bad-format .search-state-icon {
+  border-color: rgba(248, 113, 113, 0.45);
+  background: rgba(239, 68, 68, 0.16);
+  color: rgba(254, 202, 202, 0.98);
+}
+
+.search-state-card--bad-digits .search-state-icon {
+  border-color: rgba(248, 113, 113, 0.48);
+  background: rgba(220, 38, 38, 0.16);
+  color: rgba(254, 226, 226, 0.98);
+}
+
+.search-state-card--network .search-state-icon {
+  border-color: rgba(248, 113, 113, 0.45);
+  background: rgba(239, 68, 68, 0.14);
+  color: rgba(254, 202, 202, 0.98);
+}
+
+.search-state-card--no-records .search-state-icon {
+  border-color: rgba(148, 163, 184, 0.35);
+  background: rgba(100, 116, 139, 0.12);
+  color: rgba(203, 213, 225, 0.94);
+}
+
+.search-container--dashboard .search-state-card--empty-field.result-surface {
+  border-color: rgba(248, 113, 113, 0.42);
+}
+
+.search-container--dashboard .search-state-card--bad-format.result-surface {
+  border-color: rgba(248, 113, 113, 0.45);
+}
+
+.search-container--dashboard .search-state-card--bad-digits.result-surface {
+  border-color: rgba(248, 113, 113, 0.48);
+}
+
+.search-container--dashboard .search-state-card--network.result-surface {
+  border-color: rgba(248, 113, 113, 0.42);
+}
+
+.search-container--dashboard .search-state-card--no-records.result-surface {
+  border-color: rgba(100, 116, 139, 0.38);
+}
+
+.search-container--dashboard .search-state-card--loading.result-surface {
+  border-color: rgba(52, 211, 153, 0.35);
+}
+
+.search-container--dashboard .search-state-card--loading.result-surface:hover {
+  border-color: rgba(52, 211, 153, 0.42);
+}
+
+/* Landing + painel: borda vermelha nos avisos de validação */
+.search-state-card--empty-field.result-surface {
+  border-color: rgba(248, 113, 113, 0.4);
+}
+
+.search-state-card--bad-format.result-surface {
+  border-color: rgba(248, 113, 113, 0.42);
+}
+
+.search-state-card--bad-digits.result-surface {
+  border-color: rgba(248, 113, 113, 0.45);
+}
+
+.search-state-card--network.result-surface {
+  border-color: rgba(248, 113, 113, 0.4);
+}
+
+.search-state-card--no-records.result-surface {
+  border-color: rgba(148, 163, 184, 0.32);
+}
+
+.search-state-card--loading.result-surface {
+  border-color: rgba(52, 211, 153, 0.32);
 }
 
 /* Situação cadastral — cartão escuro (landing e painel pós-login) */
@@ -155,11 +334,11 @@
   margin-top: clamp(1rem, 3vw, 1.5rem);
   margin-bottom: 0;
   border-radius: 18px;
-  border: 1px solid rgba(245, 158, 11, 0.38);
-  background: linear-gradient(155deg, rgba(55, 42, 20, 0.55) 0%, rgba(15, 23, 42, 0.92) 48%, rgba(11, 18, 32, 0.94) 100%);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  background: linear-gradient(155deg, rgba(52, 24, 24, 0.55) 0%, rgba(15, 23, 42, 0.92) 48%, rgba(11, 18, 32, 0.94) 100%);
   box-shadow:
     0 8px 36px rgba(0, 0, 0, 0.35),
-    0 0 0 1px rgba(245, 158, 11, 0.08),
+    0 0 0 1px rgba(239, 68, 68, 0.1),
     inset 0 1px 0 rgba(255, 255, 255, 0.06);
   overflow: hidden;
 }
@@ -189,9 +368,9 @@
   width: 52px;
   height: 52px;
   border-radius: 14px;
-  background: rgba(245, 158, 11, 0.14);
-  border: 1px solid rgba(251, 191, 36, 0.32);
-  color: rgba(251, 191, 36, 0.95);
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(248, 113, 113, 0.38);
+  color: rgba(254, 202, 202, 0.96);
 }
 
 .situacao-cadastral-card--error .situacao-cadastral-card__icon-wrap {
@@ -252,7 +431,7 @@
   margin: 0;
   font-size: 0.875rem;
   font-weight: 600;
-  color: rgba(254, 243, 199, 0.92);
+  color: rgba(254, 226, 226, 0.95);
   word-break: break-word;
 }
 
@@ -292,6 +471,57 @@
 
 .situacao-cadastral-card--dashboard.situacao-cadastral-card--error {
   border-color: rgba(248, 113, 113, 0.38);
+}
+
+/* Alinhar fundo/sombra/hover aos cartões `result-surface` (cores de borda de alerta mantidas) */
+.situacao-cadastral-card.situacao-cadastral-card--result-surface {
+  margin-top: 0;
+  margin-bottom: 0;
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    border-color 0.25s ease;
+  isolation: isolate;
+}
+
+.situacao-cadastral-card.situacao-cadastral-card--result-surface:hover {
+  transform: translateY(-2px);
+}
+
+.situacao-cadastral-card.situacao-cadastral-card--result-surface:not(.situacao-cadastral-card--dashboard) {
+  background: linear-gradient(155deg, rgba(30, 41, 59, 0.94) 0%, rgba(15, 23, 42, 0.93) 100%);
+  box-shadow:
+    0 4px 24px rgba(0, 0, 0, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.situacao-cadastral-card.situacao-cadastral-card--result-surface:not(.situacao-cadastral-card--dashboard):hover {
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.situacao-cadastral-card.situacao-cadastral-card--result-surface.situacao-cadastral-card--dashboard {
+  background: linear-gradient(165deg, rgba(15, 23, 42, 0.72) 0%, rgba(11, 18, 32, 0.88) 100%);
+}
+
+.situacao-cadastral-card.situacao-cadastral-card--result-surface.situacao-cadastral-card--dashboard:hover {
+  box-shadow:
+    0 14px 48px rgba(0, 0, 0, 0.38),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.situacao-cadastral-card.situacao-cadastral-card--result-surface.situacao-cadastral-card--dashboard:not(.situacao-cadastral-card--error) {
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.35),
+    0 0 32px rgba(239, 68, 68, 0.09),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.situacao-cadastral-card.situacao-cadastral-card--result-surface.situacao-cadastral-card--dashboard.situacao-cadastral-card--error {
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 @media (max-width: 520px) {
@@ -1296,6 +1526,10 @@
   .result-surface:hover {
     transform: none;
   }
+
+  .situacao-cadastral-card.situacao-cadastral-card--result-surface:hover {
+    transform: none;
+  }
 }
 
 /* Uso no dashboard autenticado: busca em largura total com mais destaque */
@@ -1342,6 +1576,19 @@
 
 .search-container--dashboard .clear-button {
   margin-top: 0.35rem;
+  font-size: 0.875rem;
+  padding: 0.4rem 0.65rem 0.4rem 0.45rem;
+}
+
+.search-container--dashboard .clear-button__icon {
+  width: 1.05rem;
+  height: 1.05rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .clear-button {
+    transition-duration: 0.1s;
+  }
 }
 
 .search-container--dashboard .results-container {

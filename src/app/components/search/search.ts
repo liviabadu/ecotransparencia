@@ -35,6 +35,8 @@ export class Search implements OnDestroy {
   searchTerm = signal('');
   isLoading = signal(false);
   errorMessage = signal<string | null>(null);
+  /** Subtipo do `errorMessage` (validação x rede) para estilo e rótulo. */
+  errorFeedbackKind = signal<'empty' | 'format' | 'invalid-digits' | 'network' | null>(null);
   searchResult = signal<SearchResult | null>(null);
   noResultsFound = signal(false);
   hasSearched = signal(false);
@@ -101,6 +103,22 @@ export class Search implements OnDestroy {
   });
 
   /** Resultado CNPJ atual está nos favoritos do painel. */
+  /** Rótulo superior do cartão de erro (pt-BR). */
+  readonly errorFeedbackEyebrow = computed(() => {
+    switch (this.errorFeedbackKind()) {
+      case 'empty':
+        return 'Campo vazio';
+      case 'format':
+        return 'Formato ou tamanho';
+      case 'invalid-digits':
+        return 'Dígitos do CNPJ';
+      case 'network':
+        return 'Falha técnica';
+      default:
+        return 'Atenção';
+    }
+  });
+
   readonly isCurrentEntityFavorite = computed(() => {
     const keys = this.favoriteCnpjKeys();
     const e = this.searchResult()?.entity;
@@ -121,6 +139,7 @@ export class Search implements OnDestroy {
   private async executeCnpjSearch(): Promise<void> {
     const term = this.searchTerm();
     this.errorMessage.set(null);
+    this.errorFeedbackKind.set(null);
     this.noResultsFound.set(false);
     this.bloqueadoPorSituacaoCadastral.set(false);
     this.situacaoCadastral.set(null);
@@ -130,6 +149,7 @@ export class Search implements OnDestroy {
     const validation = this.documentValidationService.validateCnpjOnly(term);
     if (!validation.isValid) {
       this.errorMessage.set(validation.errorMessage || 'Erro de validação');
+      this.errorFeedbackKind.set(validation.cnpjFeedback ?? 'format');
       return;
     }
 
@@ -161,6 +181,7 @@ export class Search implements OnDestroy {
         return;
       }
       this.errorMessage.set('Erro ao realizar a busca. Tente novamente.');
+      this.errorFeedbackKind.set('network');
     } finally {
       if (seq === this.searchRequestSeq) {
         this.isLoading.set(false);
@@ -176,6 +197,7 @@ export class Search implements OnDestroy {
     this.searchTerm.set('');
     this.searchResult.set(null);
     this.errorMessage.set(null);
+    this.errorFeedbackKind.set(null);
     this.noResultsFound.set(false);
     this.hasSearched.set(false);
     this.bloqueadoPorSituacaoCadastral.set(false);
