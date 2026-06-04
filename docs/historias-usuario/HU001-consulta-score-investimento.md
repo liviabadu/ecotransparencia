@@ -211,6 +211,44 @@ Enquanto não houver back-end implementado, o sistema deve funcionar com dados m
 **E** deve mostrar a quantidade de ocorrências encontradas
 **E** deve mostrar o detalhamento por categoria (ambiental, trabalhista, administrativo)
 
+---
+
+### Cenários Automatizados (E2E - Playwright)
+
+Os cenários abaixo estão **implementados e passando** como testes end-to-end em Playwright (navegador real, modo *headed*), executados contra o ambiente publicado. Diferente dos cenários acima — que usam dados mockados — estes utilizam CNPJs reais e o backend de produção. Execução: `npm run e2e`.
+
+#### Cenário: E2E-01 - CNPJ ativo com pendências ASG exibe score (CA07)
+
+**Dado** que o usuário está na página de consulta
+**Quando** o usuário digita "32.102.290/0001-70" no campo de busca
+**E** clica no botão de pesquisar
+**Então** o sistema deve exibir o relatório de análise com o score de risco "35"
+**E** deve indicar a faixa "Médio" no card de score
+*(Spec: `e2e/search-cnpj.spec.ts`)*
+
+#### Cenário: E2E-02 - CNPJ inapto na Receita Federal (situação cadastral)
+
+**Dado** que o usuário está na página de consulta
+**Quando** o usuário digita "02.698.412/0001-72" no campo de busca
+**E** clica no botão de pesquisar
+**Então** o sistema deve exibir o card de situação cadastral com o título "CNPJ inativo"
+**E** deve informar a situação "Inapta"
+**E** o relatório de score não deve ser exibido
+*(Spec: `e2e/search-cnpj-inativo.spec.ts`)*
+
+#### Cenário: E2E-03 - CNPJ válido sem pendências ASG (CA12)
+
+**Dado** que o usuário está na página de consulta
+**Quando** o usuário digita "00.000.000/0001-91" no campo de busca
+**E** clica no botão de pesquisar
+**Então** o sistema deve exibir a mensagem "Nenhum registro encontrado para a entidade pesquisada"
+**E** o score não deve ser exibido
+*(Spec: `e2e/search-cnpj-sem-registros.spec.ts`)*
+
+> **Observação:** o score do cenário E2E-01 deriva de dados públicos consultados ao vivo (IBAMA/MTE); alterações nessas bases podem mudar o valor "35" e exigir ajuste do teste.
+
+---
+
 ## Dados de Teste (Mock)
 
 Para os testes automatizados, utilizar os seguintes dados mockados:

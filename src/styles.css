@@ -349,6 +349,16 @@ html[data-app-theme="light"] {
   --scrollbar-track: rgba(15, 23, 42, 0.07);
   --scrollbar-thumb: rgba(34, 197, 94, 0.48);
   --scrollbar-thumb-hover: rgba(22, 163, 74, 0.65);
+
+  /* Menu lateral (rail/drawer) no tema claro */
+  --app-sidebar-surface-top: #ffffff;
+  --app-sidebar-surface: #f8fafc;
+  --app-sidebar-surface-bottom: #f1f5f9;
+  --app-sidebar-edge: rgba(15, 23, 42, 0.1);
+  --app-sidebar-edge-accent: rgba(15, 23, 42, 0.06);
+  --logo-eco-text-dark: #15803d;
+  --logo-eco-glow-dark: rgba(34, 197, 94, 0.08);
+  --app-rail-nav-link-hover-bg: rgba(15, 23, 42, 0.06);
 }
 
 html[data-app-theme="light"] body {
@@ -500,6 +510,55 @@ html[data-app-theme="light"] *::-webkit-scrollbar-thumb:hover {
 @media (prefers-reduced-motion: reduce) {
   .app-auth-rail-scrim {
     transition-duration: 0.01ms;
+  }
+}
+
+/* ============================================================================
+   IMPRESSÃO — Relatório de Conformidade Socioambiental
+   Isola o documento (.relatorio-print-root) ao imprimir / "Salvar como PDF":
+   o restante da página fica oculto e o documento ocupa a folha em fundo claro.
+   ============================================================================ */
+@media print {
+  html,
+  body {
+    background: #ffffff !important;
+  }
+
+  /* Esconde tudo, depois revela apenas o documento e seu conteúdo. */
+  body * {
+    visibility: hidden !important;
+  }
+
+  .relatorio-print-root,
+  .relatorio-print-root * {
+    visibility: visible !important;
+  }
+
+  /* Elementos explicitamente marcados como "não imprimir". */
+  .relatorio-no-print {
+    display: none !important;
+  }
+
+  .relatorio-print-root {
+    position: absolute !important;
+    inset: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+    max-width: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    padding: 0 18mm !important;
+  }
+
+  /* Evita cortes feios entre páginas. */
+  .doc-bloco,
+  .doc-oc {
+    break-inside: avoid;
+  }
+
+  @page {
+    size: A4;
+    margin: 14mm;
   }
 }
 

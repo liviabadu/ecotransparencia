@@ -36,6 +36,11 @@ yarn-error.log
 # Firebase
 .firebase/
 
+# Playwright (e2e)
+/test-results
+/playwright-report
+/playwright/.cache
+
 # Miscellaneous
 /.angular/cache
 .sass-cache/
@@ -49,3 +54,4 @@ __screenshots__/
 # System files
 .DS_Store
 Thumbs.db
+*.themebak

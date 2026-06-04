@@ -4,12 +4,13 @@ import { FormsModule } from '@angular/forms';
 import { DocumentValidationService } from '../../services/document-validation.service';
 import { ApiService } from '../../services/api.service';
 import { SearchResult, SituacaoCadastral } from '../../models/entity.model';
+import { RelatorioConformidadeComponent } from '../../relatorio-conformidade/relatorio-conformidade.component';
 import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-search',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RelatorioConformidadeComponent],
   templateUrl: './search.html',
   styleUrl: './search.css',
 })

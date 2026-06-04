@@ -292,3 +292,19 @@ A matriz a seguir relaciona os objetivos específicos do sistema com as funciona
 | Interface intuitiva | F4 | RF04 |
 | Relatórios personalizados | F5, F7 | RF05, RF07 |
 | Comparação entre entidades | F6, F8 | RF06, RF08 |
+
+---
+
+## Cenários de Teste Automatizado (E2E)
+
+Os fluxos de busca por CNPJ (RF02 → RF04) são validados por testes end-to-end em **Playwright**, executados em navegador real (modo *headed*) contra o ambiente publicado. Cada cenário simula o usuário digitando o CNPJ e clicando em *Pesquisar*.
+
+| ID | CNPJ | Situação | Resultado esperado | Spec |
+|----|------|----------|--------------------|------|
+| CT01 | `32.102.290/0001-70` | Ativo, com pendências ASG | Relatório de análise com **Score de risco 35** (faixa *Médio* no card) | `e2e/search-cnpj.spec.ts` |
+| CT02 | `02.698.412/0001-72` | Inapto na Receita Federal | Card de situação cadastral **"CNPJ inativo"** (situação *Inapta*), sem relatório de score | `e2e/search-cnpj-inativo.spec.ts` |
+| CT03 | `00.000.000/0001-91` | Válido, sem pendências ASG | Mensagem **"Nenhum registro encontrado para a entidade pesquisada"** | `e2e/search-cnpj-sem-registros.spec.ts` |
+
+**Execução:** `npm run e2e` (ver detalhes e ressalvas na seção *Testes* do `README.md`).
+
+> **Observação:** o Score do cenário CT01 deriva de dados públicos consultados ao vivo (IBAMA/MTE) pelo backend de produção; alterações nessas bases podem mudar o valor `35` e exigir ajuste do teste.

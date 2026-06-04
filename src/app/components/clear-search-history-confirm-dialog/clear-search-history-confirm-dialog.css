@@ -28,7 +28,7 @@
   padding: 28px 24px 24px;
   border-radius: 16px;
   background: #1a1d24;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border-0);
   box-shadow:
     0 24px 48px rgba(0, 0, 0, 0.45),
     0 0 0 1px rgba(0, 0, 0, 0.2);
@@ -41,7 +41,7 @@
   font-size: 1.125rem;
   font-weight: 700;
   line-height: 1.35;
-  color: #fff;
+  color: var(--text-0);
   letter-spacing: -0.02em;
 }
 
@@ -49,7 +49,7 @@
   margin: 0 0 26px;
   font-size: 0.9375rem;
   line-height: 1.5;
-  color: rgba(255, 255, 255, 0.82);
+  color: var(--text-1);
 }
 
 .clear-search-history-confirm-actions {
@@ -97,13 +97,13 @@
 
 .clear-search-history-confirm-btn--secondary {
   background: transparent;
-  color: rgba(255, 255, 255, 0.92);
-  border-color: rgba(255, 255, 255, 0.22);
+  color: var(--text-0);
+  border-color: var(--border-1);
 }
 
 .clear-search-history-confirm-btn--secondary:hover {
   background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.32);
+  border-color: var(--border-1);
 }
 
 .clear-search-history-confirm-btn--secondary:active {
@@ -119,4 +119,11 @@
   .clear-search-history-confirm-btn--secondary:active {
     transform: none;
   }
+}
+
+/* Tema claro: painel branco */
+:host-context(html[data-app-theme="light"]) .clear-search-history-confirm-panel {
+  background: #ffffff;
+  border-color: rgba(15, 23, 42, 0.1);
+  box-shadow: 0 24px 64px rgba(15, 23, 42, 0.18);
 }

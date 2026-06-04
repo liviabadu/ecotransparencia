@@ -279,6 +279,21 @@
   text-align: center;
 }
 
+/* Logotipo hero (SVG inline) */
+.hero-logo {
+  display: block;
+  width: clamp(210px, 32vw, 312px);
+  height: auto;
+  margin: 0 auto clamp(10px, 2.4vw, 22px);
+  color: #ffffff;
+  --hero-logo-vein: #0b1220;
+}
+
+:host-context(html[data-app-theme="light"]) .hero-logo {
+  color: #2f6f4f;
+  --hero-logo-vein: #f1f5f9;
+}
+
 .hero-title {
   font-size: clamp(2.5rem, 6vw, 4rem);
   font-weight: 800;
@@ -1329,6 +1344,92 @@
 
 :host-context(html[data-app-theme="light"]) .footer-bottom__version {
   color: rgba(15, 23, 42, 0.42);
+}
+
+/* Seções "Como Funciona" e "Sobre" no tema claro */
+:host-context(html[data-app-theme="light"]) .section-title {
+  background: linear-gradient(118deg, #0f172a 0%, #15803d 60%, #2dd4bf 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  filter: none;
+}
+
+:host-context(html[data-app-theme="light"]) .how-section__lead {
+  color: var(--text-1);
+}
+
+:host-context(html[data-app-theme="light"]) .step-card {
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  box-shadow:
+    0 4px 20px rgba(15, 23, 42, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+:host-context(html[data-app-theme="light"]) .step-title {
+  color: var(--text-0);
+}
+
+:host-context(html[data-app-theme="light"]) .step-desc {
+  color: var(--text-2);
+}
+
+:host-context(html[data-app-theme="light"]) .about-text p {
+  color: var(--text-1);
+}
+
+:host-context(html[data-app-theme="light"]) .about-text strong {
+  color: #15803d;
+}
+
+/* Hero + superfícies da landing no tema claro */
+:host-context(html[data-app-theme="light"]) .hero-bg {
+  background:
+    radial-gradient(1200px 700px at 18% 0%, rgba(34, 197, 94, 0.16), transparent 55%),
+    radial-gradient(1000px 600px at 82% 22%, rgba(45, 212, 191, 0.12), transparent 60%),
+    radial-gradient(1000px 700px at 60% 95%, rgba(52, 211, 153, 0.1), transparent 60%),
+    linear-gradient(180deg, #f1f5f9, #e2e8f0);
+}
+
+:host-context(html[data-app-theme="light"]) .hero-bg::before {
+  opacity: 0.18;
+}
+
+:host-context(html[data-app-theme="light"]) .badge {
+  background: linear-gradient(145deg, rgba(15, 23, 42, 0.05), rgba(15, 23, 42, 0.02));
+  border-color: rgba(15, 23, 42, 0.12);
+  color: var(--text-0);
+  box-shadow:
+    0 6px 20px rgba(15, 23, 42, 0.08),
+    0 0 0 1px rgba(34, 197, 94, 0.06);
+}
+
+:host-context(html[data-app-theme="light"]) .badge:hover {
+  border-color: rgba(34, 197, 94, 0.4);
+}
+
+:host-context(html[data-app-theme="light"]) .badge-icon-wrap {
+  color: #15803d;
+}
+
+:host-context(html[data-app-theme="light"]) .about-stats {
+  background: rgba(15, 23, 42, 0.04);
+  border-color: rgba(15, 23, 42, 0.1);
+}
+
+:host-context(html[data-app-theme="light"]) .stat-item {
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+:host-context(html[data-app-theme="light"]) .stat-number {
+  color: var(--text-0);
+}
+
+:host-context(html[data-app-theme="light"]) .stat-label {
+  color: var(--text-2);
 }
 
 @media (prefers-color-scheme: light) {

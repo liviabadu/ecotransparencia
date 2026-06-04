@@ -893,6 +893,13 @@
           </div>
         }
       </div>
+
+      <!-- Relatório de Conformidade Socioambiental: exportação PDF + impressão (HU) -->
+      @if (searchResult()?.entity; as entidadeRelatorio) {
+        <section class="results-report" aria-label="Exportação do relatório de conformidade">
+          <app-relatorio-conformidade [entity]="entidadeRelatorio" />
+        </section>
+      }
     </div>
   }
 </div>

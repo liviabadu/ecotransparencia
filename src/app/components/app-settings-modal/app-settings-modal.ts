@@ -133,7 +133,15 @@ export class AppSettingsModal {
   }
 
   protected appearanceLabel(): string {
-    return this.language.modalCopy().themeDark;
+    const c = this.language.modalCopy();
+    switch (this.theme.mode()) {
+      case 'light':
+        return c.themeLight;
+      case 'system':
+        return c.themeSystem;
+      default:
+        return c.themeDark;
+    }
   }
 
   protected languageLabel(): string {

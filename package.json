@@ -12,7 +12,10 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "test:pact": "ng test --include='**/pact/**/*.spec.ts' --no-watch",
-    "test:pact:watch": "ng test --include='**/pact/**/*.spec.ts'"
+    "test:pact:watch": "ng test --include='**/pact/**/*.spec.ts'",
+    "e2e": "playwright test",
+    "e2e:headed": "playwright test --headed",
+    "e2e:report": "playwright show-report"
   },
   "prettier": {
     "printWidth": 100,
@@ -39,6 +42,8 @@
     "@fontsource-variable/inter": "^5.2.8",
     "@fontsource-variable/space-grotesk": "^5.2.10",
     "firebase": "^12.6.0",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^2.5.2",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0"
   },
@@ -47,9 +52,10 @@
     "@angular/cli": "^21.0.2",
     "@angular/compiler-cli": "^21.0.0",
     "@pact-foundation/pact": "^16.0.2",
+    "@playwright/test": "^1.60.0",
     "@types/node": "^24.10.1",
-    "jsdom": "^27.1.0",
     "concurrently": "^9.1.2",
+    "jsdom": "^27.1.0",
     "patch-package": "^8.0.0",
     "typescript": "~5.9.2",
     "vitest": "^4.0.8"

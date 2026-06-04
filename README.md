@@ -246,6 +246,7 @@ A EcoTransparência Frontend é uma **Single Page Application (SPA)** construíd
 | **Vitest** | 4.0.8 | Framework de testes unitários |
 | **Pact** | 16.0.2 | Contract testing (Consumer-Driven) |
 | **jsdom** | 27.1.0 | DOM virtual para testes |
+| **Playwright** | latest | Testes end-to-end (navegador real) |
 
 #### Qualidade de Código
 | Ferramenta | Configuração | Propósito |
@@ -294,6 +295,18 @@ src/
 ├── index.html                      # HTML principal
 ├── main.ts                         # Bootstrap da aplicação
 └── styles.css                      # Estilos globais
+```
+
+Na raiz do projeto, além de `src/`:
+
+```
+e2e/                                # Testes end-to-end (Playwright)
+├── login.spec.ts                   # Login com credenciais válidas → área logada
+├── search-cnpj.spec.ts             # Busca de CNPJ → relatório com score
+├── search-cnpj-inativo.spec.ts     # Busca de CNPJ inapto → "CNPJ inativo"
+└── search-cnpj-sem-registros.spec.ts  # Busca de CNPJ sem ASG → "Nenhum registro encontrado"
+playwright.config.ts                # Config E2E (modo headed, baseURL)
+server/                             # API mock local (Express) para desenvolvimento
 ```
 
 ### Decisões Arquiteturais
@@ -463,6 +476,43 @@ npm run test:pact
 
 Gera contratos em `/pacts/` para validação no backend.
 
+#### Testes End-to-End (Playwright)
+```bash
+# Abre o navegador (modo headed) e executa TODOS os testes no site
+npm run e2e
+
+# Rodar apenas um arquivo
+npx playwright test e2e/login.spec.ts
+
+# Rodar pelo nome do teste (filtro de texto)
+npx playwright test -g "score 35"
+
+# Relatório HTML da última execução
+npm run e2e:report
+```
+
+Os testes ficam em `e2e/` e rodam em **modo headed** (navegador visível) por padrão, definido em `playwright.config.ts`. Como abrem uma janela do navegador, execute em um ambiente com tela.
+
+- **`e2e/login.spec.ts`** — clica em *Entrar*, informa e-mail e senha de uma conta de teste e valida que, com credenciais corretas, o portal navega para a **área logada** (dashboard com a saudação "Olá, …"). Usa **Firebase Auth real**; as credenciais podem ser sobrescritas por `E2E_LOGIN_EMAIL` / `E2E_LOGIN_PASSWORD` (use uma conta de teste dedicada):
+  ```bash
+  E2E_LOGIN_EMAIL=conta@teste.com E2E_LOGIN_PASSWORD='senha' npx playwright test e2e/login.spec.ts
+  ```
+- **`e2e/search-cnpj.spec.ts`** — pesquisa o CNPJ `32.102.290/0001-70`, clica em *Pesquisar* e valida que o relatório de análise exibe **Score de risco 35** (faixa *Médio* no card).
+- **`e2e/search-cnpj-inativo.spec.ts`** — pesquisa o CNPJ inapto `02.698.412/0001-72` e valida que, após *Pesquisar*, aparece o card de situação cadastral com o título **"CNPJ inativo"** (situação *Inapta* na Receita) e **sem** relatório de score.
+- **`e2e/search-cnpj-sem-registros.spec.ts`** — pesquisa o CNPJ válido sem pendências ASG `00.000.000/0001-91` e valida que, após *Pesquisar*, aparece a mensagem **"Nenhum registro encontrado para a entidade pesquisada"**.
+
+> ⚠️ **Importante:** o E2E roda contra o **site publicado** (`https://ecotransparencia-d786e.web.app`), porque o score real desse CNPJ é produzido pelo backend V2 no Cloud Run (Embargos IBAMA + Lista Suja do MTE) — o mock local (`server/index.js`) não reproduz esse valor. Consequências:
+> - exige rede e o Cloud Run "acordado" (cold start pode demorar);
+> - o score deriva de dados públicos consultados ao vivo (IBAMA/MTE); se essas bases mudarem, o valor `35` pode variar e o teste precisará de ajuste.
+>
+> Para apontar para outro ambiente, use a variável `E2E_BASE_URL` (ex.: `E2E_BASE_URL=http://localhost:4200 npm run e2e`).
+
+#### Pré-requisito (primeira execução)
+```bash
+# Baixa o navegador usado pelo Playwright
+npx playwright install chromium
+```
+
 ### Deploy e Infraestrutura
 
 #### Ambiente de Produção
@@ -512,6 +562,9 @@ npm start
 | `npm run build` | Build de produção |
 | `npm test` | Executa testes unitários |
 | `npm run test:pact` | Executa contract tests |
+| `npm run e2e` | Executa testes E2E (Playwright, navegador visível) |
+| `npm run e2e:headed` | Executa testes E2E forçando modo headed |
+| `npm run e2e:report` | Abre o relatório HTML do último E2E |
 
 ---
 
