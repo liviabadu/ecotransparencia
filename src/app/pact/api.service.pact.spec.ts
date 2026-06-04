@@ -286,6 +286,132 @@ describe('ApiService Pact Tests', () => {
     });
   });
 
+  describe('entity with all data sources (Fases B + C)', () => {
+    it('should include sancoesAdmPublica, impedimentosCepim, trabalhoEscravo, icmbioAutos and icmbioEmbargos at root', async () => {
+      await provider
+        .addInteraction()
+        .given('an entity with CNPJ 55666777000181 has occurrences across all 7 sources')
+        .uponReceiving('a request to search by CNPJ expecting all root-level lists')
+        .withRequest('GET', '/api/search/document', (builder) => {
+          builder.query({ document: '55666777000181', type: 'cnpj' });
+        })
+        .willRespondWith(200, (builder) => {
+          builder.jsonBody({
+            found: true,
+            entity: {
+              id: like('99'),
+              name: like('Empresa Multifonte S.A.'),
+              document: like('55666777000181'),
+              documentType: like('cnpj'),
+              score: integer(75),
+              riskLevel: like('Alto'),
+              occurrences: eachLike({
+                id: like('emb-99'),
+                source: like('IBAMA'),
+              }),
+              asgScore: {
+                score: integer(75),
+                riskLevel: like('Alto'),
+                totalOcorrencias: integer(7),
+                breakdown: eachLike({
+                  fonte: like('Embargos IBAMA'),
+                  peso: decimal(0.4),
+                  quantidadeOcorrencias: integer(1),
+                  score: integer(50),
+                  scorePonderado: decimal(20.0),
+                }),
+              },
+              ocorrencias: {
+                embargos: eachLike({
+                  id: like('emb-99'),
+                  source: like('IBAMA'),
+                }),
+                autosInfracao: eachLike({
+                  id: like('auto-99'),
+                  source: like('IBAMA'),
+                }),
+              },
+            },
+            sancoesAdmPublica: eachLike({
+              cadastro: like('CEIS'),
+              codigoSancao: like('305206'),
+              nomeSancionado: like('Empresa Multifonte S.A.'),
+              categoriaSancao: like('Inidoneidade'),
+              dataInicioSancao: like('2023-09-01'),
+              orgaoSancionador: like('CGU'),
+              ufOrgao: like('DF'),
+              esferaOrgao: like('FEDERAL'),
+              fundamentacaoLegal: like('Lei 8.666/93'),
+            }),
+            impedimentosCepim: eachLike({
+              cnpjEntidade: like('55666777000181'),
+              nomeEntidade: like('Empresa Multifonte S.A.'),
+              numeroConvenio: like('700123/2022'),
+              orgaoConcedente: like('MMA'),
+              motivoImpedimento: like('Convênio com pendências'),
+            }),
+            trabalhoEscravo: eachLike({
+              anoAcaoFiscal: integer(2023),
+              uf: like('PA'),
+              empregador: like('Empresa Multifonte S.A.'),
+              cpfCnpjFormatado: like('55.666.777/0001-81'),
+              estabelecimento: like('Fazenda X'),
+              trabalhadoresEnvolvidos: integer(12),
+              cnae: like('0111-3/02'),
+              decisaoAdmProcedencia: like('2023-11-10'),
+              inclusaoCadastroEmpregadores: like('2024-01-15'),
+            }),
+            icmbioAutos: eachLike({
+              numeroAi: like('AI-001'),
+              tipo: like('Flora'),
+              autuado: like('Empresa Multifonte S.A.'),
+              descAi: like('Supressão em UC'),
+              data: like('2024-02-10'),
+              ano: integer(2024),
+              tipoInfra: like('Supressão'),
+              nomeUc: like('Parque Nacional X'),
+              municipio: like('Altamira'),
+              uf: like('PA'),
+              processo: like('02001.001/2024'),
+              julgamento: like('Em análise'),
+            }),
+            icmbioEmbargos: eachLike({
+              numeroEmb: like('EMB-001'),
+              numeroAi: like('AI-001'),
+              autuado: like('Empresa Multifonte S.A.'),
+              descInfra: like('Supressão de vegetação'),
+              descSanc: like('Embargo de área'),
+              tipoInfra: like('Supressão'),
+              nomeUc: like('Parque Nacional X'),
+              municipio: like('Altamira'),
+              uf: like('PA'),
+              data: like('2024-02-15'),
+              ano: integer(2024),
+              area: decimal(12.5),
+              processo: like('02001.002/2024'),
+              julgamento: like('Em análise'),
+            }),
+          });
+        })
+        .executeTest(async (mockServer) => {
+          apiService = TestBed.inject(ApiService);
+          (apiService as any).baseUrl = mockServer.url + '/api';
+
+          const result = await firstValueFrom(
+            apiService.searchByDocument('55666777000181', 'cnpj')
+          );
+
+          expect(result.found).toBe(true);
+          expect(result.entity).toBeDefined();
+          expect(result.entity!.sancoesAdmPublica?.length).toBeGreaterThan(0);
+          expect(result.entity!.impedimentosCepim?.length).toBeGreaterThan(0);
+          expect(result.entity!.trabalhoEscravo?.length).toBeGreaterThan(0);
+          expect(result.entity!.icmbioAutos?.length).toBeGreaterThan(0);
+          expect(result.entity!.icmbioEmbargos?.length).toBeGreaterThan(0);
+        });
+    });
+  });
+
   describe('entity with critical risk level', () => {
     it('should return entity with critical ASG score and multiple breakdowns', async () => {
       await provider

@@ -1,0 +1,230 @@
+@let r = relatorio();
+
+<section class="relatorio">
+  <!-- Barra de ações: não sai na impressão nem no PDF -->
+  <div class="relatorio-acoes relatorio-no-print">
+    <div class="relatorio-acoes__titulo">
+      <span class="relatorio-acoes__eyebrow">Relatório</span>
+      <strong>Conformidade Socioambiental</strong>
+    </div>
+
+    <div class="relatorio-acoes__botoes">
+      <button
+        type="button"
+        class="btn btn--ghost"
+        (click)="onImprimir()"
+        aria-label="Imprimir relatório"
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path
+            d="M6 9V3h12v6M6 18H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2M6 14h12v7H6z"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+        Imprimir
+      </button>
+
+      <button
+        type="button"
+        class="btn btn--primary"
+        (click)="onExportarPdf()"
+        [disabled]="exportando()"
+        aria-label="Exportar relatório em PDF"
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path
+            d="M12 3v12m0 0 4-4m-4 4-4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+        {{ exportando() ? 'Gerando PDF…' : 'Exportar PDF' }}
+      </button>
+    </div>
+  </div>
+
+  @if (erroExport(); as erro) {
+    <p class="relatorio-erro relatorio-no-print" role="alert">{{ erro }}</p>
+  }
+
+  <!-- Documento imprimível / exportável -->
+  <article #documento class="relatorio-doc relatorio-print-root">
+    <header class="doc-header">
+      <div class="doc-brand">
+        <span class="doc-brand__mark">eco</span>
+        <span class="doc-brand__name">Ecotransparência</span>
+      </div>
+      <h1 class="doc-title">Relatório de Conformidade Socioambiental</h1>
+      <p class="doc-generated">Documento gerado em {{ r.geradoEm }}</p>
+    </header>
+
+    <!-- Faixa-resumo: score de risco + total de ocorrências em destaque -->
+    <section class="doc-hero" aria-label="Resumo do risco">
+      @if (r.empresa.score != null) {
+        <div class="doc-hero__score" [class]="'doc-hero__score doc-risk--' + riskKey(r.empresa.score)">
+          <span class="doc-hero__score-num">{{ r.empresa.score }}</span>
+          <span class="doc-hero__score-scale">/100</span>
+        </div>
+      }
+      <div class="doc-hero__facts">
+        <span class="doc-hero__risk" [class]="'doc-hero__risk doc-risk--' + riskKey(r.empresa.score)">
+          {{ r.empresa.riskLabel ? r.empresa.riskLabel : riskLabel(r.empresa.score) }}
+        </span>
+        <p class="doc-hero__name">{{ r.empresa.nome }}</p>
+        <p class="doc-hero__sub">
+          @if (r.semRegistros) {
+            Nenhuma ocorrência encontrada nas {{ r.basesConsultadas.length }} bases oficiais.
+          } @else {
+            {{ r.totalOcorrencias }}
+            {{ r.totalOcorrencias === 1 ? 'ocorrência' : 'ocorrências' }} em
+            {{ r.blocos.length }} de {{ r.basesConsultadas.length }} bases oficiais.
+          }
+        </p>
+      </div>
+    </section>
+
+    <!-- Identificação da empresa (Critério 4) -->
+    <section class="doc-empresa" aria-label="Identificação da empresa consultada">
+      <h2 class="doc-section-title">Empresa consultada</h2>
+      <dl class="doc-fields">
+        <div class="doc-field">
+          <dt>Razão social / Nome</dt>
+          <dd>{{ r.empresa.nome }}</dd>
+        </div>
+        <div class="doc-field">
+          <dt>{{ r.empresa.documentType === 'cnpj' ? 'CNPJ' : 'CPF' }}</dt>
+          <dd>{{ r.empresa.documento }}</dd>
+        </div>
+        @if (r.empresa.setor) {
+          <div class="doc-field">
+            <dt>Setor</dt>
+            <dd>{{ r.empresa.setor }}</dd>
+          </div>
+        }
+        <div class="doc-field">
+          <dt>Documento gerado em</dt>
+          <dd>{{ r.geradoEm }}</dd>
+        </div>
+      </dl>
+    </section>
+
+    <!-- Bases oficiais pesquisadas (Critério 3) — sempre todas, com o resultado de cada -->
+    <section class="doc-fontes" aria-label="Bases pesquisadas">
+      <h2 class="doc-section-title">Bases oficiais pesquisadas</h2>
+      <ul class="doc-bases">
+        @for (base of r.basesConsultadas; track base.fonte) {
+          <li class="doc-base" [class.doc-base--ok]="base.semOcorrencias">
+            <span class="doc-base__status" aria-hidden="true">
+              {{ base.semOcorrencias ? '✓' : '!' }}
+            </span>
+            <span class="doc-base__info">
+              <span class="doc-base__nome">{{ base.fonte }}</span>
+              <span class="doc-base__desc">{{ base.descricaoFonte }}</span>
+            </span>
+            <span
+              class="doc-base__resultado"
+              [class.doc-base__resultado--ok]="base.semOcorrencias"
+            >
+              @if (base.semOcorrencias) {
+                Nenhum registro
+              } @else {
+                {{ base.totalOcorrencias }}
+                {{ base.totalOcorrencias === 1 ? 'ocorrência' : 'ocorrências' }}
+              }
+            </span>
+          </li>
+        }
+      </ul>
+    </section>
+
+    <!-- Resultado (Critérios 5 e 7) -->
+    @if (r.semRegistros) {
+      <section class="doc-vazio" aria-label="Sem ocorrências">
+        <div class="doc-vazio__icone" aria-hidden="true">✓</div>
+        <h2 class="doc-section-title">Nenhuma ocorrência encontrada</h2>
+        <p>
+          Não foram encontrados registros de autuações, embargos, trabalho análogo à escravidão
+          ou demais restrições para a empresa consultada nas bases oficiais
+          (ICMBio, MTE, IBAMA e Portal da Transparência) na data de geração deste documento.
+        </p>
+      </section>
+    } @else {
+      <section class="doc-resumo" aria-label="Resumo das ocorrências">
+        <h2 class="doc-section-title">Ocorrências encontradas</h2>
+        <p class="doc-resumo__total">
+          Total de <strong>{{ r.totalOcorrencias }}</strong>
+          {{ r.totalOcorrencias === 1 ? 'ocorrência' : 'ocorrências' }} em
+          {{ r.blocos.length }}
+          {{ r.blocos.length === 1 ? 'fonte' : 'fontes' }}.
+        </p>
+      </section>
+
+      @for (bloco of r.blocos; track bloco.fonte) {
+        <section class="doc-bloco" aria-label="Ocorrências por fonte">
+          <div class="doc-bloco__header">
+            <h3 class="doc-bloco__fonte">{{ bloco.fonte }}</h3>
+            <span class="doc-bloco__desc">{{ bloco.descricaoFonte }}</span>
+            <span class="doc-bloco__contador">
+              {{ bloco.ocorrencias.length }}
+              {{ bloco.ocorrencias.length === 1 ? 'registro' : 'registros' }}
+            </span>
+          </div>
+
+          <ul class="doc-ocorrencias">
+            @for (oc of bloco.ocorrencias; track $index) {
+              <li class="doc-oc" [class]="'doc-oc doc-oc--' + oc.severidade">
+                <div class="doc-oc__top">
+                  <span class="doc-oc__tipo">{{ oc.tipo }}</span>
+                  @if (oc.situacao) {
+                    <span class="doc-oc__situacao">{{ oc.situacao }}</span>
+                  }
+                </div>
+                <p class="doc-oc__titulo">{{ oc.titulo }}</p>
+                @if (oc.descricao) {
+                  <p class="doc-oc__descricao">{{ oc.descricao }}</p>
+                }
+
+                <div class="doc-oc__meta">
+                  @if (oc.data) {
+                    <span><strong>Data:</strong> {{ oc.data }}</span>
+                  }
+                  @if (oc.local) {
+                    <span><strong>Local:</strong> {{ oc.local }}</span>
+                  }
+                  @if (oc.valor) {
+                    <span><strong>Valor:</strong> {{ oc.valor }}</span>
+                  }
+                </div>
+
+                @if (oc.detalhes?.length) {
+                  <dl class="doc-oc__detalhes">
+                    @for (d of oc.detalhes; track d.rotulo) {
+                      <div>
+                        <dt>{{ d.rotulo }}</dt>
+                        <dd>{{ d.valor }}</dd>
+                      </div>
+                    }
+                  </dl>
+                }
+              </li>
+            }
+          </ul>
+        </section>
+      }
+    }
+
+    <footer class="doc-footer">
+      <p>
+        Documento gerado automaticamente pelo portal Ecotransparência a partir de dados públicos
+        das fontes oficiais. As informações refletem o conteúdo das bases na data e hora de geração
+        ({{ r.geradoEm }}) e devem ser confirmadas junto aos órgãos competentes para uso em
+        auditorias, contratações e decisões.
+      </p>
+    </footer>
+  </article>
+</section>

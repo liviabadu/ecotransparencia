@@ -95,6 +95,75 @@ export interface Ocorrencias {
   autosInfracao: AutoInfracao[];
 }
 
+export type CadastroSancao = 'CEIS' | 'CNEP';
+
+export interface SancaoAdmPublica {
+  cadastro: CadastroSancao;
+  codigoSancao?: string;
+  nomeSancionado?: string;
+  categoriaSancao?: string;
+  valorMulta?: number;
+  dataInicioSancao?: string;
+  dataFimSancao?: string;
+  orgaoSancionador?: string;
+  ufOrgao?: string;
+  esferaOrgao?: string;
+  fundamentacaoLegal?: string;
+}
+
+export interface ImpedimentoCepim {
+  cnpjEntidade?: string;
+  nomeEntidade?: string;
+  numeroConvenio?: string;
+  orgaoConcedente?: string;
+  motivoImpedimento?: string;
+}
+
+export interface TrabalhoEscravo {
+  anoAcaoFiscal?: number;
+  uf?: string;
+  empregador?: string;
+  cpfCnpjFormatado?: string;
+  estabelecimento?: string;
+  trabalhadoresEnvolvidos?: number;
+  cnae?: string;
+  decisaoAdmProcedencia?: string;
+  inclusaoCadastroEmpregadores?: string;
+}
+
+export interface IcmbioAuto {
+  numeroAi?: string;
+  tipo?: string;
+  valorMulta?: number;
+  autuado?: string;
+  descAi?: string;
+  data?: string;
+  ano?: number;
+  tipoInfra?: string;
+  nomeUc?: string;
+  municipio?: string;
+  uf?: string;
+  processo?: string;
+  julgamento?: string;
+}
+
+export interface IcmbioEmbargo {
+  numeroEmb?: string;
+  numeroAi?: string;
+  autuado?: string;
+  descInfra?: string;
+  descSanc?: string;
+  tipoInfra?: string;
+  nomeUc?: string;
+  municipio?: string;
+  uf?: string;
+  data?: string;
+  ano?: number;
+  area?: number;
+  processo?: string;
+  julgamento?: string;
+}
+
 export interface ScoreResult {
   score: number;
   riskLevel: RiskLevel;
@@ -107,11 +176,20 @@ export interface Entity {
   name: string;
   document: string;
   documentType: 'cpf' | 'cnpj';
-  score: number;
-  riskLevel: RiskLevel;
+  /** Ausente quando o back retornou ocorrências apenas via listas raiz V2 (sem IBAMA). */
+  score?: number;
+  /** Ausente quando o back retornou ocorrências apenas via listas raiz V2 (sem IBAMA). */
+  riskLevel?: RiskLevel;
   occurrences: Occurrence[];
   asgScore?: AsgScore;
   ocorrencias?: Ocorrencias;
+  sancoesAdmPublica?: SancaoAdmPublica[];
+  impedimentosCepim?: ImpedimentoCepim[];
+  trabalhoEscravo?: TrabalhoEscravo[];
+  icmbioAutos?: IcmbioAuto[];
+  icmbioEmbargos?: IcmbioEmbargo[];
+  /** Setor econômico resumido (ex.: CNAE agregado) — opcional; mock / API. */
+  sectorLabel?: string;
 }
 
 export interface SituacaoCadastral {

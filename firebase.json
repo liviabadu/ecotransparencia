@@ -1,4 +1,7 @@
 {
+  "storage": {
+    "rules": "storage.rules"
+  },
   "hosting": {
     "public": "dist/ecotransparencia/browser",
     "ignore": [
@@ -6,12 +9,23 @@
       "**/.*",
       "**/node_modules/**"
     ],
+    "headers": [
+      {
+        "source": "/index.html",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache, no-store, must-revalidate"
+          }
+        ]
+      }
+    ],
     "rewrites": [
       {
         "source": "/api/**",
         "run": {
           "serviceId": "ecotransparencia-api",
-          "region": "us-central1"
+          "region": "southamerica-east1"
         }
       },
       {

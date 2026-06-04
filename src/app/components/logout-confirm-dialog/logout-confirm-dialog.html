@@ -1,0 +1,31 @@
+<div
+  class="logout-confirm-backdrop"
+  role="presentation"
+  (click)="onBackdropClick($event)"
+>
+  <div
+    class="logout-confirm-panel"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="logout-confirm-title"
+    (click)="$event.stopPropagation()"
+  >
+    <h2 id="logout-confirm-title" class="logout-confirm-title">Tem certeza de que deseja sair?</h2>
+    <p class="logout-confirm-lead">
+      Sair do <strong>{{ entityName }}</strong> com
+      @if (auth.getUserEmail(); as email) {
+        <strong>{{ email }}</strong>
+      } @else {
+        <strong>a conta neste dispositivo</strong>
+      }?
+    </p>
+    <div class="logout-confirm-actions">
+      <button type="button" class="logout-confirm-btn logout-confirm-btn--primary" (click)="onConfirm()">
+        Sair
+      </button>
+      <button type="button" class="logout-confirm-btn logout-confirm-btn--secondary" (click)="onCancel()" autofocus>
+        Cancelar
+      </button>
+    </div>
+  </div>
+</div>

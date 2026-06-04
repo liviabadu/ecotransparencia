@@ -1,11 +1,14 @@
 # EcoTransparência
 
-**Acesse a aplicação anterior:** https://ecotransparencia-d786e.web.app
+**Acesse a aplicação:** https://ecotransparencia-d786e.web.app
 
-**Acesse a aplicação Atualizada:** https://ecotransparencia-d786e.web.app/
+A **EcoTransparência** é um site gratuito onde qualquer pessoa pode pesquisar uma empresa
+(pelo CNPJ) e descobrir, em segundos, se ela tem problemas ambientais, trabalhistas ou
+administrativos registrados em órgãos do governo — tudo reunido em um só lugar e resumido
+em uma **nota de risco de 0 a 100**.
 
 ---
-**O projeto é desenvolvido pela turma do 5º semestre de Análise e Desenvolvimento de Sistemas do Campus Taguatinga?**
+**O projeto é desenvolvido pela turma do 5º semestre de Análise e Desenvolvimento de Sistemas do Campus Taguatinga.**
 
 - Livia Maria Badu de Oliveira
 - Kaua Nascimento
@@ -15,173 +18,127 @@
 
 ## Índice
 
-- [Visão Geral](#visão-geral)
-- [Visão de Negócio](#visão-de-negócio)
-  - [O Problema](#o-problema)
-  - [Solução](#solução)
-  - [Público-Alvo](#público-alvo)
-  - [Proposta de Valor](#proposta-de-valor)
-  - [Fontes de Dados](#fontes-de-dados)
-  - [Metodologia do Score ASG](#metodologia-do-score-asg)
-  - [Casos de Uso](#casos-de-uso)
-- [Visão Técnica](#visão-técnica)
-  - [Arquitetura da Aplicação](#arquitetura-da-aplicação)
-  - [Stack Tecnológico](#stack-tecnológico)
-  - [Estrutura do Projeto](#estrutura-do-projeto)
-  - [Decisões Arquiteturais](#decisões-arquiteturais)
-  - [Contrato de API](#contrato-de-api)
-  - [Testes](#testes)
-  - [Deploy e Infraestrutura](#deploy-e-infraestrutura)
-- [Como Executar](#como-executar)
+- [Em poucas palavras](#em-poucas-palavras)
+- [Por que isso é útil](#por-que-isso-é-útil)
+- [Para quem é](#para-quem-é)
+- [Como usar (passo a passo)](#como-usar-passo-a-passo)
+- [Como funciona a nota de risco](#como-funciona-a-nota-de-risco)
+- [De onde vêm as informações](#de-onde-vêm-as-informações)
+- [Exemplos do dia a dia](#exemplos-do-dia-a-dia)
+- [Parte técnica (para desenvolvedores)](#parte-técnica-para-desenvolvedores)
 - [Equipe](#equipe)
-- [Licença](#licença)
+- [Licença e contato](#licença-e-contato)
 
 ---
 
-## Visão Geral
+## Em poucas palavras
 
-A **EcoTransparência** é uma plataforma digital inovadora que democratiza o acesso a informações sobre responsabilidade socioambiental das empresas brasileiras. Consolidamos dados públicos de múltiplas fontes governamentais, calculamos scores de risco ASG (Ambiental, Social e Governança), e oferecemos uma visão clara e atualizada do perfil de risco de cada organização.
+Hoje, para saber se uma empresa tem histórico de desmatamento, multas ambientais ou trabalho
+escravo, é preciso procurar em vários sites do governo (IBAMA, ICMBio, Ministério do Trabalho,
+Portal da Transparência), cada um diferente do outro. É demorado e confuso.
 
----
+A EcoTransparência faz esse trabalho por você: junta as informações dessas fontes oficiais e
+mostra, de forma simples, **uma nota de risco socioambiental** para a empresa pesquisada,
+junto com a lista de ocorrências que justificam essa nota.
 
-## Visão de Negócio
-
-### O Problema
-
-O Brasil enfrenta um desafio crítico na gestão de informações socioambientais corporativas:
-
-1. **Fragmentação de Dados**: Informações críticas sobre sustentabilidade estão espalhadas em múltiplos portais governamentais (IBAMA, ICMBio, Ministério do Trabalho, Portal de Dados Abertos), cada um com formatos e interfaces distintas.
-
-2. **Dificuldade de Acesso**: Para avaliar o risco socioambiental de uma empresa, é necessário consultar manualmente diversas bases de dados, interpretar formatos diferentes e consolidar informações de forma manual.
-
-3. **Tomada de Decisão Prejudicada**: Instituições financeiras, investidores e parceiros comerciais frequentemente tomam decisões com base em informações incompletas ou desatualizadas, aumentando a exposição a riscos reputacionais, legais e financeiros.
-
-4. **Falta de Padronização**: Não existe um score padronizado que permita comparar o perfil de risco socioambiental entre diferentes empresas de forma objetiva.
-
-5. **Barreiras para Pequenos Atores**: Pequenas empresas e organizações não têm recursos para realizar due diligence socioambiental completa de seus parceiros e fornecedores.
-
-### Solução
-
-A EcoTransparência oferece uma **plataforma centralizada e gratuita** que resolve esses problemas através de:
-
-#### Consolidação Automatizada
-Agregamos dados de múltiplas fontes governamentais oficiais em uma única interface, eliminando a necessidade de consultas manuais em diversos portais.
-
-#### Score ASG Calculado
-Transformamos dados brutos em um **score de risco de 0 a 100 pontos**, classificado em quatro níveis:
-
-| Faixa | Nível | Significado |
-|-------|-------|-------------|
-| 0-25 | **Baixo** | Pouco ou nenhum registro de ocorrências |
-| 26-50 | **Médio** | Algumas ocorrências de menor gravidade |
-| 51-75 | **Alto** | Múltiplas ocorrências ativas ou de maior gravidade |
-| 76-100 | **Crítico** | Histórico grave com múltiplas infrações ativas |
-
-
-#### Atualização Contínua
-Os dados são sincronizados periodicamente com as bases governamentais, garantindo informações atualizadas.
-
-### Público-Alvo
-
-| Segmento | Necessidade | Benefício |
-|----------|-------------|-----------|
-| **Instituições Financeiras** | Avaliar riscos na concessão de crédito | Redução de exposição a clientes com passivos ambientais |
-| **Empresas** | Conhecer situação de parceiros e fornecedores | Due diligence automatizada na cadeia de suprimentos |
-| **Órgãos Reguladores** | Monitorar conformidade setorial | Visão consolidada para fiscalização |
-| **Investidores** | Avaliar sustentabilidade de investimentos | Apoio a decisões ESG informadas |
-| **ONGs e Pesquisadores** | Acompanhar questões socioambientais | Acesso facilitado a dados públicos |
-| **Cidadãos** | Conhecer práticas de empresas | Empoderamento para consumo consciente |
-
-### Proposta de Valor
-
-1. **Gratuidade**: Acesso livre a informações que são públicas por natureza
-2. **Simplicidade**: Interface intuitiva com busca por CNPJ
-3. **Confiabilidade**: Dados exclusivamente de fontes governamentais oficiais
-4. **Transparência**: Metodologia de cálculo do score é pública e auditável
-5. **Completude**: Consolidação de múltiplas categorias de ocorrências
-
-### Fontes de Dados
-
-A plataforma integra dados das seguintes fontes oficiais:
-
-#### Ambiental IBAMA
-- **Embargos**: Áreas embargadas por desmatamento ilegal ou outras infrações ambientais
-- **Autos de Infração**: Multas e autuações por descumprimento da legislação ambiental
-- **Dados incluem**: Localização (município/UF), bioma afetado, área embargada
-#### Ambiental ICMBio
-- **Processos Administrativos**: Infrações em unidades de conservação
-- **Autos de Infração**: Autuações relacionadas à fauna, flora e áreas protegidas
-- **Dados incluem**: Tipo de infração, gravidade, enquadramento legal
-
-#### Trabalhista
-- **Lista Suja do Trabalho Escravo**: Empregadores flagrados submetendo trabalhadores a condições análogas à escravidão
-- **Autuações**: Infrações por condições de trabalho degradantes
-- **Fonte**: Ministério do Trabalho e Emprego
-
-#### Administrativo
-- **CEIS/CNEP**: Cadastro de empresas inidôneas e sancionadas
-- **Impedimentos**: Empresas impedidas de contratar com a administração pública
-- **Fonte**: Portal de Dados Abertos do Governo Federal
-
-### Metodologia do Score ASG
-
-O Score ASG (Ambiental, Social e Governança) é calculado através de uma metodologia ponderada:
-
-#### Composição do Score
-
-```
-Score Final = Σ (Score da Fonte × Peso da Fonte)
-```
-
-Cada fonte de dados possui:
-- **Quantidade de Ocorrências**: Número total de registros
-- **Peso da Fonte**: Importância relativa na composição (ex: 0.4 para IBAMA, 0.3 para ICMBio)
-- **Score por Fonte**: Pontuação baseada na quantidade e gravidade das ocorrências
-- **Score Ponderado**: Score da fonte multiplicado pelo seu peso
-
-#### Fatores Considerados
-
-Para cada ocorrência, quando disponíveis:
-- **Data**: Ocorrências mais recentes têm maior impacto
-- **Status**: Ocorrências ativas pesam mais que regularizadas
-- **Gravidade**: Influencia diretamente o score
-- **Área Afetada**: Extensão do dano ambiental
-- **Valor da Multa**: Indicador de gravidade
-- **Bioma**: Infrações em biomas protegidos podem ter peso adicional
-
-#### Exemplo de Cálculo
-
-| Fonte | Ocorrências | Peso | Score | Ponderado |
-|-------|-------------|------|-------|-----------|
-| IBAMA | 2 | 0.4 | 30 | 12.0 |
-| ICMBio | 1 | 0.3 | 20 | 6.0 |
-| Trabalhista | 0 | 0.2 | 0 | 0.0 |
-| Administrativo | 1 | 0.1 | 25 | 2.5 |
-| **Total** | | | | **20.5** |
-
-Resultado: Score 20.5 → Nível de Risco: **Baixo**
-
-### Casos de Uso
-
-#### UC01: Consulta de Fornecedor
-Uma empresa de varejo deseja contratar um novo fornecedor de madeira. Antes de fechar contrato, consulta o CNPJ na EcoTransparência e descobre que o fornecedor possui 3 embargos ativos por desmatamento na Amazônia, com score de risco 78 (Crítico). A empresa decide não prosseguir com a contratação.
-
-#### UC02: Análise de Crédito
-Um banco recebe pedido de financiamento de uma mineradora. A consulta na EcoTransparência revela múltiplas autuações do IBAMA totalizando R$ 2.5 milhões em multas. O analista de crédito inclui essa informação na avaliação de risco, ajustando as condições do financiamento.
-
-#### UC03: Due Diligence para Investimento
-Um fundo de investimento ESG analisa potencial aquisição de participação em empresa do agronegócio. A EcoTransparência mostra score 12 (Baixo), sem ocorrências nos últimos 5 anos. O relatório positivo é incluído no memorando de investimento.
-
-#### UC04: Monitoramento de Cadeia de Suprimentos
-Uma multinacional precisa reportar riscos ESG de sua cadeia de suprimentos. Utiliza a EcoTransparência para consultar periodicamente seus 200 principais fornecedores brasileiros, gerando alertas automáticos quando há mudança significativa no score.
+> A nota é chamada de **Score ASG** (Ambiental, Social e Governança) — uma forma padronizada
+> de medir o "risco socioambiental" de uma empresa.
 
 ---
 
-## Visão Técnica
+## Por que isso é útil
 
-### Arquitetura da Aplicação
+- **Informação reunida:** em vez de consultar vários portais, você pesquisa uma vez só.
+- **Fácil de entender:** uma nota de 0 a 100 e uma classificação (Baixo, Médio, Alto, Crítico).
+- **Confiável:** os dados vêm apenas de fontes oficiais do governo.
+- **Gratuito e aberto:** as informações são públicas; aqui elas ficam acessíveis a qualquer um.
+- **Transparente:** a forma de calcular a nota é explicada e pode ser conferida.
 
-A EcoTransparência Frontend é uma **Single Page Application (SPA)** construída com Angular 21, seguindo uma arquitetura baseada em componentes com separação clara de responsabilidades.
+---
+
+## Para quem é
+
+| Quem | Para quê |
+|------|----------|
+| **Bancos e financeiras** | Avaliar o risco antes de conceder crédito a uma empresa |
+| **Empresas** | Verificar fornecedores e parceiros antes de fechar negócio |
+| **Investidores** | Apoiar decisões de investimento responsável (ESG) |
+| **Órgãos reguladores** | Acompanhar a conformidade de setores e empresas |
+| **ONGs e pesquisadores** | Acompanhar questões socioambientais com dados públicos |
+| **Cidadãos** | Conhecer as práticas das empresas e consumir de forma consciente |
+
+---
+
+## Como usar (passo a passo)
+
+1. Acesse https://ecotransparencia-d786e.web.app
+2. Digite o **CNPJ** da empresa no campo de busca (com ou sem pontuação).
+3. Clique em **Pesquisar**.
+4. Veja o resultado. Há três situações possíveis:
+   - **Empresa com registros:** aparece a **nota de risco** e a lista de ocorrências.
+   - **Empresa sem registros:** aparece a mensagem *"Nenhum registro encontrado para a entidade pesquisada"* (a empresa existe, mas não tem pendências socioambientais nas bases consultadas).
+   - **CNPJ inativo:** aparece o aviso de *"CNPJ inativo"* — a empresa está irregular ou baixada na Receita Federal, então a análise não se aplica.
+
+---
+
+## Como funciona a nota de risco
+
+A nota vai de **0 a 100** — **quanto maior, maior o risco** — e é classificada em quatro níveis:
+
+| Nota | Nível | O que significa |
+|------|-------|-----------------|
+| 0–25 | **Baixo** | Pouco ou nenhum registro de ocorrências |
+| 26–50 | **Médio** | Algumas ocorrências de menor gravidade |
+| 51–75 | **Alto** | Várias ocorrências ativas ou de maior gravidade |
+| 76–100 | **Crítico** | Histórico grave, com várias infrações ativas |
+
+A nota não é um simples "número de multas". Ela leva em conta, para cada ocorrência:
+
+- **Gravidade** e tipo (uma infração ambiental pesa mais que uma administrativa);
+- **Se ainda está ativa** (pendências ativas pesam mais que regularizadas);
+- **Há quanto tempo aconteceu** (fatos recentes pesam mais);
+- A **fonte** do registro (cada base tem um peso na composição final).
+
+> A metodologia completa fica no site, na página **Metodologia do Score**, e no arquivo
+> [`docs/METODOLOGIA_SCORE.md`](docs/METODOLOGIA_SCORE.md).
+
+---
+
+## De onde vêm as informações
+
+Todos os dados são **públicos** e vêm de fontes oficiais:
+
+- **IBAMA (Ambiental):** áreas embargadas por desmatamento e multas ambientais.
+- **ICMBio (Ambiental):** infrações em unidades de conservação (fauna, flora, áreas protegidas).
+- **Ministério do Trabalho (Trabalhista):** a "Lista Suja" do trabalho escravo e autuações por condições degradantes.
+- **Portal da Transparência (Administrativo):** empresas inidôneas, sancionadas ou impedidas de contratar com o poder público (CEIS, CNEP, CEPIM).
+
+Os dados são consultados nas bases oficiais para refletir a situação mais atual possível.
+
+---
+
+## Exemplos do dia a dia
+
+- **Escolha de fornecedor:** uma rede de varejo vai contratar um fornecedor de madeira. Antes,
+  consulta o CNPJ e descobre 3 embargos ativos por desmatamento (nota 78, Crítico). Decide não fechar.
+- **Análise de crédito:** um banco recebe pedido de financiamento de uma mineradora. A consulta
+  mostra autuações do IBAMA somando milhões em multas, e o banco ajusta as condições do crédito.
+- **Investimento responsável:** um fundo ESG avalia uma empresa do agronegócio. A consulta mostra
+  nota 12 (Baixo), sem ocorrências recentes — um sinal positivo para o investimento.
+- **Acompanhamento de fornecedores:** uma multinacional consulta periodicamente seus principais
+  fornecedores e fica atenta a mudanças na nota de risco.
+
+---
+
+# Parte técnica (para desenvolvedores)
+
+> A partir daqui o conteúdo é voltado a quem vai instalar, rodar ou contribuir com o código.
+
+## Visão geral da arquitetura
+
+A EcoTransparência é uma **Single Page Application (SPA)** feita em **Angular 21**. O site é
+publicado no **Firebase Hosting**, que também encaminha as chamadas de API (`/api/**`) para um
+back-end hospedado no **Google Cloud Run**. A autenticação usa o **Firebase Authentication**.
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -203,14 +160,13 @@ A EcoTransparência Frontend é uma **Single Page Application (SPA)** construíd
 │  └─────────────┘  └─────────────┘  └─────────────┘              │
 │  ┌─────────────────────────────────────────────────┐            │
 │  │         DocumentValidationService               │            │
-│  │         (CPF/CNPJ validation with check digits) │            │
+│  │         (validação de CPF/CNPJ com dígitos)     │            │
 │  └─────────────────────────────────────────────────┘            │
 ├─────────────────────────────────────────────────────────────────┤
 │                         MODELS                                  │
 │  Entity, Occurrence, SearchResult, AsgScore, SituacaoCadastral  │
 └─────────────────────────────────────────────────────────────────┘
-                              │
-                              │ HTTP/REST
+                              │  HTTP/REST
                               ▼
 ┌─────────────────────────────────────────────────────────────────┐
 │                    FIREBASE HOSTING                             │
@@ -219,320 +175,248 @@ A EcoTransparência Frontend é uma **Single Page Application (SPA)** construíd
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│                    BACKEND API                                  │
-│                 (Google Cloud Run)                              │
-│     https://ecotransparencia-api-xxx.us-central1.run.app        │
+│                    BACKEND API (Google Cloud Run)               │
+│                    região: southamerica-east1                   │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-### Stack Tecnológico
+## Stack tecnológico
 
-#### Core Framework
+**Framework e linguagem**
+
 | Tecnologia | Versão | Propósito |
 |------------|--------|-----------|
-| **Angular** | 21.0.0 | Framework principal para SPA |
+| **Angular** | 21.0.0 | Framework principal da SPA |
 | **TypeScript** | 5.9.2 | Linguagem com tipagem estática |
-| **RxJS** | 7.8.0 | Programação reativa e observables |
+| **RxJS** | 7.8.0 | Programação reativa (observables) |
 
-#### Autenticação e Backend
+**Autenticação e hospedagem**
+
 | Tecnologia | Versão | Propósito |
 |------------|--------|-----------|
 | **Firebase** | 12.6.0 | Autenticação e hosting |
-| **@angular/fire** | 20.0.1 | SDK Angular para Firebase |
+| **@angular/fire** | 21.0.0-rc.0 | SDK do Firebase para Angular |
 
-#### Testes
-| Tecnologia | Versão | Propósito |
-|------------|--------|-----------|
-| **Vitest** | 4.0.8 | Framework de testes unitários |
-| **Pact** | 16.0.2 | Contract testing (Consumer-Driven) |
-| **jsdom** | 27.1.0 | DOM virtual para testes |
+**Testes**
 
-#### Qualidade de Código
-| Ferramenta | Configuração | Propósito |
-|------------|--------------|-----------|
-| **TypeScript Strict Mode** | `strict: true` | Tipagem rigorosa |
-| **Prettier** | 100 cols, single quotes | Formatação consistente |
-| **Angular Strict Templates** | Habilitado | Validação de templates |
+| Tecnologia | Propósito |
+|------------|-----------|
+| **Vitest** | Testes unitários |
+| **Pact** | Contract testing (compatibilidade frontend ↔ backend) |
+| **Playwright** | Testes end-to-end em navegador real |
 
-### Estrutura do Projeto
+**Qualidade de código:** TypeScript em modo estrito, Prettier (100 colunas, aspas simples) e
+templates estritos do Angular.
+
+## Estrutura do projeto
 
 ```
 src/
 ├── app/
 │   ├── components/
 │   │   └── search/                 # Componente de busca principal
-│   │       ├── search.ts           # Lógica do componente
-│   │       ├── search.html         # Template com resultados
-│   │       ├── search.css          # Estilos do componente
-│   │       └── search.spec.ts      # Testes unitários
-│   │
 │   ├── pages/
-│   │   ├── home/                   # Página inicial
-│   │   ├── login/                  # Autenticação admin
+│   │   ├── home/                   # Página inicial (pública e dashboard)
+│   │   ├── login/                  # Autenticação
 │   │   ├── admin/                  # Painel administrativo
 │   │   └── metodologia/            # Explicação do score
-│   │
 │   ├── services/
-│   │   ├── api.service.ts          # Comunicação com backend
+│   │   ├── api.service.ts          # Comunicação com o backend
 │   │   ├── auth.service.ts         # Autenticação Firebase
 │   │   ├── score.service.ts        # Cálculo e formatação de scores
-│   │   └── document-validation.service.ts  # Validação CPF/CNPJ
-│   │
-│   ├── guards/
-│   │   └── auth.guard.ts           # Proteção de rotas admin
-│   │
-│   ├── models/
-│   │   └── entity.model.ts         # Interfaces TypeScript
-│   │
-│   ├── pact/
-│   │   └── api.service.pact.spec.ts  # Contract tests
-│   │
-│   ├── app.ts                      # Componente raiz
+│   │   └── document-validation.service.ts  # Validação de CPF/CNPJ
+│   ├── guards/                     # Proteção de rotas
+│   ├── models/                     # Interfaces TypeScript
 │   ├── app.routes.ts               # Configuração de rotas
 │   └── app.config.ts               # Configuração da aplicação
-│
-├── index.html                      # HTML principal
-├── main.ts                         # Bootstrap da aplicação
-└── styles.css                      # Estilos globais
+├── index.html
+├── main.ts
+└── styles.css
 ```
 
-### Decisões Arquiteturais
+Na raiz do projeto, além de `src/`:
 
-#### 1. Standalone Components (Angular 21)
-Optamos por componentes standalone ao invés de NgModules, simplificando a estrutura e melhorando tree-shaking:
-
-```typescript
-@Component({
-  selector: 'app-search',
-  standalone: true,
-  imports: [CommonModule, FormsModule],
-  templateUrl: './search.html',
-})
-export class Search { }
+```
+e2e/                                # Testes end-to-end (Playwright)
+├── login.spec.ts                   # Login com credenciais válidas → área logada
+├── search-cnpj.spec.ts             # Busca de CNPJ → relatório com score
+├── search-cnpj-inativo.spec.ts     # Busca de CNPJ inapto → "CNPJ inativo"
+└── search-cnpj-sem-registros.spec.ts  # Busca de CNPJ sem ASG → "Nenhum registro encontrado"
+playwright.config.ts                # Config E2E (modo headed, baseURL)
+server/                             # API mock local (Express) para desenvolvimento
 ```
 
-#### 2. Signals para Estado Reativo
-Utilizamos Signals do Angular para gerenciamento de estado local, substituindo BehaviorSubjects:
+## Principais decisões de arquitetura
 
-```typescript
-searchTerm = signal('');
-isLoading = signal(false);
-searchResult = signal<SearchResult | null>(null);
-```
+- **Componentes standalone (Angular 21):** sem NgModules, estrutura mais simples e melhor tree-shaking.
+- **Signals para estado reativo:** gerenciamento de estado local com `signal()`, dispensando `subscribe/unsubscribe` e com melhor performance.
+- **Validação de documentos no frontend:** CPF/CNPJ são validados (inclusive dígitos verificadores) antes de chamar o backend, dando feedback imediato e evitando requisições inválidas.
+- **Firebase Hosting com proxy para o Cloud Run:** chamadas `/api/**` são encaminhadas ao backend, evitando problemas de CORS e usando uma URL única com SSL automático.
+- **Contract testing com Pact:** garante que frontend e backend continuem compatíveis, detectando mudanças que quebrariam a integração.
 
-**Benefícios:**
-- Melhor performance com fine-grained reactivity
-- Código mais limpo sem necessidade de subscribe/unsubscribe
-- Integração nativa com change detection
+## Contrato de API
 
-#### 3. Validação de Documentos no Frontend
-Implementamos validação completa de CPF/CNPJ com verificação de dígitos no frontend:
-
-```typescript
-// Validação CNPJ com dígitos verificadores
-const weights1 = [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
-let sum = 0;
-for (let i = 0; i < 12; i++) {
-  sum += parseInt(stripped[i], 10) * weights1[i];
-}
-```
-
-**Motivação:**
-- Feedback imediato ao usuário
-- Redução de requisições inválidas ao backend
-- Aplicação automática de máscara durante digitação
-
-#### 4. Firebase Hosting com Proxy para Cloud Run
-Configuramos Firebase Hosting para fazer proxy de requisições `/api/**` para o backend no Cloud Run:
-
-```json
-{
-  "hosting": {
-    "rewrites": [
-      {
-        "source": "/api/**",
-        "run": {
-          "serviceId": "ecotransparencia-api",
-          "region": "us-central1"
-        }
-      }
-    ]
-  }
-}
-```
-
-**Benefícios:**
-- Evita problemas de CORS
-- URL única para frontend e API
-- Certificado SSL gerenciado automaticamente
-
-#### 5. Contract Testing com Pact
-Utilizamos Pact para garantir compatibilidade entre frontend e backend:
-
-```typescript
-const provider = new PactV4({
-  consumer: 'EcoTransparenciaFrontendV2',
-  provider: 'EcoTransparenciaBackend',
-});
-```
-
-**Benefícios:**
-- Contratos versionados e auditáveis
-- Detecção precoce de breaking changes
-- Documentação viva da API
-
-### Contrato de API
-
-#### Endpoint: Busca por Documento
+Busca por documento:
 
 ```
 GET /api/search/document?document={cnpj}&type=cnpj
 ```
 
-**Response (200 OK) - Encontrado:**
-```json
+Resposta quando a empresa **é encontrada** (resumo dos campos):
+
+```
 {
   "found": true,
   "entity": {
-    "id": "1",
     "name": "Empresa Verde Sustentável Ltda",
     "document": "11222333000181",
     "documentType": "cnpj",
     "score": 45,
     "riskLevel": "Medio",
-    "occurrences": [...],
     "asgScore": {
       "score": 45,
       "riskLevel": "Medio",
       "totalOcorrencias": 3,
-      "breakdown": [
-        {
-          "fonte": "Embargos IBAMA",
-          "peso": 0.5,
-          "quantidadeOcorrencias": 2,
-          "score": 30,
-          "scorePonderado": 15.0
-        }
-      ]
+      "breakdown": [ ... por fonte: fonte, peso, quantidade, score, scorePonderado ]
     },
-    "ocorrencias": {
-      "embargos": [...],
-      "autosInfracao": [...]
-    }
+    "ocorrencias": { "embargos": [ ... ], "autosInfracao": [ ... ] }
   }
 }
 ```
 
-**Response (200 OK) - CNPJ Inativo:**
-```json
+Resposta quando o **CNPJ está inativo** na Receita:
+
+```
 {
   "found": false,
   "bloqueadoPorSituacaoCadastral": true,
   "situacaoCadastral": {
-    "dataConsulta": "2024-12-10T10:30:00Z",
-    "mensagem": "CNPJ consta como inativo na Receita Federal",
     "situacao": "INATIVA",
-    "valido": false
+    "valido": false,
+    "mensagem": "CNPJ consta como inativo na Receita Federal"
   }
 }
 ```
 
-**Response (200 OK) - Não Encontrado:**
-```json
-{
-  "found": false
-}
+Resposta quando **nada é encontrado**:
+
+```
+{ "found": false }
 ```
 
-### Testes
+## Como rodar localmente
 
-#### Testes Unitários
+**Pré-requisitos:** Node.js 20+ e npm 10+.
+
 ```bash
-npm test
-```
+# 1. Clonar o repositório
+git clone https://github.com/liviabadu/ecotransparencia.git
 
-Cobertura inclui:
-- `DocumentValidationService`: Validação de CPF/CNPJ
-- `ScoreService`: Cálculo de níveis de risco
-- `Search Component`: Comportamento do formulário
-
-#### Contract Tests (Pact)
-```bash
-npm run test:pact
-```
-
-Gera contratos em `/pacts/` para validação no backend.
-
-### Deploy e Infraestrutura
-
-#### Ambiente de Produção
-- **Frontend**: Firebase Hosting (`ecotransparencia-d786e.web.app`)
-- **Backend**: Google Cloud Run (`us-central1`)
-- **Autenticação**: Firebase Authentication
-
-#### Pipeline de Deploy
-```bash
-# Build de produção
-npm run build
-
-# Deploy no Firebase
-firebase deploy --only hosting
-```
-
-#### Variáveis de Ambiente
-Configuradas em `app.config.ts`:
-- Firebase API Key
-- Firebase Project ID
-- Firebase Auth Domain
-
----
-
-## Como Executar
-
-### Pré-requisitos
-- Node.js 20+
-- npm 10+
-
-### Instalação
-```bash
-# Clone o repositório
-git clone https://github.com/seu-usuario/ecotransparencia.git
-
-# Instale dependências
+# 2. Instalar dependências
 npm install
 
-# Execute em desenvolvimento
+# 3. Rodar em desenvolvimento
 npm start
 ```
 
-### Scripts Disponíveis
+**Scripts disponíveis:**
+
 | Comando | Descrição |
 |---------|-----------|
 | `npm start` | Servidor de desenvolvimento |
 | `npm run build` | Build de produção |
-| `npm test` | Executa testes unitários |
-| `npm run test:pact` | Executa contract tests |
+| `npm test` | Testes unitários |
+| `npm run test:pact` | Contract tests (Pact) |
+| `npm run e2e` | Testes end-to-end (Playwright, navegador visível) |
+| `npm run e2e:headed` | Testes E2E forçando modo headed |
+| `npm run e2e:report` | Abre o relatório HTML do último E2E |
+
+## Testes
+
+**Unitários** — `npm test`. Cobrem, entre outros, a validação de CPF/CNPJ
+(`DocumentValidationService`), o cálculo de níveis de risco (`ScoreService`) e o comportamento
+do formulário de busca.
+
+**Contract tests (Pact)** — `npm run test:pact`. Geram contratos em `/pacts/` para validar a API.
+
+**End-to-end (Playwright)** — testes em navegador real (modo *headed*, janela visível),
+executados contra o site publicado. Como abrem uma janela, rode em um ambiente com tela.
+
+```bash
+# Executa TODOS os testes E2E
+npm run e2e
+
+# Rodar apenas um arquivo
+npx playwright test e2e/login.spec.ts
+
+# Rodar pelo nome do teste (filtro de texto)
+npx playwright test -g "score 35"
+
+# Relatório HTML da última execução
+npm run e2e:report
+```
+
+Cenários cobertos:
+
+- **`e2e/login.spec.ts`** — clica em *Entrar*, informa e-mail e senha de uma conta de teste e
+  valida que, com credenciais corretas, o portal navega para a **área logada** (dashboard com a
+  saudação "Olá, …"). Usa **Firebase Auth real**; as credenciais podem ser sobrescritas por
+  `E2E_LOGIN_EMAIL` / `E2E_LOGIN_PASSWORD` (use uma conta de teste dedicada):
+  ```bash
+  E2E_LOGIN_EMAIL=conta@teste.com E2E_LOGIN_PASSWORD='senha' npx playwright test e2e/login.spec.ts
+  ```
+- **`e2e/search-cnpj.spec.ts`** — pesquisa o CNPJ `32.102.290/0001-70` e valida que o relatório exibe **Score de risco 35** (faixa *Médio*).
+- **`e2e/search-cnpj-inativo.spec.ts`** — pesquisa o CNPJ inapto `02.698.412/0001-72` e valida o card **"CNPJ inativo"** (situação *Inapta*), sem relatório de score.
+- **`e2e/search-cnpj-sem-registros.spec.ts`** — pesquisa o CNPJ válido sem pendências `00.000.000/0001-91` e valida a mensagem **"Nenhum registro encontrado para a entidade pesquisada"**.
+
+> ⚠️ **Importante:** os testes E2E rodam contra o **site publicado** (`https://ecotransparencia-d786e.web.app`),
+> porque a nota real desses CNPJs é produzida pelo backend no Cloud Run — o mock local
+> (`server/index.js`) não reproduz esses valores. Consequências:
+> - exige rede e o Cloud Run "acordado" (a primeira chamada pode demorar — *cold start*);
+> - a nota deriva de dados públicos consultados ao vivo (IBAMA/MTE); se essas bases mudarem, o valor `35` pode variar e o teste precisará de ajuste.
+>
+> Para apontar para outro ambiente, use a variável `E2E_BASE_URL`
+> (ex.: `E2E_BASE_URL=http://localhost:4200 npm run e2e`).
+
+**Pré-requisito (primeira execução):** baixe o navegador usado pelo Playwright.
+
+```bash
+npx playwright install chromium
+```
+
+## Deploy
+
+- **Frontend:** Firebase Hosting (`ecotransparencia-d786e.web.app`)
+- **Backend:** Google Cloud Run (região `southamerica-east1`)
+- **Autenticação:** Firebase Authentication
+
+```bash
+# Build de produção
+npm run build
+
+# Deploy do site no Firebase
+firebase deploy --only hosting
+```
+
+As configurações do Firebase (API Key, Project ID, Auth Domain) ficam em `app.config.ts`.
 
 ---
 
 ## Equipe
 
-O projeto é desenvolvido pela turma do 4º semestre de Análise e Desenvolvimento de Sistemas do Campus Taguatinga:
+Projeto desenvolvido pela turma do 5º semestre de Análise e Desenvolvimento de Sistemas do
+Campus Taguatinga:
 
 - Livia Maria Badu de Oliveira
 - Matheus Henrique Viana da Silva
-- Kaua Nascimento      
+- Kaua Nascimento
+- Nicole Teixeira
 - Rafael Lopes
-- Nicole
 
 ---
 
-## Licença
+## Licença e contato
 
-Este projeto é desenvolvido como parte do Projeto Integrador do curso de Análise e Desenvolvimento de Sistemas.
+Projeto desenvolvido como parte do Projeto Integrador do curso de Análise e Desenvolvimento de Sistemas.
 
----
-
-## Contato
-
-Para mais informações: liviabadu@gmail.com
+Contato: liviabadu@gmail.com

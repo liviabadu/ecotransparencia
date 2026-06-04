@@ -64,16 +64,16 @@ describe('Login', () => {
     const fixture = TestBed.createComponent(Login);
     await fixture.whenStable();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Área Administrativa');
+    expect(compiled.querySelector('h1')?.textContent).toContain('Entrar');
   });
 
-  it('should have back link to home page', async () => {
+  it('should have a close button that returns to home page', async () => {
     const fixture = TestBed.createComponent(Login);
     await fixture.whenStable();
     const compiled = fixture.nativeElement as HTMLElement;
-    const backLink = compiled.querySelector('.back-link');
-    expect(backLink).toBeTruthy();
-    expect(backLink?.textContent).toContain('Voltar');
+    const closeBtn = compiled.querySelector('.auth-modal__close');
+    expect(closeBtn).toBeTruthy();
+    expect(closeBtn?.getAttribute('aria-label')).toBe('Fechar');
   });
 
   it('should update email signal on input change', () => {
