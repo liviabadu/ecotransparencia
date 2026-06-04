@@ -66,7 +66,9 @@ export class RelatorioConformidadeComponent {
     this.exportando.set(true);
     try {
       await this.pdfExport.exportElementToPdf(el, this.nomeArquivoPdf());
-    } catch {
+    } catch (err) {
+      // Mantém o diagnóstico acessível em produção (o erro real ia silenciado).
+      console.error('[relatorio-conformidade] Falha ao exportar PDF:', err);
       this.erroExport.set('Não foi possível gerar o PDF. Tente novamente ou use a impressão.');
     } finally {
       this.exportando.set(false);

@@ -21,8 +21,15 @@ export class PdfExportService {
    * Lança em caso de falha para o componente exibir feedback ao usuário.
    */
   async exportElementToPdf(element: HTMLElement, fileName: string): Promise<void> {
+    // Limita a altura do canvas (Safari rejeita canvas > ~16k px); relatórios muito
+    // longos reduzem a escala em vez de falhar.
+    const MAX_CANVAS_HEIGHT_PX = 14000;
+    const baseScale = Math.min(2, window.devicePixelRatio || 1.5);
+    const heightCapScale = MAX_CANVAS_HEIGHT_PX / Math.max(1, element.scrollHeight);
+    const scale = Math.max(0.75, Math.min(baseScale, heightCapScale));
+
     const canvas = await html2canvas(element, {
-      scale: Math.min(2, window.devicePixelRatio || 1.5),
+      scale,
       useCORS: true,
       backgroundColor: '#ffffff',
       logging: false,

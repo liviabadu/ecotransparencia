@@ -163,9 +163,13 @@
 }
 
 /* ---- Faixa-resumo (hero) ------------------------------------------------- */
+/* Atenção: html2canvas (exportação PDF) não suporta color-mix()/color(srgb …);
+   use apenas cores rgba()/hex concretas neste componente. */
 .doc-hero {
   --risk: #16a34a;
   --risk-soft: #f0fdf4;
+  --risk-border: rgba(22, 163, 74, 0.28);
+  --risk-glow: rgba(22, 163, 74, 0.4);
   display: flex;
   align-items: center;
   gap: 20px;
@@ -173,7 +177,7 @@
   margin-bottom: 24px;
   border-radius: 14px;
   background: var(--risk-soft);
-  border: 1px solid color-mix(in srgb, var(--risk) 28%, transparent);
+  border: 1px solid var(--risk-border);
 }
 
 .doc-hero__score {
@@ -187,7 +191,7 @@
   justify-content: center;
   color: #fff;
   background: var(--risk);
-  box-shadow: 0 6px 16px color-mix(in srgb, var(--risk) 40%, transparent);
+  box-shadow: 0 6px 16px var(--risk-glow);
   line-height: 1;
 }
 
@@ -239,22 +243,32 @@
 .doc-risk--baixo {
   --risk: #16a34a;
   --risk-soft: #f0fdf4;
+  --risk-border: rgba(22, 163, 74, 0.28);
+  --risk-glow: rgba(22, 163, 74, 0.4);
 }
 .doc-risk--medio {
   --risk: #d97706;
   --risk-soft: #fffbeb;
+  --risk-border: rgba(217, 119, 6, 0.28);
+  --risk-glow: rgba(217, 119, 6, 0.4);
 }
 .doc-risk--alto {
   --risk: #ea580c;
   --risk-soft: #fff7ed;
+  --risk-border: rgba(234, 88, 12, 0.28);
+  --risk-glow: rgba(234, 88, 12, 0.4);
 }
 .doc-risk--critico {
   --risk: #dc2626;
   --risk-soft: #fef2f2;
+  --risk-border: rgba(220, 38, 38, 0.28);
+  --risk-glow: rgba(220, 38, 38, 0.4);
 }
 .doc-risk--na {
   --risk: #64748b;
   --risk-soft: #f8fafc;
+  --risk-border: rgba(100, 116, 139, 0.28);
+  --risk-glow: rgba(100, 116, 139, 0.4);
 }
 
 /* Section titles */
