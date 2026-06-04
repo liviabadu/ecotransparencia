@@ -345,7 +345,9 @@ export class RelatorioConformidadeService {
       // Aceita "dd/mm/aaaa" já formatado vindo da API.
       return typeof date === 'string' ? date : null;
     }
-    return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    // Datas de ocorrência são datas de calendário (sem hora). Formata em UTC para
+    // evitar que "2023-06-15" (meia-noite UTC) recue um dia em fusos negativos.
+    return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'UTC' });
   }
 
   private formatPeriodo(inicio?: string, fim?: string): string | undefined {
