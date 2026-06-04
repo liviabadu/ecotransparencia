@@ -8,7 +8,7 @@ administrativos registrados em órgãos do governo — tudo reunido em um só lu
 em uma **nota de risco de 0 a 100**.
 
 ---
-**O projeto é desenvolvido pela turma do 5º semestre de Análise e Desenvolvimento de Sistemas do Campus Taguatinga?**
+**O projeto é desenvolvido pela turma do 5º semestre de Análise e Desenvolvimento de Sistemas do Campus Taguatinga.**
 
 - Livia Maria Badu de Oliveira
 - Kaua Nascimento
