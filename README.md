@@ -78,6 +78,9 @@ junto com a lista de ocorrências que justificam essa nota.
    - **Empresa com registros:** aparece a **nota de risco** e a lista de ocorrências.
    - **Empresa sem registros:** aparece a mensagem *"Nenhum registro encontrado para a entidade pesquisada"* (a empresa existe, mas não tem pendências socioambientais nas bases consultadas).
    - **CNPJ inativo:** aparece o aviso de *"CNPJ inativo"* — a empresa está irregular ou baixada na Receita Federal, então a análise não se aplica.
+5. Quando a empresa tem registros, logo abaixo do resultado aparece o **Relatório de
+   Conformidade Socioambiental**, um documento pronto para guardar ou compartilhar. Use os botões
+   **Imprimir** ou **Exportar PDF** para imprimir o relatório ou baixá-lo como arquivo PDF.
 
 ---
 
@@ -190,6 +193,13 @@ back-end hospedado no **Google Cloud Run**. A autenticação usa o **Firebase Au
 | **TypeScript** | 5.9.2 | Linguagem com tipagem estática |
 | **RxJS** | 7.8.0 | Programação reativa (observables) |
 
+**Geração de relatórios**
+
+| Tecnologia | Versão | Propósito |
+|------------|--------|-----------|
+| **html2canvas** | 1.4.1 | Rasteriza o relatório (HTML) em um canvas |
+| **jsPDF** | 2.5.2 | Monta o PDF A4 a partir do canvas e dispara o download |
+
 **Autenticação e hospedagem**
 
 | Tecnologia | Versão | Propósito |
@@ -220,6 +230,12 @@ src/
 │   │   ├── login/                  # Autenticação
 │   │   ├── admin/                  # Painel administrativo
 │   │   └── metodologia/            # Explicação do score
+│   ├── relatorio-conformidade/     # Relatório de Conformidade (documento + PDF)
+│   │   ├── relatorio-conformidade.component.*  # Renderização do documento
+│   │   ├── services/
+│   │   │   ├── relatorio-conformidade.service.ts  # Consolida dados da API no relatório
+│   │   │   └── pdf-export.service.ts              # Exportação em PDF (html2canvas + jsPDF)
+│   │   └── models/                 # View-models do relatório
 │   ├── services/
 │   │   ├── api.service.ts          # Comunicação com o backend
 │   │   ├── auth.service.ts         # Autenticação Firebase
@@ -241,7 +257,8 @@ e2e/                                # Testes end-to-end (Playwright)
 ├── login.spec.ts                   # Login com credenciais válidas → área logada
 ├── search-cnpj.spec.ts             # Busca de CNPJ → relatório com score
 ├── search-cnpj-inativo.spec.ts     # Busca de CNPJ inapto → "CNPJ inativo"
-└── search-cnpj-sem-registros.spec.ts  # Busca de CNPJ sem ASG → "Nenhum registro encontrado"
+├── search-cnpj-sem-registros.spec.ts  # Busca de CNPJ sem ASG → "Nenhum registro encontrado"
+└── export-pdf.spec.ts              # Exportação do relatório em PDF → download válido
 playwright.config.ts                # Config E2E (modo headed, baseURL)
 server/                             # API mock local (Express) para desenvolvimento
 ```
@@ -303,6 +320,67 @@ Resposta quando **nada é encontrado**:
 ```
 { "found": false }
 ```
+
+## Geração de relatórios (PDF)
+
+Quando a busca encontra registros, o site monta o **Relatório de Conformidade Socioambiental** —
+um documento com o score, a empresa consultada, as bases pesquisadas e as ocorrências agrupadas
+por fonte — que pode ser impresso ou exportado em PDF.
+
+Todo o processo acontece **no navegador**: o backend só fornece os dados da empresa; não existe
+serviço de geração de PDF no servidor.
+
+```
+Entity (resposta da API)
+        │
+        ▼  consolidação (RelatorioConformidadeService)
+RelatorioConformidade (view-model)
+        │
+        ▼  renderização (RelatorioConformidadeComponent)
+Documento HTML/CSS "de papel"
+        │
+        ▼  html2canvas (rasterização)
+Canvas (imagem do documento)
+        │
+        ▼  jsPDF (páginas A4 + download)
+relatorio-conformidade-{CNPJ}-{AAAA-MM-DD}.pdf
+```
+
+O pipeline tem três etapas, cada uma em um arquivo de `src/app/relatorio-conformidade/`:
+
+**1. Consolidação** — `services/relatorio-conformidade.service.ts`
+
+Transforma a `Entity` retornada pela API no view-model `RelatorioConformidade`. As ocorrências
+são agrupadas em quatro blocos fixos, um por fonte oficial (IBAMA, ICMBio, MTE e Portal da
+Transparência) — as quatro bases aparecem sempre na seção "bases pesquisadas", mesmo quando não
+têm ocorrências, para dar rastreabilidade ao que foi consultado. Datas, moeda (BRL) e áreas são
+formatadas em pt-BR; as datas usam `timeZone: 'UTC'` na formatação para que uma data como
+`2023-06-15` não "volte um dia" em fusos negativos como o do Brasil.
+
+**2. Renderização** — `relatorio-conformidade.component.{ts,html,css}`
+
+Componente standalone (signals + `computed`) que renderiza o relatório como um documento:
+cabeçalho com data de geração, score visual, dados da empresa, bases pesquisadas, blocos de
+ocorrências e o aviso de responsabilidade no rodapé. O CSS é pensado para papel (fundo branco,
+tipografia de documento) e **evita de propósito funções modernas de cor** como `color-mix()` e
+`oklch()` — o html2canvas não as entende e a exportação falharia. O botão **Imprimir** usa o
+`window.print()` nativo, com regras `@media print` que escondem a barra de ações e isolam o
+documento.
+
+**3. Exportação em PDF** — `services/pdf-export.service.ts`
+
+Ao clicar em **Exportar PDF**:
+
+1. O **html2canvas** rasteriza o nó do documento em um canvas. A escala é calculada para dar
+   nitidez (até 2× o device pixel ratio), mas limitada a ~14.000 px de altura — o Safari rejeita
+   canvas acima de ~16.000 px.
+2. O **jsPDF** cria um PDF A4 (210 × 297 mm, margens de 10 mm). Se o relatório não cabe em uma
+   página, o canvas é fatiado em blocos do tamanho da área útil e cada fatia vira uma página.
+3. O download é disparado com o nome `relatorio-conformidade-{CNPJ}-{AAAA-MM-DD}.pdf`.
+
+Durante a geração, o botão exibe "Gerando PDF…" e fica desabilitado; se algo falhar, uma
+mensagem de erro aparece no lugar do download. O fluxo completo é coberto pelo teste E2E
+`e2e/export-pdf.spec.ts` (veja [Testes](#testes)).
 
 ## Como rodar localmente
 
@@ -368,6 +446,10 @@ Cenários cobertos:
 - **`e2e/search-cnpj.spec.ts`** — pesquisa o CNPJ `32.102.290/0001-70` e valida que o relatório exibe **Score de risco 35** (faixa *Médio*).
 - **`e2e/search-cnpj-inativo.spec.ts`** — pesquisa o CNPJ inapto `02.698.412/0001-72` e valida o card **"CNPJ inativo"** (situação *Inapta*), sem relatório de score.
 - **`e2e/search-cnpj-sem-registros.spec.ts`** — pesquisa o CNPJ válido sem pendências `00.000.000/0001-91` e valida a mensagem **"Nenhum registro encontrado para a entidade pesquisada"**.
+- **`e2e/export-pdf.spec.ts`** — pesquisa o CNPJ `32.102.290/0001-70`, clica em **Exportar PDF**
+  e valida o download: nome `relatorio-conformidade-{CNPJ}-{AAAA-MM-DD}.pdf`, conteúdo iniciando
+  com os bytes `%PDF-` (PDF válido), tamanho acima de 10 KB e nenhum erro de renderização. O CNPJ
+  pode ser sobrescrito com a variável `E2E_CNPJ`.
 
 > ⚠️ **Importante:** os testes E2E rodam contra o **site publicado** (`https://ecotransparencia-d786e.web.app`),
 > porque a nota real desses CNPJs é produzida pelo backend no Cloud Run — o mock local
